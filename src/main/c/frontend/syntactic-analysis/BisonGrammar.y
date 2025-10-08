@@ -39,6 +39,8 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 	Expression * expression;
 	Factor * factor;
 	Program * program;
+	Condition condition;
+	Attribute * attributes;
 }
 
 /**
@@ -80,15 +82,6 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> EQUAL
 %token <token> NOT_EQUAL /* x!=10 */
 %token <token> RHO
-
-
-
-
-
-
-
-
-
 %token <token> UNKNOWN
 
 /** Non-terminals. */
@@ -96,9 +89,12 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <expression> expression
 %type <factor> factor
 %type <program> program
-%type <expression> condition
+%type <condition> condition
+%type <attributes> attributes
 %type <expression> column_list
 %type <expression> table
+%type <expression> input
+
 
 /**
  * Precedence and associativity.

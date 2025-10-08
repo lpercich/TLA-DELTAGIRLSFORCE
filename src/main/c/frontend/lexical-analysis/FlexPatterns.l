@@ -14,15 +14,15 @@
  * @see https://westes.github.io/flex/manual/Definitions-Section.html#Definitions-Section
  */
 
+extern CompilationStatus SymbolLexemeAction(TokenLabel label);
+extern CompilationStatus LogicalConditionLexemeAction(TokenLabel label);
+
 extern CompilationStatus ArithmeticOperatorLexemeAction(TokenLabel label);
 extern CompilationStatus EnterImportExpressionLexemeAction(FlexContext context);
-extern CompilationStatus EnterMultilineCommentLexemeAction(FlexContext context);
 extern CompilationStatus EOFLexemeAction();
 extern CompilationStatus IgnoredLexemeAction();
 extern CompilationStatus IntegerLexemeAction();
 extern CompilationStatus LeaveImportExpressionLexemeAction();
-extern CompilationStatus LeaveMultilineCommentLexemeAction();
-extern CompilationStatus ParenthesisLexemeAction(TokenLabel label);
 extern CompilationStatus SubexpressionLexemeAction();
 extern CompilationStatus UnknownLexemeAction();
 
@@ -34,7 +34,6 @@ extern CompilationStatus UnknownLexemeAction();
  * @see https://westes.github.io/flex/manual/Start-Conditions.html
  */
 %x IMPORT_EXPRESSION
-%x MULTILINE_COMMENT
 
 /**
  * Reusable patterns.
@@ -58,13 +57,18 @@ whitespace			[[:space:]]+
 <IMPORT_EXPRESSION>[^{}]+			{ return SubexpressionLexemeAction(); }
 <IMPORT_EXPRESSION>.				{ return UnknownLexemeAction(); }
 
-
 "{"                                 {return SymbolLexemeAction(OPEN_BRACE);}
 "}"                                 {return SymbolLexemeAction(CLOSE_BRACE);}
 "["									{ return SymbolLexemeAction(OPEN_BRACKETS); }
 "]"									{ return SymbolLexemeAction(CLOSE_BRACKETS); }
 "("									{ return SymbolLexemeAction(OPEN_PARENTHESIS); }
 ")"									{ return SymbolLexemeAction(CLOSE_PARENTHESIS); }
+":"									{ return SymbolLexemeAction(COLON); }
+","									{ return SymbolLexemeAction(COMMA); }
+"and"                               { return LogicalConditionLexemeAction(AND); }
+"or"                               { return LogicalConditionLexemeAction(OR); }
+
+
 
 [[:digit:]]+						{ return IntegerLexemeAction(); }
 

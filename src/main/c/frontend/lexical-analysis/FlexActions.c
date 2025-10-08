@@ -70,16 +70,6 @@ CompilationStatus EnterImportExpressionLexemeAction(FlexContext context) {
 	return IN_PROGRESS;
 }
 
-CompilationStatus EnterMultilineCommentLexemeAction(FlexContext context) {
-	if (_logIgnoredLexemes) {
-		Token * token = createToken(_lexicalAnalyzer, OPEN_COMMENT);
-		_logTokenAction(__FUNCTION__, token);
-		destroyToken(token);
-	}
-	enterLexicalAnalyzerContext(_lexicalAnalyzer, context);
-	return IN_PROGRESS;
-}
-
 CompilationStatus EOFLexemeAction() {
 	CompilationStatus status = IN_PROGRESS;
 	Token * token = createToken(_lexicalAnalyzer, 0);
@@ -125,17 +115,15 @@ CompilationStatus LeaveImportExpressionLexemeAction() {
 	return IN_PROGRESS;
 }
 
-CompilationStatus LeaveMultilineCommentLexemeAction() {
-	leaveLexicalAnalyzerContext(_lexicalAnalyzer);
-	if (_logIgnoredLexemes) {
-		Token * token = createToken(_lexicalAnalyzer, CLOSE_COMMENT);
-		_logTokenAction(__FUNCTION__, token);
-		destroyToken(token);
-	}
+CompilationStatus SymbolLexemeAction(FlexContext context, TokenLabel label) {
+	Token * token = createToken(_lexicalAnalyzer, label);
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
+	enterLexicalAnalyzerContext(_lexicalAnalyzer, context);
 	return IN_PROGRESS;
 }
-
-CompilationStatus ParenthesisLexemeAction(TokenLabel label) {
+CompilationStatus LogicalConditionLexemeAction(TokenLabel label) {
 	Token * token = createToken(_lexicalAnalyzer, label);
 	_logTokenAction(__FUNCTION__, token);
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
