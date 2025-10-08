@@ -54,23 +54,17 @@ whitespace			[[:space:]]+
 
 %}
 
-"{"									{ return EnterImportExpressionLexemeAction(IMPORT_EXPRESSION); }
+
 <IMPORT_EXPRESSION>[^{}]+			{ return SubexpressionLexemeAction(); }
-<IMPORT_EXPRESSION>"}"				{ return LeaveImportExpressionLexemeAction(); }
 <IMPORT_EXPRESSION>.				{ return UnknownLexemeAction(); }
 
-"/*"								{ return EnterMultilineCommentLexemeAction(MULTILINE_COMMENT); }
-<MULTILINE_COMMENT>"*/"				{ return LeaveMultilineCommentLexemeAction(); }
-<MULTILINE_COMMENT>[^*]+			{ return IgnoredLexemeAction(); }
-<MULTILINE_COMMENT>.				{ return IgnoredLexemeAction(); }
 
-"-"									{ return ArithmeticOperatorLexemeAction(SUB); }
-"*"									{ return ArithmeticOperatorLexemeAction(MUL); }
-"/"									{ return ArithmeticOperatorLexemeAction(DIV); }
-"+"									{ return ArithmeticOperatorLexemeAction(ADD); }
-
-"("									{ return ParenthesisLexemeAction(OPEN_PARENTHESIS); }
-")"									{ return ParenthesisLexemeAction(CLOSE_PARENTHESIS); }
+"{"                                 {return SymbolLexemeAction(OPEN_BRACE);}
+"}"                                 {return SymbolLexemeAction(CLOSE_BRACE);}
+"["									{ return SymbolLexemeAction(OPEN_BRACKETS); }
+"]"									{ return SymbolLexemeAction(CLOSE_BRACKETS); }
+"("									{ return SymbolLexemeAction(OPEN_PARENTHESIS); }
+")"									{ return SymbolLexemeAction(CLOSE_PARENTHESIS); }
 
 [[:digit:]]+						{ return IntegerLexemeAction(); }
 

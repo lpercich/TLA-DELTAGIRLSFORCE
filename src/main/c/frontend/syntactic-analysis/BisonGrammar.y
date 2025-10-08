@@ -28,6 +28,10 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 	signed int integer;
 	TokenLabel token;
+	boolean boolean;
+	char * string;
+	
+
 
 	/** Non-terminals. */
 
@@ -51,18 +55,40 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 /** Terminals. */
 %token <integer> INTEGER
-%token <token> ADD
-%token <token> CLOSE_BRACE
-%token <token> CLOSE_COMMENT
-%token <token> CLOSE_PARENTHESIS
-%token <token> DIV
-%token <token> MUL
-%token <token> OPEN_BRACE
-%token <token> OPEN_COMMENT
-%token <token> OPEN_PARENTHESIS
-%token <token> SUB
+%token <string> STRING
+%token <boolean> BOOL
+%token <token> CLOSE_BRACE  /* o sea {} */
+%token <token> CLOSE_BRACKET  /* o sea [] */
+%token <token> CLOSE_PARENTHESIS  /* o sea () */
+%token <token> OPEN_BRACE /* {} */
+%token <token> OPEN_BRACKET /* [] */
+%token <token> OPEN_PARENTHESIS /* () */
+%token <token> OR
+%token <token> AND 
+%token <token> SELECTION
+%token <token> PROJECTION
+%token <token> COLON
+%token <token> COMMA
+%token <token> UNION
+%token <token> INTERSECTION
+%token <token> DIFF
+%token <token> JOIN
+%token <token> LOWER    /* x<10*/
+%token <token> HIGHER
+%token <token> LOWER_EQUAL
+%token <token> HIGHER_EQUAL
+%token <token> EQUAL
+%token <token> NOT_EQUAL /* x!=10 */
+%token <token> RHO
 
-%token <token> IGNORED
+
+
+
+
+
+
+
+
 %token <token> UNKNOWN
 
 /** Non-terminals. */
@@ -70,6 +96,9 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <expression> expression
 %type <factor> factor
 %type <program> program
+%type <expression> condition
+%type <expression> column_list
+%type <expression> table
 
 /**
  * Precedence and associativity.
