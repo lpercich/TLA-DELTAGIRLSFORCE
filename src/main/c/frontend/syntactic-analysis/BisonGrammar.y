@@ -35,12 +35,16 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 	/** Non-terminals. */
 
+	
+	Expression * expression; /*operadores*/
+	Condition* condition;
+	ConditionList * condition_list;
 	Constant * constant;
-	Expression * expression;
-	Factor * factor;
-	Program * program;
-	Condition condition;
 	Attribute * attributes;
+	Program * program;
+	Aggregation * aggregation; /*funciones de agregacion*/
+	Order * order;
+	Relation *relation;   /*tablas*/
 }
 
 /**
@@ -53,7 +57,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
  */
 %destructor { destroyConstant($$); } <constant>
 %destructor { destroyExpression($$); } <expression>
-%destructor { destroyFactor($$); } <factor>
+%destructor { destroyCondition($$); } <condition>
 
 /** Terminals. */
 %token <integer> INTEGER
@@ -65,8 +69,9 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> OPEN_BRACE /* {} */
 %token <token> OPEN_BRACKET /* [] */
 %token <token> OPEN_PARENTHESIS /* () */
-%token <token> OR
-%token <token> AND 
+%token <condition> OR
+%token <condition> AND 
+%token <condition> NOT 
 %token <token> SELECTION
 %token <token> PROJECTION
 %token <token> COLON
@@ -75,25 +80,27 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> INTERSECTION
 %token <token> DIFF
 %token <token> JOIN
-%token <token> LOWER    /* x<10*/
-%token <token> HIGHER
-%token <token> LOWER_EQUAL
-%token <token> HIGHER_EQUAL
-%token <token> EQUAL
-%token <token> NOT_EQUAL /* x!=10 */
+%token <condition> LOWER    /* x<10*/
+%token <condition> LOWER_EQUAL
+%token <condition> HIGHER_EQUAL
+%token <condition> EQUAL
+%token <condition> NOT_EQUAL /* x!=10 */
 %token <token> RHO
 %token <token> UNKNOWN
+%
 
 /** Non-terminals. */
 %type <constant> constant
 %type <expression> expression
-%type <factor> factor
-%type <program> program
-%type <condition> condition
 %type <attributes> attributes
 %type <expression> column_list
 %type <expression> table
 %type <expression> input
+%type <condition> condition
+%type <condition> simple_condition
+%type <condition> compound_condition
+%type <condition> condition_list
+
 
 
 /**
@@ -112,18 +119,16 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 program: expression											{ $$ = ExpressionProgramSemanticAction($1); }
 	;
 
-expression: expression[left] ADD expression[right]			{ $$ = ArithmeticExpressionSemanticAction($left, $right, ADDITION); }
-	| expression[left] DIV expression[right]				{ $$ = ArithmeticExpressionSemanticAction($left, $right, DIVISION); }
-	| expression[left] MUL expression[right]				{ $$ = ArithmeticExpressionSemanticAction($left, $right, MULTIPLICATION); }
-	| expression[left] SUB expression[right]				{ $$ = ArithmeticExpressionSemanticAction($left, $right, SUBTRACTION); }
-	| factor												{ $$ = FactorExpressionSemanticAction($1); }
+condition: condition[left] AND condition[right]			{ $$ = BinaryExpressionSemanticAction($left, $right, AND); }
+	| condition[left] OR condition[right]					{ $$ = BinaryExpressionSemanticAction($left, $right, OR); }
+	| NOT condition[left]									{ $$ = UnaryExpressionSemanticAction($left, null, NOT); }
 	;
 
-factor: OPEN_PARENTHESIS expression CLOSE_PARENTHESIS		{ $$ = ExpressionFactorSemanticAction($2); }
-	| constant												{ $$ = ConstantFactorSemanticAction($1); }
-	;
 
 constant: INTEGER											{ $$ = IntegerConstantSemanticAction($1); }
 	;
+
+	
+
 
 %%

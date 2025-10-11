@@ -19,20 +19,41 @@ typedef enum FactorType FactorType;
 
 typedef struct Constant Constant;
 typedef struct Expression Expression;
+typedef struct Condition Condition;
 typedef struct Factor Factor;
+typedef struct Relation Relation;
 typedef struct Program Program;
 
 /**
  * Node types for the Abstract Syntax Tree (AST).
  */
 
-enum ExpressionType {
-	ADDITION,
-	DIVISION,
-	FACTOR,
-	MULTIPLICATION,
-	SUBTRACTION
+enum ConditionType {
+	AND,
+    OR,
+    NOT,
+    EQUAL,
+    NOT_EQUAL,
+    LESS,
+    LESS_EQUAL,
+    GREATER,
+    GREATER_EQUAL
 };
+
+enum OperationType{
+	SELECTION,
+	PROJECTION,
+	RHO
+	
+}
+
+enum RelationType{
+	BASE_TABLE,
+	JOIN,
+	UNION,
+	INTERSECTION,
+	DIFF
+}
 
 enum FactorType {
 	CONSTANT,
@@ -43,24 +64,64 @@ struct Constant {
 	int value;
 };
 
+enum OrderByType
+{
+	ASC,
+	DESC
+};
+
+enum 
+
 struct Factor {
 	union {
 		Constant * constant;
 		Expression * expression;
+		Condition * condition
 	};
 	FactorType type;
 };
 
-struct Expression {
+ struct Expression {
+    union {
+        struct {                // expresión aritmética
+            struct Expression *leftExpression;
+            struct Expression *rightExpression;
+        };
+        struct {                // expresión simple: columna o constante
+            char *columnName;   // nombre de la columna
+            int constant;       // valor constante
+        };
+    };
+    ExpressionType type;        // ADD, SUB, MUL, DIV, COLUMN, CONSTANT
+} Expression;
+
+
+struct Condition {
 	union {
-		Factor * factor;
+		Factor * factor; //no c para q usamos esto!!!!
 		struct {
-			Expression * leftExpression;
-			Expression * rightExpression;
+			Condition * leftCondition;
+			Condition * rightCondition;
 		};
 	};
-	ExpressionType type;
-};
+	ConditionType type;
+}
+
+ struct Relation {
+    union {
+        struct {                // relación derivada
+            struct Relation *leftRelation;
+            struct Relation *rightRelation;
+        };
+        struct {                // relación base o operación unaria
+            char *tableName;    // para BASE_TABLE
+            struct Condition *condition; // para SELECTION
+            struct Expression *projectionList; // para PROJECTION
+        };
+    };
+    RelationType type;          // BASE_TABLE, SELECTION, PROJECTION, JOIN, UNION, ...
+} Relation;
+
 
 struct Program {
 	Expression * expression;

@@ -16,14 +16,10 @@
 
 extern CompilationStatus SymbolLexemeAction(TokenLabel label);
 extern CompilationStatus LogicalConditionLexemeAction(TokenLabel label);
-
-extern CompilationStatus ArithmeticOperatorLexemeAction(TokenLabel label);
-extern CompilationStatus EnterImportExpressionLexemeAction(FlexContext context);
+extern CompilationStatus StringLexemeAction();
 extern CompilationStatus EOFLexemeAction();
 extern CompilationStatus IgnoredLexemeAction();
 extern CompilationStatus IntegerLexemeAction();
-extern CompilationStatus LeaveImportExpressionLexemeAction();
-extern CompilationStatus SubexpressionLexemeAction();
 extern CompilationStatus UnknownLexemeAction();
 
 %}
@@ -42,6 +38,8 @@ extern CompilationStatus UnknownLexemeAction();
  * @see https://westes.github.io/flex/manual/Patterns.html
  */
 whitespace			[[:space:]]+
+number              -?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?
+string              \"([^\"\\]|\\.)*\"
 
 %%
 
@@ -65,13 +63,29 @@ whitespace			[[:space:]]+
 ")"									{ return SymbolLexemeAction(CLOSE_PARENTHESIS); }
 ":"									{ return SymbolLexemeAction(COLON); }
 ","									{ return SymbolLexemeAction(COMMA); }
-"and"                               { return LogicalConditionLexemeAction(AND); }
-"or"                               { return LogicalConditionLexemeAction(OR); }
+"PROJECTION"                        { return SymbolLexemeAction(PROJECTION); }
+"SELECTION"                         { return SymbolLexemeAction(SELECTION); }
+"JOIN"                              { return SymbolLexemeAction(JOIN); }
+"UNION"                             { return SymbolLexemeAction(UNION); }
+"INTERSECTION"                      { return SymbolLexemeAction(INTERSECTION); }
+"DIFF"                              { return SymbolLexemeAction(DIFF); }
+"RHO"                               { return SymbolLexemeAction(RHO); }
+"AND"                               { return LogicalConditionLexemeAction(AND); }
+"OR"                                { return LogicalConditionLexemeAction(OR); }
+"NOT"                               { return LogicalConditionLexemeAction(OR); }
+"LOWER"                             { return LogicalConditionLexemeAction(LOWER); }
+"LOWER_EQUAL"                       { return LogicalConditionLexemeAction(LOWER_EQUAL); }
+"HIGHER_EQUAL"                      { return LogicalConditionLexemeAction(HIGHER_EQUAL); }
+"EQUAL"                             { return LogicalConditionLexemeAction(EQUAL); }
+"NOT_EQUAL"                         { return LogicalConditionLexemeAction(NOT_EQUAL); }
+
 
 
 
 [[:digit:]]+						{ return IntegerLexemeAction(); }
 
+{number}                            { return IntegerLexemeAction(); }
+{string}                            { return StringLexemeAction(); }
 {whitespace}						{ return IgnoredLexemeAction(); }
 .									{ return UnknownLexemeAction(); }
 

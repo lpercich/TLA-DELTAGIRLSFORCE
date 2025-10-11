@@ -43,14 +43,15 @@ Constant * IntegerConstantSemanticAction(const int value) {
 	return constant;
 }
 
-Expression * ArithmeticExpressionSemanticAction(Expression * leftExpression, Expression * rightExpression, ExpressionType type) {
+Condition * BinaryConditionSemanticAction(Condition * leftCondition, Condition * rightCondition, ConditionType type) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Expression * expression = calloc(1, sizeof(Expression));
-	expression->leftExpression = leftExpression;
-	expression->rightExpression = rightExpression;
-	expression->type = type;
-	return expression;
+	Condition * condition = calloc(1, sizeof(Condition));
+	condition->leftCondition= leftCondition
+	condition->rightCondtion = rightCondition;
+	condition->type = type;
+	return condition;
 }
+
 
 Expression * FactorExpressionSemanticAction(Factor * factor) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
