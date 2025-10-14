@@ -16,6 +16,8 @@ ModuleDestructor initializeAbstractSyntaxTreeModule();
 
 typedef enum ExpressionType ExpressionType;
 typedef enum FactorType FactorType;
+typedef enum ConditionType ConditionType;
+typedef enum RelationType RelationType;
 
 typedef struct Constant Constant;
 typedef struct Expression Expression;
@@ -40,12 +42,12 @@ enum ConditionType {
     GREATER_EQUAL
 };
 
-enum OperationType{
+enum ExpressionType{
 	SELECTION,
 	PROJECTION,
 	RHO
 	
-}
+};
 
 enum RelationType{
 	BASE_TABLE,
@@ -53,7 +55,7 @@ enum RelationType{
 	UNION,
 	INTERSECTION,
 	DIFF
-}
+};
 
 enum FactorType {
 	CONSTANT,
@@ -70,7 +72,6 @@ enum OrderByType
 	DESC
 };
 
-enum 
 
 struct Factor {
 	union {
@@ -93,7 +94,7 @@ struct Factor {
         };
     };
     ExpressionType type;        // ADD, SUB, MUL, DIV, COLUMN, CONSTANT
-} Expression;
+};
 
 
 struct Condition {
@@ -105,7 +106,7 @@ struct Condition {
 		};
 	};
 	ConditionType type;
-}
+};
 
  struct Relation {
     union {
