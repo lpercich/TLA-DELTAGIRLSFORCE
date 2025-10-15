@@ -1,28 +1,37 @@
 {
-    "operation": "UNION",
+    "UNION":{
     "left": {
-      "operation": "PROJECTION",
+       "PROJECTION":{
       "attributes": ["nombre"],
       "input": {
-        "operation": "SELECT",
+         "SELECTION":{
         ">":["edad", 30],
         "input": {
-          "operation": "table",
+          "TABLE": {
           "name": "Persona"
+          }
         }
+      }
+      }
       }
     },
     "right": {
-      "operation": "PROJECTION",
+       "PROJECTION":{
       "attributes": ["nombre"],
       "input": {
-        "operation": "SELECT",
+         "SELECTION":{
         "<":["edad", 20],
         "input": {
-          "operation": "table",
+          "TABLE": {
           "name": "Persona"
+          }
         }
+      }
+      }
       }
     }
   }
+}
+
+
   

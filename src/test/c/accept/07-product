@@ -1,5 +1,5 @@
 {
-  "operation": "PRODUCT",
+  "PRODUCT":{
   "left": {
     "operation": "table",
     "name": "Persona"
@@ -7,5 +7,6 @@
   "right": {
     "operation": "table",
     "name": "Curso"
+  }
   }
 }

@@ -1,10 +1,12 @@
 {
-    "operation": "RHO",
+    "RHO":{
     "name": "PersonaNueva",
     "input": {
-        "operation": "table",
+        "TABLE":{
         "name": "Persona"
+        }
       }
   }
+}
 
 

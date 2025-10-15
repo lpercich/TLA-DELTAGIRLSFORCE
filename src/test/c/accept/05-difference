@@ -1,5 +1,5 @@
 {
-    "operation": "DIFF",
+    "DIFF": {
     "left": {
       "operation": "table",
       "name": "Empleados"
@@ -9,4 +9,5 @@
       "name": "Gerentes"
     }
   }
+}
   

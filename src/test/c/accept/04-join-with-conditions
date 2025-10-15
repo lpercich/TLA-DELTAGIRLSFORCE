@@ -1,5 +1,5 @@
 {
-    "operation": "JOIN",
+    "JOIN" : {
     "=": ["Persona.id", "Trabajo.persona_id"],
     "left": {
       "operation": "table",
@@ -9,4 +9,5 @@
       "operation": "table",
       "name": "Trabajo"
     }
+  }
 }

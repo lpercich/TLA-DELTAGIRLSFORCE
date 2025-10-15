@@ -82,11 +82,12 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> INTERSECTION
 %token <token> DIFF
 %token <token> JOIN
-%token <condition> LOWER    /* x<10*/
-%token <condition> LOWER_EQUAL
-%token <condition> HIGHER_EQUAL
-%token <condition> EQUAL
-%token <condition> NOT_EQUAL /* x!=10 */
+%token <token> LOWER    /* x<10*/
+%token <token> LOWER_EQUAL
+%token <token> HIGHER_EQUAL
+%token <token> HIGHER
+%token <token> EQUAL
+%token <token> NOT_EQUAL /* x!=10 */
 %token <token> RHO
 %token <token> UNKNOWN
 %
@@ -117,21 +118,38 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 program: expression											{ $$ = ExpressionProgramSemanticAction($1); }
 	;
+	expression: 
+	table
+	|selection
+	|projection
+	|join ;
 
-condition: condition[left] AND condition[right]			{ $$ = BinaryExpressionSemanticAction($left, $right, "AND"); }
+table: OPEN_BRACKET id OPEN_BRACKET
+selection: OPEN_BRACKET  id COMMA id OPEN_BRACKET
+projection: OPEN_BRACKET  id COMMA id  OPEN_BRACKET
+join: OPEN_BRACKET  expression COMMA expression CLOSE_PARENTHESIS
+
+
+
+
+condition: 
+
+	AND OPEN_BRACKET COMMA  
+
+
+condition[left] AND condition[right]			{ $$ = BinaryExpressionSemanticAction($left, $right, "AND"); }
 	| condition[left] OR condition[right]				{ $$ = BinaryExpressionSemanticAction($left, $right, "OR"); }
 	| NOT condition	[expr]								{ $$ = UnaryExpressionSemanticAction($expr); }
 	| comparison                           				{ $$ = $comparison; }
 	;
 
 comparison:
-      IDENTIFIER[left] EQUAL VALUE[right]          { $$ = ComparisonConditionSemanticAction($left, "=", $right); }
-    | IDENTIFIER[left] NOT_EQUAL VALUE[right]      { $$ = ComparisonConditionSemanticAction($left, "!=", $right); }
-    | IDENTIFIER[left] LOWER VALUE[right]          { $$ = ComparisonConditionSemanticAction($left, "<", $right); }
-    | IDENTIFIER[left] LOWER_EQUAL VALUE[right]    { $$ = ComparisonConditionSemanticAction($left, "<=", $right); }
-    | IDENTIFIER[left] HIGHER VALUE[right]         { $$ = ComparisonConditionSemanticAction($left, ">", $right); }
-    | IDENTIFIER[left] HIGHER_EQUAL VALUE[right]   { $$ = ComparisonConditionSemanticAction($left, ">=", $right); }
-    ;
+	| EQUAL COLON OPEN_BRACKET id COMMA id CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($3, "=", $5); }
+	| LOWER COLON OPEN_BRACKET id COMMA id CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($3, "=", $5); }
+	| HIGHER COLON OPEN_BRACKET id COMMA id CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($3, "=", $5); }
+	| LOWER_EQUAL COLON OPEN_BRACKET id COMMA id CLOSE_BRACKET { $$ = ComparisonConditionSemanticAction($3, "=", $5); }
+	| HIGHER_EQUAL COLON OPEN_BRACKET id COMMA id CLOSE_BRACKET { $$ = ComparisonConditionSemanticAction($3, "=", $5); }
+;
 
 
 

@@ -1,5 +1,5 @@
 {
-  "operation": "PROJECTION",
+   "PROJECTION": {
     "attributes": ["nombre", "edad"],
     "input": {
         "operation": "table",
@@ -7,4 +7,5 @@
       }
   
   }
+}
 

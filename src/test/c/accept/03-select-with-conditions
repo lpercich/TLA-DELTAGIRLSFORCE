@@ -1,9 +1,10 @@
 {
-    "operation": "SELECT",
+     "SELECTION":{
     ">":["edad", 30],
     "input": {
       "operation": "table",
       "name": "Persona"
     }
   }
+}
   

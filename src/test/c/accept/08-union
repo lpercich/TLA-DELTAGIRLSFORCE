@@ -1,11 +1,13 @@
 {
-    "operation": "UNION",
+    "UNION":{
     "left": {
-        "operation": "table",
-        "name": "Empleados"
+        "TABLE":{
+        "name": "Empleados"}
     },
     "right": {
-        "operation": "table",
+        "TABLE": {
         "name": "Contratistas"
+        }
     }
+}
 }
