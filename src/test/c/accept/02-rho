@@ -1,0 +1,10 @@
+{
+    "operation": "RHO",
+    "name": "PersonaNueva",
+    "input": {
+        "operation": "table",
+        "name": "Persona"
+      }
+  }
+
+

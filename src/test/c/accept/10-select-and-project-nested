@@ -1,0 +1,17 @@
+{
+  "operation": "PROJECTION",
+  "attributes": ["nombre"],
+  "input": {
+    "operation": "SELECT",
+    "condition": {
+      "operator": ">",
+      "left": "edad",
+      "right": 30
+    },
+    "input": {
+      "operation": "table",
+      "name": "Persona"
+    }
+  }
+}
+

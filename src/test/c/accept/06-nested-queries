@@ -1,0 +1,28 @@
+{
+    "operation": "UNION",
+    "left": {
+      "operation": "PROJECTION",
+      "attributes": ["nombre"],
+      "input": {
+        "operation": "SELECT",
+        ">":["edad", 30],
+        "input": {
+          "operation": "table",
+          "name": "Persona"
+        }
+      }
+    },
+    "right": {
+      "operation": "PROJECTION",
+      "attributes": ["nombre"],
+      "input": {
+        "operation": "SELECT",
+        "<":["edad", 20],
+        "input": {
+          "operation": "table",
+          "name": "Persona"
+        }
+      }
+    }
+  }
+  

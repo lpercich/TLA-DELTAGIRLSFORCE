@@ -1,0 +1,9 @@
+{
+    "operation": "SELECT",
+    "AND": [{"<": ["edad", 30]},{">": ["edad", 30]}],
+    "input": {
+      "operation": "table",
+      "name": "Persona"
+    }
+  }
+  

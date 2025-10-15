@@ -1,0 +1,7 @@
+{
+  "operation": "projection",
+  "input": {
+    "operation": "table",
+    "name": "Persona"
+  }
+}

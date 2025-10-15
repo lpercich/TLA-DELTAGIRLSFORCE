@@ -1,0 +1,10 @@
+{
+  "operation": "PROJECTION",
+    "attributes": ["nombre", "edad"],
+    "input": {
+        "operation": "table",
+        "name": "Persona"
+      }
+  
+  }
+

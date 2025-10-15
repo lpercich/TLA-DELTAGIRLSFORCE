@@ -73,11 +73,12 @@ string              \"([^\"\\]|\\.)*\"
 "AND"                               { return LogicalConditionLexemeAction(AND); }
 "OR"                                { return LogicalConditionLexemeAction(OR); }
 "NOT"                               { return LogicalConditionLexemeAction(NOT); }
-"LOWER"                             { return LogicalConditionLexemeAction(LOWER); }
-"LOWER_EQUAL"                       { return LogicalConditionLexemeAction(LOWER_EQUAL); }
-"HIGHER_EQUAL"                      { return LogicalConditionLexemeAction(HIGHER_EQUAL); }
-"EQUAL"                             { return LogicalConditionLexemeAction(EQUAL); }
-"NOT_EQUAL"                         { return LogicalConditionLexemeAction(NOT_EQUAL); }
+"<"                                 { return LogicalConditionLexemeAction(LOWER); }
+"<="                                { return LogicalConditionLexemeAction(LOWER_EQUAL); }
+">"                                 { return LogicalConditionLexemeAction(HIGHER); }
+">="                                { return LogicalConditionLexemeAction(HIGHER_EQUAL); }
+"="                                 { return LogicalConditionLexemeAction(EQUAL); }
+"!="                                { return LogicalConditionLexemeAction(NOT_EQUAL); }
 
 
 

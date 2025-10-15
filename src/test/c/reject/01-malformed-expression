@@ -1,0 +1,13 @@
+{
+  "operation": "SELECTION",
+  "condition": {
+    "operator": ">",
+    "left": "edad",
+    "right": 30
+  },
+  "input": {
+    "operation": "table",
+    "name": "Persona"
+  }
+}
+

@@ -1,0 +1,11 @@
+{
+    "operation": "UNION",
+    "left": {
+        "operation": "table",
+        "name": "Empleados"
+    },
+    "right": {
+        "operation": "table",
+        "name": "Contratistas"
+    }
+}

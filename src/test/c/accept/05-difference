@@ -1,0 +1,12 @@
+{
+    "operation": "DIFF",
+    "left": {
+      "operation": "table",
+      "name": "Empleados"
+    },
+    "right": {
+      "operation": "table",
+      "name": "Gerentes"
+    }
+  }
+  

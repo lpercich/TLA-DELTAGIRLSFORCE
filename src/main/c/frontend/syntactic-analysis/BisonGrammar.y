@@ -111,9 +111,6 @@ void yyerror(const YYLTYPE * location, const char * message) {}
  * @see https://en.cppreference.com/w/cpp/language/operator_precedence.html
  * @see https://www.gnu.org/software/bison/manual/html_node/Precedence.html
  */
-%left ADD SUB
-%left MUL DIV
-
 %%
 
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
