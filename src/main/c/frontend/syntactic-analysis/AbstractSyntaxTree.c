@@ -31,33 +31,60 @@ void destroyExpression(Expression * expression) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (expression != NULL) {
 		switch (expression->type) {
-			case ADDITION:
-			case DIVISION:
-			case MULTIPLICATION:
-			case SUBTRACTION:
-				destroyExpression(expression->leftExpression);
-				destroyExpression(expression->rightExpression);
+			case SELECTION:
+			destroyExpression(expression->selection.input);
+			destroyCondition(expression->selection.condition);
+			case PROJECTION:
+			destroyExpression(expression->projection.input);
+			destroyAtributes(expression->projection.attributes,expression->projection.attrCount);
+			case RHO:
+				destroyExpression(expression->renaming.input);
+				free(expression->renaming.newName);
 				break;
-			case FACTOR:
-				destroyFactor(expression->factor);
+			case BASETABLE:
+				destroyRelation(expression->base.relation);
 				break;
 		}
 		free(expression);
 	}
 }
 
-void destroyFactor(Factor * factor) {
-	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
-	if (factor != NULL) {
-		switch (factor->type) {
-			case CONSTANT:
-				destroyConstant(factor->constant);
-				break;
-			case EXPRESSION:
-				destroyExpression(factor->expression);
-				break;
+void destroyCondition(Condition *condition){
+	if (condition != NULL) {
+		switch (condition->type) {
+			case UNARY:
+			destroyCondition(condition->unary.expr);
+			break;
+			case BINARY:
+			destroyCondition(condition->binary.left);
+			destroyCondition(condition->binary.right);
+			free(condition->binary.operator);
+			break;
+			case COMPARISON:
+			free(condition->comparison.leftOperand);
+			free(condition->comparison.rightOperand);
+			free(condition->comparison.operator);
+			break;
 		}
-		free(factor);
+		free(condition);
+	}
+}
+
+void destroyRelation(Relation *relation){
+	if (relation != NULL) {
+		switch (relation->type) {
+			case BASE_TABLE:
+			free(relation->base.tableName);
+			break;
+			case JOIN: 
+			case UNION:
+			case INTERSECTION:
+			case DIFF:
+			destroyRelation(relation->binary.left);
+			destroyRelation(relation->binary.right);
+			break;
+		}
+		free(relation);
 	}
 }
 

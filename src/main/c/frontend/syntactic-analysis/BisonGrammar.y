@@ -63,6 +63,8 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <integer> INTEGER
 %token <string> STRING
 %token <boolean> BOOL
+%token <string> IDENTIFIER
+%token <string> VALUE
 %token <token> CLOSE_BRACE  /* o sea {} */
 %token <token> CLOSE_BRACKET  /* o sea [] */
 %token <token> CLOSE_PARENTHESIS  /* o sea () */
@@ -119,10 +121,21 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 program: expression											{ $$ = ExpressionProgramSemanticAction($1); }
 	;
 
-condition: condition[left] AND condition[right]			{ $$ = BinaryExpressionSemanticAction($left, $right, AND); }
-	| condition[left] OR condition[right]					{ $$ = BinaryExpressionSemanticAction($left, $right, OR); }
-	| NOT condition[left]									{ $$ = UnaryExpressionSemanticAction($left, null, NOT); }
+condition: condition[left] AND condition[right]			{ $$ = BinaryExpressionSemanticAction($left, $right, "AND"); }
+	| condition[left] OR condition[right]				{ $$ = BinaryExpressionSemanticAction($left, $right, "OR"); }
+	| NOT condition	[expr]								{ $$ = UnaryExpressionSemanticAction($expr); }
+	| comparison                           				{ $$ = $comparison; }
 	;
+
+comparison:
+      IDENTIFIER[left] EQUAL VALUE[right]          { $$ = ComparisonConditionSemanticAction($left, "=", $right); }
+    | IDENTIFIER[left] NOT_EQUAL VALUE[right]      { $$ = ComparisonConditionSemanticAction($left, "!=", $right); }
+    | IDENTIFIER[left] LOWER VALUE[right]          { $$ = ComparisonConditionSemanticAction($left, "<", $right); }
+    | IDENTIFIER[left] LOWER_EQUAL VALUE[right]    { $$ = ComparisonConditionSemanticAction($left, "<=", $right); }
+    | IDENTIFIER[left] HIGHER VALUE[right]         { $$ = ComparisonConditionSemanticAction($left, ">", $right); }
+    | IDENTIFIER[left] HIGHER_EQUAL VALUE[right]   { $$ = ComparisonConditionSemanticAction($left, ">=", $right); }
+    ;
+
 
 
 constant: INTEGER											{ $$ = IntegerConstantSemanticAction($1); }

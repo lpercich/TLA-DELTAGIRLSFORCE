@@ -72,7 +72,7 @@ string              \"([^\"\\]|\\.)*\"
 "RHO"                               { return SymbolLexemeAction(RHO); }
 "AND"                               { return LogicalConditionLexemeAction(AND); }
 "OR"                                { return LogicalConditionLexemeAction(OR); }
-"NOT"                               { return LogicalConditionLexemeAction(OR); }
+"NOT"                               { return LogicalConditionLexemeAction(NOT); }
 "LOWER"                             { return LogicalConditionLexemeAction(LOWER); }
 "LOWER_EQUAL"                       { return LogicalConditionLexemeAction(LOWER_EQUAL); }
 "HIGHER_EQUAL"                      { return LogicalConditionLexemeAction(HIGHER_EQUAL); }

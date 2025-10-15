@@ -31,21 +31,14 @@ typedef struct Program Program;
  */
 
 enum ConditionType {
-	AND,
-    OR,
-    NOT,
-    EQUAL,
-    NOT_EQUAL,
-    LESS,
-    LESS_EQUAL,
-    GREATER,
-    GREATER_EQUAL
+	BINARY, UNARY, COMPARISON
 };
 
 enum ExpressionType{
 	SELECTION,
 	PROJECTION,
-	RHO
+	RHO,
+    BASETABLE
 	
 };
 
@@ -77,51 +70,75 @@ struct Factor {
 	union {
 		Constant * constant;
 		Expression * expression;
-		Condition * condition
+		Condition * condition;
 	};
 	FactorType type;
 };
 
- struct Expression {
+struct Expression {
+    ExpressionType type;
+
     union {
-        struct {                // expresión aritmética
-            struct Expression *leftExpression;
-            struct Expression *rightExpression;
-        };
-        struct {                // expresión simple: columna o constante
-            char *columnName;   // nombre de la columna
-            int constant;       // valor constante
-        };
+        struct { // SELECTION
+            struct Expression *input;
+            Condition *condition;
+        } selection;
+
+        struct { // PROJECTION
+            struct Expression *input;
+            char **attributes;
+            size_t attrCount;
+        } projection;
+
+        struct { // RENAMING
+            struct Expression *input;
+            char *newName;
+        } renaming;
+
+        struct { // Entrada base
+            Relation *relation;
+        } base;
     };
-    ExpressionType type;        // ADD, SUB, MUL, DIV, COLUMN, CONSTANT
 };
 
 
+//queda para preguntar xq con la correccion alfinal no me queda claro???
 struct Condition {
-	union {
-		Factor * factor; //no c para q usamos esto!!!!
-		struct {
-			Condition * leftCondition;
-			Condition * rightCondition;
-		};
-	};
-	ConditionType type;
+    ConditionType type;
+
+    union {
+        struct { // Comparación simple: columna operador valor
+            char *leftOperand;   // ej: "edad"
+            char *operator;      // ej: ">"
+            char *rightOperand;  // ej: "18"
+        } comparison;
+
+        struct { // Binaria: AND / OR
+            Condition *left;
+            Condition *right;
+            char *operator;     // "AND" o "OR"
+        } binary;
+
+        struct { // Unaria: solo NOT
+            Condition *expr;
+        } unary;
+    };
 };
 
  struct Relation {
+    RelationType type;
+
     union {
-        struct {                // relación derivada
-            struct Relation *leftRelation;
-            struct Relation *rightRelation;
-        };
-        struct {                // relación base o operación unaria
-            char *tableName;    // para BASE_TABLE
-            struct Condition *condition; // para SELECTION
-            struct Expression *projectionList; // para PROJECTION
-        };
+        struct { // Tabla base
+            char *tableName;
+        } base;
+
+        struct { // Operaciones binarias: JOIN, UNION, etc.
+            Relation *left;
+            Relation *right;
+        } binary;
     };
-    RelationType type;          // BASE_TABLE, SELECTION, PROJECTION, JOIN, UNION, ...
-} Relation;
+};
 
 
 struct Program {
@@ -133,8 +150,8 @@ struct Program {
  */
 
 void destroyConstant(Constant * constant);
-void destroyExpression(Expression * expression);
-void destroyFactor(Factor * factor);
-void destroyProgram(Program * program);
-
+void destroyCondition(Condition *condition);
+void destroyRelation(Relation *relation);
+void destroyExpression(Expression *expression);
+void destroyProgram(Program *program);
 #endif

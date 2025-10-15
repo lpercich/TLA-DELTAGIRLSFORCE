@@ -43,23 +43,39 @@ Constant * IntegerConstantSemanticAction(const int value) {
 	return constant;
 }
 
-Condition * BinaryConditionSemanticAction(Condition * leftCondition, Condition * rightCondition, ConditionType type) {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Condition * condition = calloc(1, sizeof(Condition));
-	condition->leftCondition= leftCondition
-	condition->rightCondtion = rightCondition;
-	condition->type = type;
-	return condition;
+Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *op) {
+    Condition *cond = malloc(sizeof(Condition));
+    cond->type = BINARY;
+    cond->binary.left = left;
+    cond->binary.right = right;
+    cond->binary.operator = strdup(op);
+    return cond;
 }
 
+Condition *UnaryConditionSemanticAction(Condition *expr, const char *op) {
+    Condition *cond = malloc(sizeof(Condition));
+    cond->type = UNARY;
+    cond->unary.expr = expr;
+    return cond;
+}
 
+Condition *ComparisonConditionSemanticAction(char *left, char *op, char *right) {
+    Condition *cond = malloc(sizeof(Condition));
+    cond->type = COMPARISON;
+    cond->comparison.leftOperand = left;
+    cond->comparison.operator = op;
+    cond->comparison.rightOperand = right;
+    return cond;
+}
+
+/*
 Expression * FactorExpressionSemanticAction(Factor * factor) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Expression * expression = calloc(1, sizeof(Expression));
 	expression->factor = factor;
 	expression->type = FACTOR;
 	return expression;
-}
+}*/
 
 Factor * ConstantFactorSemanticAction(Constant * constant) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
