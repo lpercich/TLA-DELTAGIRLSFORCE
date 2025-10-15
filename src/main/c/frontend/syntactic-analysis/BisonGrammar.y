@@ -40,6 +40,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 	Condition* condition;
 	ConditionList * condition_list;
 	Constant * constant;
+	Comparison * comparison;
 	Attribute * attributes;
 	Program * program;
 	Aggregation * aggregation; /*funciones de agregacion*/
@@ -74,7 +75,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <condition> OR
 %token <condition> AND 
 %token <condition> NOT 
-%token <token> SELECTION
+%token <token> SELECT
 %token <token> PROJECTION
 %token <token> COLON
 %token <token> COMMA
@@ -82,14 +83,18 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> INTERSECTION
 %token <token> DIFF
 %token <token> JOIN
-%token <token> LOWER    /* x<10*/
-%token <token> LOWER_EQUAL
-%token <token> HIGHER_EQUAL
-%token <token> HIGHER
-%token <token> EQUAL
-%token <token> NOT_EQUAL /* x!=10 */
+%token <token> NAME
+%token <token> INPUT
+%token <condition> LOWER    /* x<10*/
+%token <condition> LOWER_EQUAL
+%token <condition> HIGHER_EQUAL
+%token <condition> HIGHER
+%token <condition> EQUAL
+%token <condition> NOT_EQUAL /* x!=10 */
 %token <token> RHO
+%token <token> OPERATION
 %token <token> UNKNOWN
+
 %
 
 /** Non-terminals. */
@@ -103,7 +108,8 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <condition> simple_condition
 %type <condition> compound_condition
 %type <condition> condition_list
-
+%type <comparison> comparison
+%type <program> program
 
 
 /**

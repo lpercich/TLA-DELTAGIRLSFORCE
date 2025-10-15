@@ -64,7 +64,7 @@ string              \"([^\"\\]|\\.)*\"
 ":"									{ return SymbolLexemeAction(COLON); }
 ","									{ return SymbolLexemeAction(COMMA); }
 "PROJECTION"                        { return SymbolLexemeAction(PROJECTION); }
-"SELECTION"                         { return SymbolLexemeAction(SELECTION); }
+"SELECT"                         { return SymbolLexemeAction(SELECTION); }
 "JOIN"                              { return SymbolLexemeAction(JOIN); }
 "UNION"                             { return SymbolLexemeAction(UNION); }
 "INTERSECTION"                      { return SymbolLexemeAction(INTERSECTION); }
@@ -86,7 +86,6 @@ string              \"([^\"\\]|\\.)*\"
 [[:digit:]]+						{ return IntegerLexemeAction(); }
 
 {number}                            { return IntegerLexemeAction(); }
-{string}                            { return StringLexemeAction(); }
 {whitespace}						{ return IgnoredLexemeAction(); }
 .									{ return UnknownLexemeAction(); }
 

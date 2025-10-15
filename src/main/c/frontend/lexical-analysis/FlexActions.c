@@ -86,7 +86,7 @@ CompilationStatus IntegerLexemeAction() {
 	return status;
 }
 
-CompilationStatus SymbolLexemeAction(TokenLabel label) {
+CompilationStatus SymbolLexemeAction(TokenLabel label, FlexContext *context) {
 	Token * token = createToken(_lexicalAnalyzer, label);
 	_logTokenAction(__FUNCTION__, token);
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
@@ -109,20 +109,4 @@ CompilationStatus UnknownLexemeAction() {
 	return FAILED;
 }
 
-CompilationStatus StringLexemeAction() {
-	Token * token = createToken(_lexicalAnalyzer, STRING);
-	char * raw = token->lexeme;
-	size_t len = strlen(raw);
-	if (len >= 2 && raw[0] == '"' && raw[len - 1] == '"') {
-		raw[len - 1] = '\0'; 
-		token->lexeme = strdup(raw + 1); 
-	}
-
-	token->semanticValue->string = strdup(token->lexeme);
-	_logTokenAction(__FUNCTION__, token);
-
-	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
-	destroyToken(token);
-	return status;
-}
 
