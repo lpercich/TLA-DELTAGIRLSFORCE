@@ -86,7 +86,6 @@ string              \"([^\"\\]|\\.)*\"
 [[:digit:]]+						{ return IntegerLexemeAction(); }
 
 {number}                            { return IntegerLexemeAction(); }
-{string}                            { return StringLexemeAction(); }
 {whitespace}						{ return IgnoredLexemeAction(); }
 .									{ return UnknownLexemeAction(); }
 
