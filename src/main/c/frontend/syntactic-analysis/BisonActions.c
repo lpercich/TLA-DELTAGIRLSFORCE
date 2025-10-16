@@ -100,3 +100,19 @@ Program * ExpressionProgramSemanticAction(Expression * expression) {
 	_compilerState->abstractSyntaxtTree = program;
 	return program;
 }
+
+
+Relation *BinaryRelationSemanticAction(RelationType type, Relation *left, Relation *right) {
+    Relation *r = malloc(sizeof(Relation));
+    r->type = type;
+    r->binary.left = left;
+    r->binary.right = right;
+    return r;
+}
+
+Relation *BaseRelationSemanticAction(char *tableName) {
+    Relation *r = malloc(sizeof(Relation));
+    r->type = BASE;
+    r->base.tableName = tableName;
+    return r;
+}
