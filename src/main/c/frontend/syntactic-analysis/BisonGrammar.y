@@ -157,6 +157,9 @@ comparison:
 	| HIGHER_EQUAL COLON OPEN_BRACKET id COMMA id CLOSE_BRACKET { $$ = ComparisonConditionSemanticAction($3, "=", $5); }
 ;
 
+relation:
+JOIN COLON OPEN_BRACE
+
 
 
 constant: INTEGER											{ $$ = IntegerConstantSemanticAction($1); }
