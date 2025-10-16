@@ -52,13 +52,10 @@ string              \"([^\"\\]|\\.)*\"
 %}
 
 
-<IMPORT_EXPRESSION>[^{}]+			{ return SubexpressionLexemeAction(); }
-<IMPORT_EXPRESSION>.				{ return UnknownLexemeAction(); }
-
 "{"                                 {return SymbolLexemeAction(OPEN_BRACE);}
 "}"                                 {return SymbolLexemeAction(CLOSE_BRACE);}
-"["									{ return SymbolLexemeAction(OPEN_BRACKETS); }
-"]"									{ return SymbolLexemeAction(CLOSE_BRACKETS); }
+"["									{ return SymbolLexemeAction(OPEN_BRACKET); }
+"]"									{ return SymbolLexemeAction(CLOSE_BRACKET); }
 "("									{ return SymbolLexemeAction(OPEN_PARENTHESIS); }
 ")"									{ return SymbolLexemeAction(CLOSE_PARENTHESIS); }
 ":"									{ return SymbolLexemeAction(COLON); }

@@ -52,9 +52,9 @@ Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, cons
     return cond;
 }
 
-Condition *UnaryConditionSemanticAction(Condition *expr, const char *op) {
+Condition *UnaryConditionSemanticAction(Condition *expr) {
     Condition *cond = malloc(sizeof(Condition));
-    cond->type = UNARY;
+    cond->type = NOT;
     cond->unary.expr = expr;
     return cond;
 }
@@ -69,27 +69,26 @@ Condition *ComparisonConditionSemanticAction(char *left, char *op, char *right) 
 }
 
 Expression * SelectionSemanticAction(Expression *input, Condition * condition){
-	Expression exp = malloc(sizeof(Expression));
-	exp.type= SELECTION;
-	exp.selection.condition= condition; //preg si hay que reservar espacio ????
-	exp.selection.input=input;
+	Expression * exp = malloc(sizeof(Expression));
+	exp->type= SELECTION;
+	exp->selection.condition= condition; //preg si hay que reservar espacio ????
+	exp->selection.input=input;
 	return exp;
 }
 
-Expression * ProjectionSemanticAction(Expression *input, char ** atts, int attCount){
-	Expression exp = malloc(sizeof(Expression));
-	exp.type= PROJECTION;
-	exp.projection.attrCount=attCount;
-	exp.projection.attributes=atts;
-	exp.projection.input=input;
+Expression * ProjectionSemanticAction(Expression *input, Attributes * atts){
+	Expression * exp = malloc(sizeof(Expression));
+	exp->type= PROJECTION;
+	exp->projection.attributes=atts;
+	exp->projection.input=input;
 	return exp;
 }
 
 Expression * RenameSemanticAction(Expression* input, char * newName){
-	Expression exp = malloc(sizeof(Expression));
-	exp.type=RHO;
-	exp.renaming.input=input;
-	exp.renaming.newName=newName;
+	Expression * exp = malloc(sizeof(Expression));
+	exp->type=RHO;
+	exp->renaming.input=input;
+	exp->renaming.newName=newName;
 	return exp;
 }
 
@@ -138,7 +137,14 @@ Relation *BinaryRelationSemanticAction(RelationType type, Relation *left, Relati
 
 Relation *BaseRelationSemanticAction(char *tableName) {
     Relation *r = malloc(sizeof(Relation));
-    r->type = BASE_TABLE;
+    r->type = BASE_TABLE_REL;
     r->base.tableName = tableName;
     return r;
+}
+
+Attributes * AtributeSemanticAction(char * next, Attributes * list){
+		Attributes * ats= malloc(sizeof(Attributes));
+		ats->value=next;
+		ats->next=list;
+		return ats;	
 }

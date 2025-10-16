@@ -21,10 +21,9 @@ Expression * ArithmeticExpressionSemanticAction(Expression * leftExpression, Exp
 Expression * FactorExpressionSemanticAction(Factor * factor);
 Factor * ConstantFactorSemanticAction(Constant * constant);
 Factor * ExpressionFactorSemanticAction(Expression * expression);
-Condition * BinaryConditionSemanticAction(Condition * left, Condition * right, char* OPERATOR);
-Condition * UnaryConditionSemanticAction(Condition * condition);
-Condition * ComparisonConditionSemanticAction(char * left, char * right, char* OPERATOR);
+Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *op);
+Condition *UnaryConditionSemanticAction(Condition *expr);
 Program * ExpressionProgramSemanticAction(Expression * expression);
-Relation *BinaryRelationSemanticAction(RelationType type, Relation *left, Relation *right);
+Relation *BinaryRelationSemanticAction(RelationType type, Relation *left, Relation *right, Condition * condition);
 Relation *BaseRelationSemanticAction(char *tableName);
 #endif

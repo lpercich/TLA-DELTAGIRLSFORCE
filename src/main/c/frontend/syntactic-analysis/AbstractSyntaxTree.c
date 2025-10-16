@@ -36,12 +36,12 @@ void destroyExpression(Expression * expression) {
 			destroyCondition(expression->selection.condition);
 			case PROJECTION:
 			destroyExpression(expression->projection.input);
-			destroyAtributes(expression->projection.attributes,expression->projection.attrCount);
+			//destroyAtributes(expression->projection.attributes);
 			case RHO:
 				destroyExpression(expression->renaming.input);
 				free(expression->renaming.newName);
 				break;
-			case BASETABLE:
+			case BASE_TABLE_EXP:
 				destroyRelation(expression->base.relation);
 				break;
 		}
@@ -73,7 +73,7 @@ void destroyCondition(Condition *condition){
 void destroyRelation(Relation *relation){
 	if (relation != NULL) {
 		switch (relation->type) {
-			case BASE_TABLE:
+			case BASE_TABLE_REL:
 			free(relation->base.tableName);
 			break;
 			case JOIN: 

@@ -25,6 +25,9 @@ typedef struct Condition Condition;
 typedef struct Factor Factor;
 typedef struct Relation Relation;
 typedef struct Program Program;
+typedef struct Attributes Attributes;
+typedef struct Aggregation Aggregation;
+typedef struct Order Order;
 
 /**
  * Node types for the Abstract Syntax Tree (AST).
@@ -38,12 +41,12 @@ enum ExpressionType{
 	SELECTION,
 	PROJECTION,
 	RHO,
-    BASETABLE
+    BASE_TABLE_EXP
 	
 };
 
 enum RelationType{
-	BASE_TABLE,
+	BASE_TABLE_REL,
 	JOIN,
 	UNION,
 	INTERSECTION,
@@ -65,6 +68,10 @@ enum OrderByType
 	DESC
 };
 
+struct Attributes{
+    char * value;
+    Attributes * next;
+};
 
 struct Factor {
 	union {
@@ -86,8 +93,7 @@ struct Expression {
 
         struct { // PROJECTION
             struct Expression *input;
-            char **attributes;
-            size_t attrCount;
+            Attributes *attributes;
         } projection;
 
         struct { // RENAMING
@@ -100,6 +106,7 @@ struct Expression {
         } base;
     };
 };
+
 
 
 //queda para preguntar xq con la correccion alfinal no me queda claro???
