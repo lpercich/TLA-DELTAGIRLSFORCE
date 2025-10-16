@@ -1,12 +1,11 @@
 {
     "DIFF": {
     "left": {
-      "operation": "table",
-      "name": "Empleados"
+      "TABLE":"Empleados"
+      
     },
     "right": {
-      "operation": "table",
-      "name": "Gerentes"
+      "TABLE": "Gerentes"
     }
   }
 }

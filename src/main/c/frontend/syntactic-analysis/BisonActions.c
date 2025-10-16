@@ -68,6 +68,31 @@ Condition *ComparisonConditionSemanticAction(char *left, char *op, char *right) 
     return cond;
 }
 
+Expression * SelectionSemanticAction(Expression *input, Condition * condition){
+	Expression exp = malloc(sizeof(Expression));
+	exp.type= SELECTION;
+	exp.selection.condition= condition; //preg si hay que reservar espacio ????
+	exp.selection.input=input;
+	return exp;
+}
+
+Expression * ProjectionSemanticAction(Expression *input, char ** atts, int attCount){
+	Expression exp = malloc(sizeof(Expression));
+	exp.type= PROJECTION;
+	exp.projection.attrCount=attCount;
+	exp.projection.attributes=atts;
+	exp.projection.input=input;
+	return exp;
+}
+
+Expression * RenameSemanticAction(Expression* input, char * newName){
+	Expression exp = malloc(sizeof(Expression));
+	exp.type=RHO;
+	exp.renaming.input=input;
+	exp.renaming.newName=newName;
+	return exp;
+}
+
 /*
 Expression * FactorExpressionSemanticAction(Factor * factor) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
@@ -102,17 +127,18 @@ Program * ExpressionProgramSemanticAction(Expression * expression) {
 }
 
 
-Relation *BinaryRelationSemanticAction(RelationType type, Relation *left, Relation *right) {
+Relation *BinaryRelationSemanticAction(RelationType type, Relation *left, Relation *right, Condition * condition) {
     Relation *r = malloc(sizeof(Relation));
     r->type = type;
     r->binary.left = left;
     r->binary.right = right;
+	r->binary.condition=condition;
     return r;
 }
 
 Relation *BaseRelationSemanticAction(char *tableName) {
     Relation *r = malloc(sizeof(Relation));
-    r->type = BASE;
+    r->type = BASE_TABLE;
     r->base.tableName = tableName;
     return r;
 }

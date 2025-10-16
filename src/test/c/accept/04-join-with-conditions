@@ -2,12 +2,10 @@
     "JOIN" : {
     "=": ["Persona.id", "Trabajo.persona_id"],
     "left": {
-      "operation": "table",
-      "name": "Persona"
-    },
+      "TABLE":"Persona"
+  },
     "right": {
-      "operation": "table",
-      "name": "Trabajo"
+     "TABLE": "Trabajo"
     }
   }
-}
+  }

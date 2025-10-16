@@ -1,16 +1,11 @@
 {
-  "operation": "outer_join",
-  "condition": {
-    "operator": "=",
-    "left": "Persona.id",
-    "right": "Curso.idPersona"
-  },
-  "leftInput": {
-    "operation": "table",
-    "name": "Persona"
-  },
-  "rightInput": {
-    "operation": "table",
-    "name": "Curso"
-  }
+  "OUTER_JOIN":{
+    "=": ["Persona.id", "Curso.persona_id"],
+  "left": {
+    "TABLE": "Persona"
+},
+  "right": {
+    "TABLE":"Curso"
+}
+}
 }

@@ -1,9 +1,9 @@
 {
-  "operation": "PROJECTION",
+  "PROJECTION": {
     "attributes": ["nombre", "edad"],
     "input": {
       
       }
-  
+  }
   }
 

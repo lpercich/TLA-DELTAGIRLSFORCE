@@ -136,6 +136,7 @@ struct Condition {
         struct { // Operaciones binarias: JOIN, UNION, etc.
             Relation *left;
             Relation *right;
+            Condition * condition; //para el on del JOIN
         } binary;
     };
 };

@@ -1,12 +1,11 @@
 {
   "PRODUCT":{
   "left": {
-    "operation": "table",
-    "name": "Persona"
-  },
+    "TABLE": "Persona"
+  
+},
   "right": {
-    "operation": "table",
-    "name": "Curso"
-  }
+    "TABLE": "Curso"
+}
   }
 }

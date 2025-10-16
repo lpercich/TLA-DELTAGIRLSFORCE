@@ -7,9 +7,8 @@
          "SELECTION":{
         ">":["edad", 30],
         "input": {
-          "TABLE": {
-          "name": "Persona"
-          }
+          "TABLE": "Persona"
+          
         }
       }
       }
@@ -22,9 +21,8 @@
          "SELECTION":{
         "<":["edad", 20],
         "input": {
-          "TABLE": {
-          "name": "Persona"
-          }
+          "TABLE":  "Persona"
+          
         }
       }
       }

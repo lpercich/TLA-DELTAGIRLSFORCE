@@ -2,14 +2,10 @@
   "PROJECTION":{
   "attributes": ["nombre"],
   "input": {
-    "SELECTTION":{
-    "condition": {        
-      ">":["edad", 30]
-
-    },
+    "SELECTION":{       
+    ">":["edad", 30],
     "input": {
-       "TABLE":{
-      "name": "Persona"}
+       "TABLE":"Persona"
     }
   }
   }

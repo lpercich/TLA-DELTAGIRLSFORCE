@@ -2,9 +2,8 @@
    "PROJECTION": {
     "attributes": ["nombre", "edad"],
     "input": {
-        "operation": "table",
-        "name": "Persona"
-      }
+        "TABLE": "Persona"
+    }
   
   }
 }

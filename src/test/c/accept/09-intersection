@@ -1,14 +1,12 @@
 {
   "INTERSECTION":{
     "left": {
-         "TABLE":{
-        "name": "Empleados"
-         }
+         "TABLE":"Empleados"
+         
     },
     "right": {
-     "TABLE":{
-        "name": "Contratistas"
-     }
+     "TABLE":"Contratistas"
+     
     }
 }
 }

@@ -2,11 +2,7 @@
     "RHO":{
     "name": "PersonaNueva",
     "input": {
-        "TABLE":{
-        "name": "Persona"
+        "TABLE":"Persona"
         }
       }
   }
-}
-
-
