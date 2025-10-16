@@ -108,7 +108,6 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> OPERATION
 %token <token> UNKNOWN
 
-%
 
 /** Non-terminals. */
 %type <constant> constant
