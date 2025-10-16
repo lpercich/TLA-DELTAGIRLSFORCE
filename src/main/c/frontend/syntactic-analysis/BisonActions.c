@@ -148,3 +148,4 @@ Attributes * AtributeSemanticAction(char * next, Attributes * list){
 		ats->next=list;
 		return ats;	
 }
+

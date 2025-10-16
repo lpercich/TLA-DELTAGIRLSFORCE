@@ -95,6 +95,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> INTER
 %token <token> DIF
 %token <token> JOINTOKEN
+%token <token> CARTESIAN_PRODUCT
 
 %token <token> NAME
 %token <token> INPUT
@@ -123,6 +124,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <expression> table
 %type <expression> input
 %type <expression> projection
+%type <expression> product
 %type <expression> selection
 %type <expression> side_input
 %type <expression> rho
@@ -165,11 +167,15 @@ table: TABLE COLON OPEN_BRACE  STRING CLOSE_BRACE {$$= BaseRelationSemanticActio
 selection: SELECT COLON OPEN_BRACE comparison COMMA input CLOSE_BRACE {$$= SelectionSemanticAction($4,$6); };
 projection: PROJECT COLON OPEN_BRACE attributes_param COMMA input CLOSE_BRACE{$$= ProjectionSemanticAction($6, $4);};
 rho: RENAME COLON OPEN_BRACE NAME STRING COMMA input CLOSE_BRACE {$$= RenameSemanticAction($5, $7);};
-input: INPUT COLON  OPEN_BRACE expression CLOSE_BRACE {};
+input: INPUT COLON  OPEN_BRACE expression CLOSE_BRACE {$$ = $4;};
+
+
 side_input:
-	left COLON OPEN_BRACE expression CLOSE_BRACE
-	|right COLON OPEN_BRACE expression CLOSE_BRACE
+	left COLON OPEN_BRACE expression CLOSE_BRACE {$$=$4;}
+	|right COLON OPEN_BRACE expression CLOSE_BRACE {$$=$4;}
 ;
+
+
 condition: 
 	AND COLON OPEN_BRACKET condition[left] COMMA condition[right] CLOSE_BRACKET	{ $$ = BinaryConditionSemanticAction($left, $right, "AND"); }
 	| OR COLON OPEN_BRACKET condition[left] OR condition[right]				{ $$ = BinaryConditionSemanticAction($left, $right, "OR"); }
@@ -189,9 +195,11 @@ comparison:
 
 relation:
 JOINTOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input {$$= BinaryRelationSemanticAction(JOIN, $5, $6, $4 );}
+|CARTESIAN_PRODUCT COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE {$$= BinaryRelationSemanticAction(PRODUCT, $4, $5, NULL );}
 | UN COLON OPEN_BRACE side_input COMMA side_input {$$= BinaryRelationSemanticAction(UNION, $4, $5, NULL );}
 | INTER COLON OPEN_BRACE side_input COMMA side_input {$$= BinaryRelationSemanticAction(INTERSECTION, $4, $5, NULL);}
 | DIF COLON OPEN_BRACE side_input COMMA side_input {$$= BinaryRelationSemanticAction(DIFF, $4, $5, NULL);}
+
 ;
 
 attributes:

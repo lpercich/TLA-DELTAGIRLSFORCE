@@ -50,7 +50,8 @@ enum RelationType{
 	JOIN,
 	UNION,
 	INTERSECTION,
-	DIFF
+	DIFF,
+    PRODUCT
 };
 
 enum FactorType {

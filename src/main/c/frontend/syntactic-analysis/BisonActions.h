@@ -26,4 +26,7 @@ Condition *UnaryConditionSemanticAction(Condition *expr);
 Program * ExpressionProgramSemanticAction(Expression * expression);
 Relation *BinaryRelationSemanticAction(RelationType type, Relation *left, Relation *right, Condition * condition);
 Relation *BaseRelationSemanticAction(char *tableName);
+Attributes * AtributeSemanticAction(char * next, Attributes * list);
+Expression* TableExpressionSemanticAction(Expression* expression);
+
 #endif

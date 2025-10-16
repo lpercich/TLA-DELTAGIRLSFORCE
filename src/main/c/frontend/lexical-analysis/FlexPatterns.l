@@ -66,6 +66,7 @@ string              \"([^\"\\]|\\.)*\"
 "UNION"                             { return SymbolLexemeAction(UN); }
 "INTERSECTION"                      { return SymbolLexemeAction(INTER); }
 "DIFF"                              { return SymbolLexemeAction(DIF); }
+"PRODUCT"                           { return SymbolLexemeAction(CARTESIAN_PRODUCT);}
 "RHO"                               { return SymbolLexemeAction(RENAME); }
 "AND"                               { return LogicalConditionLexemeAction(AND); }
 "OR"                                { return LogicalConditionLexemeAction(OR); }
