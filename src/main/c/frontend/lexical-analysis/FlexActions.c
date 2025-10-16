@@ -109,4 +109,12 @@ CompilationStatus UnknownLexemeAction() {
 	return FAILED;
 }
 
+CompilationStatus StringLexemeAction(){
+	Token * token = createToken(_lexicalAnalyzer, STRING);
+	token->semanticValue->string= token->lexeme;
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	destroyToken(token);
+	return status;
+}
 

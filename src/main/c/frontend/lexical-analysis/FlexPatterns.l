@@ -60,13 +60,13 @@ string              \"([^\"\\]|\\.)*\"
 ")"									{ return SymbolLexemeAction(CLOSE_PARENTHESIS); }
 ":"									{ return SymbolLexemeAction(COLON); }
 ","									{ return SymbolLexemeAction(COMMA); }
-"PROJECTION"                        { return SymbolLexemeAction(PROJECTION); }
-"SELECT"                         { return SymbolLexemeAction(SELECTION); }
-"JOIN"                              { return SymbolLexemeAction(JOIN); }
-"UNION"                             { return SymbolLexemeAction(UNION); }
-"INTERSECTION"                      { return SymbolLexemeAction(INTERSECTION); }
-"DIFF"                              { return SymbolLexemeAction(DIFF); }
-"RHO"                               { return SymbolLexemeAction(RHO); }
+"PROJECTION"                        { return SymbolLexemeAction(PROJECT); }
+"SELECT"                            { return SymbolLexemeAction(SELECT); }
+"JOIN"                              { return SymbolLexemeAction(JOINTOKEN); }
+"UNION"                             { return SymbolLexemeAction(UN); }
+"INTERSECTION"                      { return SymbolLexemeAction(INTER); }
+"DIFF"                              { return SymbolLexemeAction(DIF); }
+"RHO"                               { return SymbolLexemeAction(RENAME); }
 "AND"                               { return LogicalConditionLexemeAction(AND); }
 "OR"                                { return LogicalConditionLexemeAction(OR); }
 "NOT"                               { return LogicalConditionLexemeAction(NOT); }
@@ -82,6 +82,7 @@ string              \"([^\"\\]|\\.)*\"
 
 [[:digit:]]+						{ return IntegerLexemeAction(); }
 
+{string}                            {return StringLexemeAction();}
 {number}                            { return IntegerLexemeAction(); }
 {whitespace}						{ return IgnoredLexemeAction(); }
 .									{ return UnknownLexemeAction(); }
