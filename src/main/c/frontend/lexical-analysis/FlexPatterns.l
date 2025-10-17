@@ -68,6 +68,14 @@ string              \"([^\"\\]|\\.)*\"
 "DIFF"                              { return SymbolLexemeAction(DIF); }
 "PRODUCT"                           { return SymbolLexemeAction(CARTESIAN_PRODUCT);}
 "RHO"                               { return SymbolLexemeAction(RENAME); }
+"AGGREGATION"                       { return SymbolLexemeAction(AGGREGATION); }
+"group_by"                          { return SymbolLexemeAction(GROUP_BY); }
+"aggregations"                      { return SymbolLexemeAction(AGGREGATIONS); }
+"AVG"                               { return SymbolLexemeAction(AVG); }
+"SUM"                               { return SymbolLexemeAction(SUM); }
+"COUNT"                             { return SymbolLexemeAction(COUNT); }
+"MIN"                               { return SymbolLexemeAction(MIN); }
+"MAX"                               { return SymbolLexemeAction(MAX); }
 "AND"                               { return LogicalConditionLexemeAction(AND); }
 "OR"                                { return LogicalConditionLexemeAction(OR); }
 "NOT"                               { return LogicalConditionLexemeAction(NOT); }

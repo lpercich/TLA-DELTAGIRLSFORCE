@@ -96,6 +96,15 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> DIF
 %token <token> JOINTOKEN
 %token <token> CARTESIAN_PRODUCT
+%token <token> AGGREGATION 
+%token <token> GROUP_BY 
+%token <token> AGGREGATIONS 
+%token <token> AVG
+%token <token> SUM 
+%token <token> COUNT 
+%token <token> MIN 
+%token <token> MAX
+
 
 %token <token> NAME
 %token <token> INPUT
@@ -128,7 +137,8 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <expression> selection
 %type <expression> side_input
 %type <expression> rho
-
+%type <expression> aggregation
+%type <expression> aggregation_function
 
 
 %type <condition> condition
@@ -175,6 +185,28 @@ side_input:
 	|right COLON OPEN_BRACE expression CLOSE_BRACE {$$=$4;}
 ;
 
+aggregation_list:
+      aggregation_function
+    | aggregation_list COMMA aggregation_function
+    ;
+
+aggregation_function:
+      OPEN_BRACE AVG COLON STRING CLOSE_BRACE  { $$ = AggregationFunctionSemanticAction("AVG", $4); }
+    | OPEN_BRACE SUM COLON STRING CLOSE_BRACE  { $$ = AggregationFunctionSemanticAction("SUM", $4); }
+    | OPEN_BRACE COUNT COLON STRING CLOSE_BRACE { $$ = AggregationFunctionSemanticAction("COUNT", $4); }
+    | OPEN_BRACE MIN COLON STRING CLOSE_BRACE  { $$ = AggregationFunctionSemanticAction("MIN", $4); }
+    | OPEN_BRACE MAX COLON STRING CLOSE_BRACE  { $$ = AggregationFunctionSemanticAction("MAX", $4); }
+    ;
+
+aggregation:
+    AGGREGATION COLON OPEN_BRACE
+        GROUP_BY COLON OPEN_BRACKET attributes CLOSE_BRACKET COMMA
+        AGGREGATIONS COLON OPEN_BRACKET aggregation_list CLOSE_BRACKET COMMA
+        INPUT COLON input
+    CLOSE_BRACE
+    {
+        $$ = AggregationSemanticAction($6, $10, $14);
+    };
 
 condition: 
 	AND COLON OPEN_BRACKET condition[left] COMMA condition[right] CLOSE_BRACKET	{ $$ = BinaryConditionSemanticAction($left, $right, "AND"); }
