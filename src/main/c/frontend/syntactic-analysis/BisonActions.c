@@ -124,6 +124,13 @@ Program * ExpressionProgramSemanticAction(Expression * expression) {
 	_compilerState->abstractSyntaxtTree = program;
 	return program;
 }
+Program * RelationProgramSemanticAction(Relation * relation) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+	Program * program = calloc(1, sizeof(Program));
+	program->relation = relation;
+	_compilerState->abstractSyntaxtTree = program;
+	return program;
+}
 
 
 Relation *BinaryRelationSemanticAction(RelationType type, Relation *left, Relation *right, Condition * condition) {
@@ -135,9 +142,11 @@ Relation *BinaryRelationSemanticAction(RelationType type, Relation *left, Relati
     return r;
 }
 
+
+
 Relation *BaseRelationSemanticAction(char *tableName) {
     Relation *r = malloc(sizeof(Relation));
-    r->type = BASE_TABLE_REL;
+    r->type = BASE_TABLE;
     r->base.tableName = tableName;
     return r;
 }

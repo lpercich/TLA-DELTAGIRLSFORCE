@@ -24,6 +24,8 @@ extern CompilationStatus EOFLexemeAction();
 extern CompilationStatus IgnoredLexemeAction();
 extern CompilationStatus IntegerLexemeAction();
 extern CompilationStatus UnknownLexemeAction();
+extern CompilationStatus newContextSymbolLexemeAction(TokenLabel label);
+extern CompilationStatus closeContextSymbolLexemeAction(TokenLabel label);
 
 %}
 

@@ -64,7 +64,6 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <integer> INTEGER
 %token <string> STRING
 %token <boolean> BOOL
-%token <string> IDENTIFIER
 %token <string> VALUE
 
 %token <token> CLOSE_BRACE  /* o sea {} */
@@ -75,9 +74,9 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> OPEN_PARENTHESIS /* () */
 %token <token> IGNORED
 
-%token <condition> OR
-%token <condition> AND 
-%token <condition> NOT 
+%token <string> OR
+%token <string> AND 
+%token <token> NOT 
 
 %token <token> SELECT
 %token <token> TABLE
@@ -87,7 +86,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> left
 %token <token> right
 
-
+%token <string> table
 %token <token> COLON
 %token <token> COMMA
 
@@ -102,14 +101,13 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> NAME
 %token <token> INPUT
 
-%token <condition> LOWER    /* x<10*/
-%token <condition> LOWER_EQUAL
-%token <condition> HIGHER_EQUAL
-%token <condition> HIGHER
-%token <condition> EQUAL
-%token <condition> NOT_EQUAL /* x!=10 */
+%token <token> LOWER    /* x<10*/
+%token <token> LOWER_EQUAL
+%token <token> HIGHER_EQUAL
+%token <token> HIGHER
+%token <token> EQUAL
+%token <token> NOT_EQUAL /* x!=10 */
 
-%token <token> OPERATION
 %token <token> UNKNOWN
 
 
@@ -117,25 +115,15 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 /** Non-terminals. */
 %type <constant> constant
 %type <attributes> attributes
-%type <attribute> attribute
 %type <attributes> attributes_param
 
 %type <expression> expression
 
 
-%type <expression> table
 %type <expression> input
-%type <expression> projection
-%type <expression> product
-%type <expression> selection
-%type <expression> side_input
-%type <expression> rho
-
-
+%type <relation> side_input
 
 %type <condition> condition
-%type <condition> simple_condition
-%type <condition> compound_condition
 %type <comparison> comparison
 %type <relation> relation
 %type <program> program
@@ -153,35 +141,31 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 program: 
   OPEN_BRACE expression CLOSE_BRACE											{ $$ = ExpressionProgramSemanticAction($2); }
+	|OPEN_BRACE relation CLOSE_BRACE										{$$ = RelationProgramSemanticAction($2);}
 	;
 
 expression: 
-	table
-	|selection
-	|projection
-	|rho
-	|relation
+	SELECT COLON OPEN_BRACE condition COMMA input CLOSE_BRACE {$$= SelectionSemanticAction($4,$6); };
+	|PROJECT COLON OPEN_BRACE attributes_param COMMA input CLOSE_BRACE{$$= ProjectionSemanticAction($6, $4);};
+	|RENAME COLON OPEN_BRACE NAME STRING COMMA input CLOSE_BRACE {$$= RenameSemanticAction($5, $7);};
 	|input
 	;
 
 
-table: TABLE COLON STRING {$$= BaseRelationSemanticAction($3);};
-selection: SELECT COLON OPEN_BRACE comparison COMMA input CLOSE_BRACE {$$= SelectionSemanticAction($4,$6); };
-projection: PROJECT COLON OPEN_BRACE attributes_param COMMA input CLOSE_BRACE{$$= ProjectionSemanticAction($6, $4);};
-rho: RENAME COLON OPEN_BRACE NAME STRING COMMA input CLOSE_BRACE {$$= RenameSemanticAction($5, $7);};
-input: INPUT COLON OPEN_BRACE expression CLOSE_BRACE {$$ = $4;};
+
+ input: INPUT COLON OPEN_BRACE expression CLOSE_BRACE {$$ = $4;};
 
 
 side_input:
-	left COLON OPEN_BRACE expression CLOSE_BRACE {$$=$4;}
-	|right COLON OPEN_BRACE expression CLOSE_BRACE {$$=$4;}
+	left COLON OPEN_BRACE relation CLOSE_BRACE {$$=$4;}
+	|right COLON OPEN_BRACE relation CLOSE_BRACE {$$=$4;}
 ;
 
 
 condition: 
-	AND COLON OPEN_BRACKET condition[left] COMMA condition[right] CLOSE_BRACKET	{ $$ = BinaryConditionSemanticAction($left, $right, "AND"); }
-	| OR COLON OPEN_BRACKET condition[left] OR condition[right]				{ $$ = BinaryConditionSemanticAction($left, $right, "OR"); }
-	| NOT COLON OPEN_BRACKET condition	[expr]							{ $$ = UnaryConditionSemanticAction($expr); }
+	AND COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET	{ $$ = BinaryConditionSemanticAction($4, $6, $1); }
+	| OR COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET			{ $$ = BinaryConditionSemanticAction($4, $6, "OR"); }
+	| NOT COLON OPEN_BRACKET condition CLOSE_BRACKET							{ $$ = UnaryConditionSemanticAction($4); }
 	| comparison                           				{ $$ = $comparison; }
 	;
 
@@ -196,12 +180,12 @@ comparison:
 ;
 
 relation:
-JOINTOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input {$$= BinaryRelationSemanticAction(JOIN, $5, $6, $4 );}
-|CARTESIAN_PRODUCT COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE {$$= BinaryRelationSemanticAction(PRODUCT, $4, $5, NULL );}
-| UN COLON OPEN_BRACE side_input COMMA side_input {$$= BinaryRelationSemanticAction(UNION, $4, $5, NULL );}
-| INTER COLON OPEN_BRACE side_input COMMA side_input {$$= BinaryRelationSemanticAction(INTERSECTION, $4, $5, NULL);}
-| DIF COLON OPEN_BRACE side_input COMMA side_input {$$= BinaryRelationSemanticAction(DIFF, $4, $5, NULL);}
-
+TABLE COLON table {$$= BaseRelationSemanticAction($3);};
+|JOINTOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input {$$= BinaryRelationSemanticAction(JOIN, $6, $8, $4 );}
+|CARTESIAN_PRODUCT COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE {$$= BinaryRelationSemanticAction(PRODUCT, $4, $6, NULL );}
+| UN COLON OPEN_BRACE side_input COMMA side_input {$$= BinaryRelationSemanticAction(UNION, $4, $6, NULL );}
+| INTER COLON OPEN_BRACE side_input COMMA side_input {$$= BinaryRelationSemanticAction(INTERSECTION, $4, $6, NULL);}
+| DIF COLON OPEN_BRACE side_input COMMA side_input {$$= BinaryRelationSemanticAction(DIFF, $4, $6, NULL);}
 ;
 
 attributes:

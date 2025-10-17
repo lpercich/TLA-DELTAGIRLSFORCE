@@ -41,9 +41,6 @@ void destroyExpression(Expression * expression) {
 				destroyExpression(expression->renaming.input);
 				free(expression->renaming.newName);
 				break;
-			case BASE_TABLE_EXP:
-				destroyRelation(expression->base.relation);
-				break;
 		}
 		free(expression);
 	}
@@ -73,7 +70,7 @@ void destroyCondition(Condition *condition){
 void destroyRelation(Relation *relation){
 	if (relation != NULL) {
 		switch (relation->type) {
-			case BASE_TABLE_REL:
+			case BASE_TABLE:
 			free(relation->base.tableName);
 			break;
 			case JOIN: 

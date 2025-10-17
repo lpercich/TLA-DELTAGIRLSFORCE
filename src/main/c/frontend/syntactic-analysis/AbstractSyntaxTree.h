@@ -40,13 +40,12 @@ enum ConditionType {
 enum ExpressionType{
 	SELECTION,
 	PROJECTION,
-	RHO,
-    BASE_TABLE_EXP
+	RHO
 	
 };
 
 enum RelationType{
-	BASE_TABLE_REL,
+	BASE_TABLE,
 	JOIN,
 	UNION,
 	INTERSECTION,
@@ -101,10 +100,6 @@ struct Expression {
             struct Expression *input;
             char *newName;
         } renaming;
-
-        struct { // Entrada base
-            Relation *relation;
-        } base;
     };
 };
 
@@ -152,6 +147,7 @@ struct Condition {
 
 struct Program {
 	Expression * expression;
+    Relation * relation;
 };
 
 /**

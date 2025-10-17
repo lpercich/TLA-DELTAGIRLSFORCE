@@ -28,5 +28,6 @@ Relation *BinaryRelationSemanticAction(RelationType type, Relation *left, Relati
 Relation *BaseRelationSemanticAction(char *tableName);
 Attributes * AtributeSemanticAction(char * next, Attributes * list);
 Expression* TableExpressionSemanticAction(Expression* expression);
-
+Program * RelationProgramSemanticAction(Relation * relation);
+Condition *ComparisonConditionSemanticAction(char *left, char *op, char *right);
 #endif
