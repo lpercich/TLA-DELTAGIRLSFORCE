@@ -96,6 +96,8 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> DIF
 %token <token> JOINTOKEN
 %token <token> CARTESIAN_PRODUCT
+%token <token> ATTRIBUTES
+
 
 %token <token> NAME
 %token <token> INPUT
@@ -163,11 +165,11 @@ expression:
 	;
 
 
-table: TABLE COLON OPEN_BRACE  STRING CLOSE_BRACE {$$= BaseRelationSemanticAction($4);};
+table: TABLE COLON STRING {$$= BaseRelationSemanticAction($3);};
 selection: SELECT COLON OPEN_BRACE comparison COMMA input CLOSE_BRACE {$$= SelectionSemanticAction($4,$6); };
 projection: PROJECT COLON OPEN_BRACE attributes_param COMMA input CLOSE_BRACE{$$= ProjectionSemanticAction($6, $4);};
 rho: RENAME COLON OPEN_BRACE NAME STRING COMMA input CLOSE_BRACE {$$= RenameSemanticAction($5, $7);};
-input: INPUT COLON  OPEN_BRACE expression CLOSE_BRACE {$$ = $4;};
+input: INPUT COLON OPEN_BRACE expression CLOSE_BRACE {$$ = $4;};
 
 
 side_input:
@@ -207,7 +209,7 @@ attributes:
 	|STRING COMMA attributes {$$= AtributeSemanticAction($1, $3);}
 ;
 attributes_param:
-	OPEN_BRACKET attributes CLOSE_BRACKET {$$=$2;}
+	 ATTRIBUTES COLON OPEN_BRACKET attributes CLOSE_BRACKET {$$=$2;}
 	;
 	
 constant: INTEGER										{ $$ = IntegerConstantSemanticAction($1); }

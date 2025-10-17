@@ -64,23 +64,26 @@ string              \"([^\"\\]|\\.)*\"
 ":"									{ return SymbolLexemeAction(COLON); }
 ","									{ return SymbolLexemeAction(COMMA); }
 "\"PROJECTION\""                        { return SymbolLexemeAction(PROJECT); }
-"SELECT"                            { return SymbolLexemeAction(SELECT); }
-"JOIN"                              { return SymbolLexemeAction(JOINTOKEN); }
-"UNION"                             { return SymbolLexemeAction(UN); }
-"INTERSECTION"                      { return SymbolLexemeAction(INTER); }
-"DIFF"                              { return SymbolLexemeAction(DIF); }
-"PRODUCT"                           { return SymbolLexemeAction(CARTESIAN_PRODUCT);}
-"RHO"                               { return SymbolLexemeAction(RENAME); }
-"AND"                               { return LogicalConditionLexemeAction(AND); }
-"OR"                                { return LogicalConditionLexemeAction(OR); }
-"NOT"                               { return LogicalConditionLexemeAction(NOT); }
-"<"                                 { return LogicalConditionLexemeAction(LOWER); }
-"<="                                { return LogicalConditionLexemeAction(LOWER_EQUAL); }
-">"                                 { return LogicalConditionLexemeAction(HIGHER); }
-">="                                { return LogicalConditionLexemeAction(HIGHER_EQUAL); }
-"="                                 { return LogicalConditionLexemeAction(EQUAL); }
-"!="                                { return LogicalConditionLexemeAction(NOT_EQUAL); }
+"\"TABLE\""                        { return SymbolLexemeAction(TABLE); }
+"\"SELECT\""                            { return SymbolLexemeAction(SELECT); }
+"\"JOIN\""                              { return SymbolLexemeAction(JOINTOKEN); }
+"\"UNION\""                             { return SymbolLexemeAction(UN); }
+"\"INTERSECTION\""                      { return SymbolLexemeAction(INTER); }
+"\"DIFF\""                              { return SymbolLexemeAction(DIF); }
+"\"PRODUCT\""                           { return SymbolLexemeAction(CARTESIAN_PRODUCT);}
+"\"RHO\""                               { return SymbolLexemeAction(RENAME); }
+"\"AND\""                               { return LogicalConditionLexemeAction(AND); }
+"\"OR\""                                { return LogicalConditionLexemeAction(OR); }
+"\"NOT\""                               { return LogicalConditionLexemeAction(NOT); }
+"\"<\""                                 { return LogicalConditionLexemeAction(LOWER); }
+"\"<=\""                                { return LogicalConditionLexemeAction(LOWER_EQUAL); }
+"\">\""                                 { return LogicalConditionLexemeAction(HIGHER); }
+"\">=\""                                { return LogicalConditionLexemeAction(HIGHER_EQUAL); }
+"\"=\""                                 { return LogicalConditionLexemeAction(EQUAL); }
+"\"!=\""                                { return LogicalConditionLexemeAction(NOT_EQUAL); }
 
+"\"attributes\""                        {return SymbolLexemeAction(ATTRIBUTES);}
+"\"input\""                              {return SymbolLexemeAction(INPUT);}
 
 
 
