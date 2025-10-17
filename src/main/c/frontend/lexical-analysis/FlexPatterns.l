@@ -86,7 +86,9 @@ string              \"([^\"\\]|\\.)*\"
 
 "\"attributes\""                        {return SymbolLexemeAction(ATTRIBUTES);}
 "\"input\""                              {return SymbolLexemeAction(INPUT);}
-
+"\"left\""                              {return SymbolLexemeAction(left);}
+"\"right\""                              {return SymbolLexemeAction(right);}
+"\"NAME\""                              {return SymbolLexemeAction(NAME);}
 
 
 [[:digit:]]+						{ return IntegerLexemeAction(); }

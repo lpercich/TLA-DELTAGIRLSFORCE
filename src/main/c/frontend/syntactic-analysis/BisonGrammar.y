@@ -147,10 +147,9 @@ program:
 expression: 
 	SELECT COLON OPEN_BRACE condition COMMA input CLOSE_BRACE {$$= SelectionSemanticAction($4,$6); };
 	|PROJECT COLON OPEN_BRACE attributes_param COMMA input CLOSE_BRACE{$$= ProjectionSemanticAction($6, $4);};
-	|RENAME COLON OPEN_BRACE NAME STRING COMMA input CLOSE_BRACE {$$= RenameSemanticAction($5, $7);};
-	|input
+	|RENAME COLON OPEN_BRACE NAME COLON STRING COMMA input CLOSE_BRACE {$$= RenameSemanticAction($6, $8);};
+	|input 
 	;
-
 
 
  input: INPUT COLON OPEN_BRACE expression CLOSE_BRACE {$$ = $4;};

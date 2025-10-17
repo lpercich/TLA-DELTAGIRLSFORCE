@@ -1,6 +1,6 @@
 {
     "RHO":{
-    "name": "PersonaNueva",
+    "NAME": "PersonaNueva",
     "input": {
         "TABLE":"Persona"
         }
