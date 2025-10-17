@@ -26,6 +26,7 @@ ModuleDestructor initializeFlexActionsModule(LexicalAnalyzer * lexicalAnalyzer) 
 	_lexicalAnalyzer = lexicalAnalyzer;
 	_logger = createLogger("FlexActions");
 	_logIgnoredLexemes = getBooleanOrDefault("LOG_IGNORED_LEXEMES", _logIgnoredLexemes);
+	printf("entre en ignore\n");
 	return _shutdownFlexActionsModule;
 }
 
@@ -86,14 +87,34 @@ CompilationStatus IntegerLexemeAction() {
 	return status;
 }
 
-CompilationStatus SymbolLexemeAction(TokenLabel label, FlexContext *context) {
+CompilationStatus SymbolLexemeAction(TokenLabel label) {
 	Token * token = createToken(_lexicalAnalyzer, label);
 	_logTokenAction(__FUNCTION__, token);
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
 	destroyToken(token);
-	enterLexicalAnalyzerContext(_lexicalAnalyzer, context);
 	return IN_PROGRESS;
 }
+
+CompilationStatus newContextSymbolLexemeAction(TokenLabel label){
+	Token * token = createToken(_lexicalAnalyzer, label);
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	enterLexicalAnalyzerContext(_lexicalAnalyzer, token->context);
+	destroyToken(token);
+	return IN_PROGRESS;
+}
+
+CompilationStatus closeContextSymbolLexemeAction(TokenLabel label){
+	Token * token = createToken(_lexicalAnalyzer, label);
+	_logTokenAction(__FUNCTION__, token);
+	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
+	leaveLexicalAnalyzerContext(_lexicalAnalyzer);
+	destroyToken(token);
+	return IN_PROGRESS;
+}
+
+
+
 CompilationStatus LogicalConditionLexemeAction(TokenLabel label) {
 	Token * token = createToken(_lexicalAnalyzer, label);
 	_logTokenAction(__FUNCTION__, token);

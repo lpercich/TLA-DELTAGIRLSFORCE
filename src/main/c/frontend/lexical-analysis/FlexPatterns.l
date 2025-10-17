@@ -1,10 +1,12 @@
 %top{
 
+
 #include "../../support/type/CompilationStatus.h"
 #include "../../support/type/FlexContext.h"
 #include "../../support/type/TokenLabel.h"
 #include "../syntactic-analysis/AbstractSyntaxTree.h"
 #include "../syntactic-analysis/BisonParser.h"
+
 
 }
 
@@ -13,6 +15,7 @@
 /**
  * @see https://westes.github.io/flex/manual/Definitions-Section.html#Definitions-Section
  */
+
 
 extern CompilationStatus SymbolLexemeAction(TokenLabel label);
 extern CompilationStatus LogicalConditionLexemeAction(TokenLabel label);
@@ -29,7 +32,7 @@ extern CompilationStatus UnknownLexemeAction();
  *
  * @see https://westes.github.io/flex/manual/Start-Conditions.html
  */
-%x IMPORT_EXPRESSION
+%s IMPORT_EXPRESSION
 
 /**
  * Reusable patterns.
@@ -52,15 +55,15 @@ string              \"([^\"\\]|\\.)*\"
 %}
 
 
-"{"                                 {return SymbolLexemeAction(OPEN_BRACE);}
-"}"                                 {return SymbolLexemeAction(CLOSE_BRACE);}
-"["									{ return SymbolLexemeAction(OPEN_BRACKET); }
-"]"									{ return SymbolLexemeAction(CLOSE_BRACKET); }
+"{"                                 {return newContextSymbolLexemeAction(OPEN_BRACE);}
+"}"                                 {return closeContextSymbolLexemeAction(CLOSE_BRACE);}
+"["									{ return newContextSymbolLexemeAction(OPEN_BRACKET); }
+"]"									{ return closeContextSymbolLexemeAction(CLOSE_BRACKET); }
 "("									{ return SymbolLexemeAction(OPEN_PARENTHESIS); }
 ")"									{ return SymbolLexemeAction(CLOSE_PARENTHESIS); }
 ":"									{ return SymbolLexemeAction(COLON); }
 ","									{ return SymbolLexemeAction(COMMA); }
-"PROJECTION"                        { return SymbolLexemeAction(PROJECT); }
+"\"PROJECTION\""                        { return SymbolLexemeAction(PROJECT); }
 "SELECT"                            { return SymbolLexemeAction(SELECT); }
 "JOIN"                              { return SymbolLexemeAction(JOINTOKEN); }
 "UNION"                             { return SymbolLexemeAction(UN); }
