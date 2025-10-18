@@ -84,6 +84,15 @@ string              \"([^\"\\]|\\.)*\"
 "\"=\""                                 { return LogicalConditionLexemeAction(EQUAL); }
 "\"!=\""                                { return LogicalConditionLexemeAction(NOT_EQUAL); }
 
+"\"AGGREGATION\""                       { return SymbolLexemeAction(AGGREGATION); }
+"\"group_by\""                          { return SymbolLexemeAction(GROUP_BY); }
+"\"aggregations\""                      { return SymbolLexemeAction(AGGREGATIONS); }
+"\"AVG\""                               { return SymbolLexemeAction(AVG); }
+"\"SUM\""                               { return SymbolLexemeAction(SUM); }
+"\"COUNT\""                             { return SymbolLexemeAction(COUNT); }
+"\"MIN\""                               { return SymbolLexemeAction(MIN); }
+"\"MAX\""                               { return SymbolLexemeAction(MAX); }
+
 "\"attributes\""                        {return SymbolLexemeAction(ATTRIBUTES);}
 "\"input\""                              {return SymbolLexemeAction(INPUT);}
 "\"left\""                              {return SymbolLexemeAction(left);}

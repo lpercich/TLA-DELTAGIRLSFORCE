@@ -40,7 +40,9 @@ enum ConditionType {
 enum ExpressionType{
 	SELECTION,
 	PROJECTION,
-	RHO
+	RHO,
+    AGGR,
+    BASE_TABLE_EXP
 	
 };
 
@@ -72,6 +74,11 @@ struct Attributes{
     char * value;
     Attributes * next;
 };
+typedef struct Aggregation {
+    char *function;  
+    Attributes *attribute;  
+    struct Aggregation *next;
+} Aggregation;
 
 struct Factor {
 	union {
@@ -100,6 +107,16 @@ struct Expression {
             struct Expression *input;
             char *newName;
         } renaming;
+        struct { // AGGREGATION
+            struct Expression *input;
+            Attributes *group_by;
+            Aggregation *aggregations;
+        } aggregation;
+
+        struct { // Entrada base
+            Relation *relation;
+        } base;
+
     };
 };
 

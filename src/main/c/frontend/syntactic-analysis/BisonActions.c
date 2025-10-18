@@ -157,4 +157,21 @@ Attributes * AtributeSemanticAction(char * next, Attributes * list){
 		ats->next=list;
 		return ats;	
 }
+Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggs, Expression *input) {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+    Expression *expr = calloc(1, sizeof(Expression));
+  	expr->type = AGGR;
+    expr->aggregation.input = input;
+    expr->aggregation.group_by = group_by;
+    expr->aggregation.aggregations = aggs;
+    return expr;
+}
+
+Aggregation * AggregationFunctionSemanticAction(char *func, Attributes *attribute) {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+    Aggregation *agg = calloc(1, sizeof(Aggregation));
+    agg->function = strdup(func);
+    agg->attribute = strdup(attribute);
+    return agg;
+}
 
