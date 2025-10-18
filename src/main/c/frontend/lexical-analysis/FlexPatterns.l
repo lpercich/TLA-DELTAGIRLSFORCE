@@ -42,9 +42,12 @@ extern CompilationStatus closeContextSymbolLexemeAction(TokenLabel label);
  * @see https://westes.github.io/flex/manual/Matching.html
  * @see https://westes.github.io/flex/manual/Patterns.html
  */
-whitespace			[[:space:]]+
+whitespace        [ \t\n\r\f\v]+
+
 number              -?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?
-string              \"([^\"\\]|\\.)*\"
+string              \"([^\\\"]|\\.)*\"
+
+
 
 %%
 
@@ -57,16 +60,16 @@ string              \"([^\"\\]|\\.)*\"
 %}
 
 
-"{"                                 {return newContextSymbolLexemeAction(OPEN_BRACE);}
-"}"                                 {return closeContextSymbolLexemeAction(CLOSE_BRACE);}
-"["									{ return newContextSymbolLexemeAction(OPEN_BRACKET); }
-"]"									{ return closeContextSymbolLexemeAction(CLOSE_BRACKET); }
-"("									{ return SymbolLexemeAction(OPEN_PARENTHESIS); }
-")"									{ return SymbolLexemeAction(CLOSE_PARENTHESIS); }
-":"									{ return SymbolLexemeAction(COLON); }
-","									{ return SymbolLexemeAction(COMMA); }
+"{"                                     {return newContextSymbolLexemeAction(OPEN_BRACE);}
+"}"                                     {return closeContextSymbolLexemeAction(CLOSE_BRACE);}
+"["						            	{ return newContextSymbolLexemeAction(OPEN_BRACKET); }
+"]"						            	{  return closeContextSymbolLexemeAction(CLOSE_BRACKET); }
+"("						            	{ return SymbolLexemeAction(OPEN_PARENTHESIS); }
+")"						            	{ return SymbolLexemeAction(CLOSE_PARENTHESIS); }
+":"						            	{ return SymbolLexemeAction(COLON); }
+","						            	{  return SymbolLexemeAction(COMMA); }
 "\"PROJECTION\""                        { return SymbolLexemeAction(PROJECT); }
-"\"TABLE\""                        { return SymbolLexemeAction(TABLE); }
+"\"TABLE\""                             { return SymbolLexemeAction(TABLE); }
 "\"SELECT\""                            { return SymbolLexemeAction(SELECT); }
 "\"JOIN\""                              { return SymbolLexemeAction(JOINTOKEN); }
 "\"UNION\""                             { return SymbolLexemeAction(UN); }
@@ -94,21 +97,21 @@ string              \"([^\"\\]|\\.)*\"
 "\"MAX\""                               { return SymbolLexemeAction(MAX); }
 
 "\"attributes\""                        {return SymbolLexemeAction(ATTRIBUTES);}
-"\"input\""                              {return SymbolLexemeAction(INPUT);}
+"\"input\""                             {return SymbolLexemeAction(INPUT);}
 "\"left\""                              {return SymbolLexemeAction(left);}
-"\"right\""                              {return SymbolLexemeAction(right);}
+"\"right\""                             {return SymbolLexemeAction(right);}
 "\"NAME\""                              {return SymbolLexemeAction(NAME);}
 
 
-[[:digit:]]+						{ return IntegerLexemeAction(); }
+[[:digit:]]+						    { return IntegerLexemeAction(); }
 
-{string}                            {return StringLexemeAction();}
-{number}                            { return IntegerLexemeAction(); }
-{whitespace}						{ return IgnoredLexemeAction(); }
-.									{ return UnknownLexemeAction(); }
+{string}                                {return StringLexemeAction();}
+{number}                                { return IntegerLexemeAction(); }
+{whitespace}						    { return IgnoredLexemeAction(); }
 
-<<EOF>>								{ return EOFLexemeAction(); }
 
+<<EOF>>								    { return EOFLexemeAction(); }
+.								    	{return UnknownLexemeAction(); }
 %%
 
 /**
