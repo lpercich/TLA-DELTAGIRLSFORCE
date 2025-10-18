@@ -91,7 +91,6 @@ CompilationStatus SymbolLexemeAction(TokenLabel label, FlexContext *context) {
 	_logTokenAction(__FUNCTION__, token);
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
 	destroyToken(token);
-	enterLexicalAnalyzerContext(_lexicalAnalyzer, context);
 	return IN_PROGRESS;
 }
 CompilationStatus LogicalConditionLexemeAction(TokenLabel label) {
