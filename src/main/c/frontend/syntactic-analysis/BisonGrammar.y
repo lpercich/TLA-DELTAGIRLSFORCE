@@ -31,21 +31,15 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 	bool boolean;
 	char * string;
 	
-
-
 	/** Non-terminals. */
-
-	
 	Expression * expression; /*operadores*/
 	Condition* condition;
 	Constant * constant;
 	Condition * comparison;
 	Attributes * attributes;
-	Attributes attribute;
 	Program * program;
 	Aggregation * aggregation; /*funciones de agregacion*/
 	Order * order;
-	Relation *relation;   /*tablas*/
 }
 
 /**
@@ -64,7 +58,6 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <integer> INTEGER
 %token <string> STRING
 %token <boolean> BOOL
-%token <string> VALUE
 
 %token <token> CLOSE_BRACE  /* o sea {} */
 %token <token> CLOSE_BRACKET  /* o sea [] */
@@ -74,8 +67,8 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> OPEN_PARENTHESIS /* () */
 %token <token> IGNORED
 
-%token <string> OR
-%token <string> AND 
+%token <token> OR
+%token <token> AND 
 %token <token> NOT 
 
 %token <token> SELECT
@@ -106,7 +99,6 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> MAX
 
 
-
 %token <token> NAME
 %token <token> INPUT
 
@@ -130,21 +122,20 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 %type <expression> expression
 
-
 %type <expression> input
-%type <relation> side_input
-%type <expression> projection
-%type <expression> product
-%type <expression> selection
-%type <expression> rho
-%type <expression> aggregation
-%type <expression> aggregation_function
+%type <expression> side_input
+%type <expression> relation
 
+
+%type <expression> aggregation
+%type <aggregation> aggregation_function
+%type <aggregation> aggregation_list
 
 %type <condition> condition
 %type <comparison> comparison
-%type <relation> relation
 %type <program> program
+
+%type <string>     value
 
 
 /**
@@ -159,7 +150,6 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 program: 
   OPEN_BRACE expression CLOSE_BRACE											{ $$ = ExpressionProgramSemanticAction($2); }
-	|OPEN_BRACE relation CLOSE_BRACE										{$$ = RelationProgramSemanticAction($2);}
 	;
 
 expression: 
@@ -167,6 +157,10 @@ expression:
 	|PROJECT COLON OPEN_BRACE attributes_param COMMA input CLOSE_BRACE{$$= ProjectionSemanticAction($6, $4);};
 	|RENAME COLON OPEN_BRACE NAME COLON STRING COMMA input CLOSE_BRACE {$$= RenameSemanticAction($6, $8);};
 	|input 
+	|TABLE COLON STRING                                           { $$ = BaseExpressionSemanticAction($3); }
+	|relation
+	|aggregation
+
 	;
 
 
@@ -202,7 +196,7 @@ aggregation:
     };
 
 condition: 
-	AND COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET	{ $$ = BinaryConditionSemanticAction($4, $6, $1); }
+	AND COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET	{ $$ = BinaryConditionSemanticAction($4, $6, "AND"); }
 	| OR COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET			{ $$ = BinaryConditionSemanticAction($4, $6, "OR"); }
 	| NOT COLON OPEN_BRACKET condition CLOSE_BRACKET							{ $$ = UnaryConditionSemanticAction($4); }
 	| comparison { $$ = $1; }
@@ -210,25 +204,24 @@ condition:
 	;
 
 comparison:
-	 EQUAL COLON OPEN_BRACKET VALUE COMMA VALUE CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($4, "=", $6); }
-	| LOWER COLON OPEN_BRACKET VALUE COMMA VALUE CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($4, "<", $6); }
-	| HIGHER COLON OPEN_BRACKET VALUE COMMA VALUE CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($4, ">", $6); }
-	| LOWER_EQUAL COLON OPEN_BRACKET VALUE COMMA VALUE CLOSE_BRACKET { $$ = ComparisonConditionSemanticAction($4, "<=", $6); }
-	| HIGHER_EQUAL COLON OPEN_BRACKET VALUE COMMA VALUE CLOSE_BRACKET { $$ = ComparisonConditionSemanticAction($4, ">=", $6); }
-	| NOT_EQUAL COLON OPEN_BRACKET VALUE COMMA VALUE CLOSE_BRACKET { $$ = ComparisonConditionSemanticAction($4, "!=", $6); }
+	 EQUAL COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($4, "=", $6); }
+	| LOWER COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($4, "<", $6); }
+	| HIGHER COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($4, ">", $6); }
+	| LOWER_EQUAL COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET { $$ = ComparisonConditionSemanticAction($4, "<=", $6); }
+	| HIGHER_EQUAL COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET { $$ = ComparisonConditionSemanticAction($4, ">=", $6); }
+	| NOT_EQUAL COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET { $$ = ComparisonConditionSemanticAction($4, "!=", $6); }
 
 ;
 
 relation:
-    TABLE COLON STRING                                           { $$ = BaseRelationSemanticAction($3); }
-  | JOINTOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input CLOSE_BRACE
-                                                                 { $$ = BinaryRelationSemanticAction(JOIN, $6, $8, $4 ); }
+  JOINTOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input CLOSE_BRACE
+                                                                 { $$ = BinaryExpressionSemanticAction(JOIN, $6, $8, $4 ); }
   | CARTESIAN_PRODUCT COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE
-                                                                 { $$ = BinaryRelationSemanticAction(PRODUCT, $4, $6, NULL ); }
-  | UN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE  { $$ = BinaryRelationSemanticAction(UNION, $4, $6, NULL ); }
+                                                                 { $$ = BinaryExpressionSemanticAction(PRODUCT, $4, $6, NULL ); }
+  | UN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE  { $$ = BinaryExpressionSemanticAction(UNION, $4, $6, NULL ); }
   | INTER COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE
-                                                                 { $$ = BinaryRelationSemanticAction(INTERSECTION, $4, $6, NULL); }
-  | DIF COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE { $$ = BinaryRelationSemanticAction(DIFF, $4, $6, NULL); }
+                                                                 { $$ = BinaryExpressionSemanticAction(INTERSECTION, $4, $6, NULL); }
+  | DIF COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE { $$ = BinaryExpressionSemanticAction(DIFF, $4, $6, NULL); }
 ;
 
 
@@ -245,7 +238,14 @@ attributes_item:
       STRING                                    { $$ = AtributeSemanticAction($1, NULL); }
 ;
 
-
+value:
+	STRING { $$ = $1; }
+    | INTEGER {
+        char buf[32];
+        snprintf(buf, sizeof buf, "%d", $1);
+        $$ = strdup(buf);
+      }
+    ;
 	
 constant: INTEGER										{ $$ = IntegerConstantSemanticAction($1); }
 	;

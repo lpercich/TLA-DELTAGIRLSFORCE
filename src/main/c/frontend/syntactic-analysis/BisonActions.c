@@ -68,7 +68,7 @@ Condition *ComparisonConditionSemanticAction(char *left, char *op, char *right) 
     return cond;
 }
 
-Expression * SelectionSemanticAction(Expression *input, Condition * condition){
+Expression * SelectionSemanticAction( Condition * condition, Expression *input){
 	Expression * exp = malloc(sizeof(Expression));
 	exp->type= SELECTION;
 	exp->selection.condition= condition; //preg si hay que reservar espacio ????
@@ -133,22 +133,48 @@ Program * RelationProgramSemanticAction(Relation * relation) {
 }
 
 
-Relation *BinaryRelationSemanticAction(RelationType type, Relation *left, Relation *right, Condition * condition) {
-    Relation *r = malloc(sizeof(Relation));
-    r->type = type;
-    r->binary.left = left;
-    r->binary.right = right;
-	r->binary.condition=condition;
-    return r;
+Expression *BinaryExpressionSemanticAction(RelationType type, Expression *left, Expression *right, Condition * cond) {
+    Expression *e = calloc(1, sizeof(Expression));
+    switch (type) {
+        case JOIN:
+            e->type = JOIN;
+            e->join.left = left;
+            e->join.right = right;
+            e->join.condition = cond;
+            break;
+        case PRODUCT:
+            e->type = PRODUCT;
+            e->binary.left = left;
+            e->binary.right = right;
+            break;
+        case UNION:
+            e->type = UNION;
+            e->binary.left = left;
+            e->binary.right = right;
+            break;
+        case INTERSECTION:
+            e->type = INTERSECTION;
+            e->binary.left = left;
+            e->binary.right = right;
+            break;
+        case DIFF:
+            e->type = DIFF;
+            e->binary.left = left;
+            e->binary.right = right;
+            break;
+        default:
+		break;
+	}
+		return e;
 }
 
 
 
-Relation *BaseRelationSemanticAction(char *tableName) {
-    Relation *r = malloc(sizeof(Relation));
-    r->type = BASE_TABLE;
-    r->base.tableName = tableName;
-    return r;
+Expression *BaseExpressionSemanticAction(char *tableName) {
+    Expression *e = malloc(sizeof(Expression));
+    e->type = BASE_TABLE;
+    e->base.tableName = tableName;
+    return e;
 }
 
 Attributes * AtributeSemanticAction(char * next, Attributes * list){
@@ -167,7 +193,7 @@ Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggs, 
     return expr;
 }
 
-Aggregation * AggregationFunctionSemanticAction(char *func, Attributes *attribute) {
+Aggregation * AggregationFunctionSemanticAction(char *func, char *attribute) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Aggregation *agg = calloc(1, sizeof(Aggregation));
     agg->function = strdup(func);

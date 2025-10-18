@@ -93,6 +93,9 @@ CompilationStatus SymbolLexemeAction(TokenLabel label) {
 	if (label == CLOSE_BRACKET) {
         printf(">>> CLOSE_BRACKET token emitted: %s\n", token->lexeme);
     }
+	if (label == COMMA) {
+        printf(">>> COMMA token emitted: %s\n", token->lexeme);
+    }
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
 	destroyToken(token);
 	return IN_PROGRESS;
@@ -136,14 +139,17 @@ CompilationStatus UnknownLexemeAction() {
 CompilationStatus StringLexemeAction() {
     Token *token = createToken(_lexicalAnalyzer, STRING);
     size_t len = strlen(token->lexeme);
-    char *clean = malloc(len - 1);
-    if (clean != NULL) {
+	char *clean =NULL;
+	if(len>2){
+		clean== malloc(len - 1);
+		 if (clean != NULL) {
         strncpy(clean, token->lexeme + 1, len - 2);
         clean[len - 2] = '\0';
-        token->semanticValue->string = clean;
-    } else {
-        token->semanticValue->string = NULL;
-    }
+    } 
+
+	}
+	 token->semanticValue->string = clean;
+
 
     _logTokenAction(__FUNCTION__, token);
     CompilationStatus status = pushToken(_lexicalAnalyzer, token);

@@ -15,19 +15,34 @@ ModuleDestructor initializeBisonActionsModule();
 /**
  * Bison semantic actions.
  */
+Program * ExpressionProgramSemanticAction(Expression * expression);
+
 
 Constant * IntegerConstantSemanticAction(const int value);
-Expression * ArithmeticExpressionSemanticAction(Expression * leftExpression, Expression * rightExpression, ExpressionType type);
 Expression * FactorExpressionSemanticAction(Factor * factor);
 Factor * ConstantFactorSemanticAction(Constant * constant);
 Factor * ExpressionFactorSemanticAction(Expression * expression);
+
 Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *op);
 Condition *UnaryConditionSemanticAction(Condition *expr);
-Program * ExpressionProgramSemanticAction(Expression * expression);
-Relation *BinaryRelationSemanticAction(RelationType type, Relation *left, Relation *right, Condition * condition);
-Relation *BaseRelationSemanticAction(char *tableName);
-Attributes * AtributeSemanticAction(char * next, Attributes * list);
-Expression* TableExpressionSemanticAction(Expression* expression);
-Program * RelationProgramSemanticAction(Relation * relation);
 Condition *ComparisonConditionSemanticAction(char *left, char *op, char *right);
+
+
+
+Expression *BinaryRelationSemanticAction(RelationType type, Relation *left, Relation *right, Condition * condition);
+Expression *BaseExpressionSemanticAction(char *tableName);
+
+Expression * SelectionSemanticAction(Condition *condition, Expression *input);
+Expression * RenameSemanticAction(Expression *input, char *newName);
+Expression * ProjectionSemanticAction(Expression *input, Attributes *atts);
+
+Expression * BaseRelationSemanticAction(char *tableName);
+Expression * BinaryExpressionSemanticAction(RelationType type, Expression *left, Expression *right,Condition *cond);
+
+Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggs, Expression *input);
+Aggregation * AggregationFunctionSemanticAction(char *func, char *attribute);
+
+Attributes * AtributeSemanticAction(char * next, Attributes * list);
+
+Program * ExpressionProgramSemanticAction(Expression * relation);
 #endif

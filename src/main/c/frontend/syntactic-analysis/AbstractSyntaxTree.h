@@ -43,7 +43,8 @@ enum ExpressionType{
 	RHO,
     AGGR,
     BASE_TABLE_EXP
-	
+
+
 };
 
 enum RelationType{
@@ -108,15 +109,35 @@ struct Expression {
             char *newName;
         } renaming;
         struct { // AGGREGATION
-            struct Expression *input;
+            
+            
+        struct Expression *input;
             Attributes *group_by;
             Aggregation *aggregations;
         } aggregation;
 
         struct { // Entrada base
-            Relation *relation;
+            char* tableName;
         } base;
 
+
+        struct 
+        {
+           struct Expression *left;
+            struct Expression *right;
+        } binary;
+
+
+        struct 
+        {
+             struct Expression *left;
+            struct Expression *right;
+             Condition *condition;
+        }join;
+        
+
+     
+      
     };
 };
 
