@@ -74,6 +74,7 @@ void destroyRelation(Relation *relation){
 			free(relation->base.tableName);
 			break;
 			case JOIN: 
+			destroyCondition(relation->binary.condition);
 			case UNION:
 			case INTERSECTION:
 			case DIFF:
@@ -88,6 +89,7 @@ void destroyRelation(Relation *relation){
 void destroyProgram(Program * program) {
 	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
 	if (program != NULL) {
+		destroyRelation(program->relation);
 		destroyExpression(program->expression);
 		free(program);
 	}
