@@ -54,6 +54,7 @@ void destroyExpression(Expression *expression) {
 		case UNION:
 		case INTERSECTION:
 		case DIFF:
+        case PRODUCT:
 			destroyExpression(expression->binary.left);
 			destroyExpression(expression->binary.right);
 			break;
