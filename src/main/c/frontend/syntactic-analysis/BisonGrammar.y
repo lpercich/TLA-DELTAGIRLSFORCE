@@ -40,7 +40,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 	Program * program;
 	Aggregation * aggregation; /*funciones de agregacion*/
 	Order * order;
-	Orders* order_dirs;
+	Directions* directions;
 }
 
 /**
@@ -81,8 +81,8 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 %token <token> left
 %token <token> right
-%token <token> ASC 
-%token <token> DESC
+%token <token> ASC_T 
+%token <token> DESC_T
 
 %token <token> COLON
 %token <token> COMMA
@@ -101,6 +101,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> COUNT 
 %token <token> MIN 
 %token <token> MAX
+%token <token> DIRECTIONS
 
 
 %token <token> NAME
@@ -122,11 +123,11 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <attributes> attributes_list
 %type <attributes> attributes_item
 %type <attributes> attributes_param
-%type <string> order_dir
+%type <directions> directions_list
+%type <directions> directions_item
+%type <directions> directions_param
 %type <expression> expression
 %type <order> order
-%type <order_dirs> order_dirs
-%type <order_dirs> order_d
 %type <expression> input
 %type <expression> side_input
 %type <expression> relation
@@ -172,22 +173,28 @@ expression:
 
 input: INPUT COLON OPEN_BRACE expression CLOSE_BRACE { $$ = $4;};
 
-order: ORDER COLON OPEN_BRACE attributes_param  order_dirs COMMA input CLOSE_BRACE { $$ = OrderSemanticAction( $4, $6, $8) }
-|
+order: ORDER COLON OPEN_BRACE attributes_param directions_param COMMA input CLOSE_BRACE { $$ = OrderSemanticAction( $4, $5, $7); }
 ;
 
 
-    
-order_dirs: COMMA OPEN_BRACKET order_d CLOSE_BRACKET {$$=$3;};
 
-order_d:  order_dir { $$ = $1; }
-| order_dir COMMA order_dirs { $1->next = $3; $$ = $1; }
-| {$$=NULL;}
+directions_param:
+   COMMA DIRECTIONS COLON OPEN_BRACKET directions_list CLOSE_BRACKET { $$ = $5; }
+	|%empty                                		{ $$ = DirectionsSemanticAction(DEFAULT, NULL); }
 ;
 
-order_dir: ASC { $$ = $1;}
-| DESC { $$ = $1;}
+directions_list:
+      directions_item                           { $$ = $1; }
+    | directions_item COMMA directions_list     { $1->next = $3; $$ = $1; }
+
 ;
+
+directions_item: 
+	ASC_T                                    { $$ = DirectionsSemanticAction(ASC, NULL); }
+	|DESC_T                                   { $$ = DirectionsSemanticAction(DESC, NULL); }
+	|%empty 	                                		{ $$ = DirectionsSemanticAction(DEFAULT, NULL); }
+;
+
 
 side_input:
 	left COLON OPEN_BRACE expression CLOSE_BRACE { $$=$4; }
@@ -262,15 +269,9 @@ attributes_item:
 
 value:
 	STRING { $$ = $1; }
-    | INTEGER {
-        char buf[32];
-        snprintf(buf, sizeof buf, "%d", $1);
-        $$ = strdup(buf);
-      }
+    | INTEGER  			{$$ = IntegerSemanticAction($1);}
     ;
 	
-constant: INTEGER										{ $$ = IntegerConstantSemanticAction($1); }
-	;
 
 
 %%

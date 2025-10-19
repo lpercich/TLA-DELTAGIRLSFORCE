@@ -1,0 +1,12 @@
+{
+  "ORDER": {
+    "attributes": ["edad"],
+    "directions": ["DESC"],
+    "input": {
+      "SELECT": {
+        ">": ["edad", 30],
+        "input": { "TABLE": "Persona" }
+      }
+    }
+  }
+}

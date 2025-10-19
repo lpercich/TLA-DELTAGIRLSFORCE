@@ -124,6 +124,7 @@ Program * ExpressionProgramSemanticAction(Expression * expression) {
 	_compilerState->abstractSyntaxtTree = program;
 	return program;
 }
+
 Program * OrderProgramSemanticAction(Order * order){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Program * program = calloc(1, sizeof(Program));
@@ -165,6 +166,7 @@ Attributes * AtributeSemanticAction(char * next, Attributes * list){
 		 ats->next = NULL; 
 		return ats;	
 }
+
 Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggs, Expression *input) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Expression *expr = calloc(1, sizeof(Expression));
@@ -183,12 +185,24 @@ Aggregation * AggregationFunctionSemanticAction(char *func, char *attribute) {
     return agg;
 }
 
-Order * OrderSemanticAction(Attributes * atts, Orders* orders, Expression * input){
-	Order * o = calloc(1, sixeof(Order));
+Order * OrderSemanticAction(Attributes * atts, Directions* directions, Expression * input){
+	Order * o = calloc(1, sizeof(Order));
 	o->attributes=atts;
-	o->orders=orders;
+	o->directions=directions;
 	o->input=input;
 	return o;
 }
 
+Directions * DirectionsSemanticAction(DirectionType next, Directions * tail){
+		Directions * dir= calloc(1, sizeof(Directions));
+		 dir->value = next ;                       
+		 dir->next = NULL;
+		return dir;	
+}
 
+
+char * IntegerSemanticAction(int i){
+	char buf[32];  
+	snprintf(buf, sizeof buf, "%d", i); 
+	return strdup(buf);
+}

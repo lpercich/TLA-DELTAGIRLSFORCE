@@ -79,18 +79,13 @@ void destroyCondition(Condition *condition) {
             destroyCondition(condition->binary.left);
             destroyCondition(condition->binary.right);
             free(condition->binary.operator);
-            condition->binary.left = NULL;
-            condition->binary.right = NULL;
-            condition->binary.operator = NULL;
+
             break;
 
         case COMPARISON:
             free(condition->comparison.leftOperand);
             free(condition->comparison.rightOperand);
             free(condition->comparison.operator);
-            condition->comparison.leftOperand = NULL;
-            condition->comparison.rightOperand = NULL;
-            condition->comparison.operator = NULL;
             break;
 
         default:
@@ -102,10 +97,22 @@ void destroyCondition(Condition *condition) {
 
 void destroyOrder(Order* order){
     if(order!=NULL){
+        destroyAttributes(order->attributes);
+        destroyDirections(order->directions);
         destroyExpression(order->input);
-        destroyOrders(order->orders);
+        free(order);
+
     }
 }
+
+void destroyDirections(Directions *directions){
+    while (directions != NULL) {
+        Directions *next = directions->next;
+        free(directions);
+        directions = next;
+    }
+}
+
 
 void destroyProgram(Program *program) {
     logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);

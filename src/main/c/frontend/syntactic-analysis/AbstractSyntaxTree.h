@@ -17,6 +17,8 @@ ModuleDestructor initializeAbstractSyntaxTreeModule();
 typedef enum ExpressionType ExpressionType;
 typedef enum FactorType FactorType;
 typedef enum ConditionType ConditionType;
+typedef enum DirectionType DirectionType;
+
 
 
 typedef struct Constant Constant;
@@ -28,6 +30,7 @@ typedef struct Program Program;
 typedef struct Attributes Attributes;
 typedef struct Aggregation Aggregation;
 typedef struct Order Order;
+typedef struct Directions Directions;
 
 /**
  * Node types for the Abstract Syntax Tree (AST).
@@ -51,7 +54,6 @@ enum ExpressionType{
 
 };
 
-
 enum FactorType {
 	CONSTANT,
 	EXPRESSION
@@ -61,11 +63,9 @@ struct Constant {
 	int value;
 };
 
-enum OrderType
-{
-	ASC,
-	DESC
-};
+enum  DirectionType{   
+    ASC, DESC, DEFAULT
+ };
 
 struct Attributes{
     char * value;
@@ -122,30 +122,25 @@ struct Expression {
             struct Expression *right;
         } binary;
 
-
         struct 
-        {
-             struct Expression *left;
+        {   struct Expression *left;
             struct Expression *right;
              Condition *condition;
         }join;
-        
-       
       
     };
 };
 
 struct Order {
         Attributes *attributes;
-        Orders orders;
+        Directions *directions;
         Expression *input;
 };
 
-
-struct Orders{
-    OrderType value;
-    Orders * next;
-}
+struct Directions{
+    DirectionType value;
+    Directions * next;
+};
 
 //queda para preguntar xq con la correccion alfinal no me queda claro???
 struct Condition {
@@ -202,4 +197,7 @@ void destroyRelation(Relation *relation);
 void destroyExpression(Expression *expression);
 void destroyProgram(Program *program);
 void destroyAttributes(Attributes *attrs) ;
+void destroyOrder(Order *order);
+void destroyDirections(Directions *directions);
+
 #endif
