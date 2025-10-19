@@ -58,6 +58,11 @@ void destroyExpression(Expression *expression) {
 			destroyExpression(expression->binary.left);
 			destroyExpression(expression->binary.right);
 			break;
+        case AGGR:
+                destroyExpression(expression->aggregation.input);
+                destroyAttributes(expression->aggregation.group_by);
+                destroyAggregation(expression->aggregation.aggregations);
+                break;
         default:
             break;
     }
@@ -120,5 +125,14 @@ void destroyAttributes(Attributes *attrs) {
         free(attrs->value);   
         free(attrs);
         attrs = next;
+    }
+}
+void destroyAggregation(Aggregation *aggr) {
+    while (aggr != NULL) {
+        Aggregation *next = aggr->next;
+        free(aggr->function);   
+        free(aggr->attribute);   
+        free(aggr);
+        aggr = next;
     }
 }

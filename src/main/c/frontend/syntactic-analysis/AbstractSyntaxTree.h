@@ -105,7 +105,6 @@ struct Expression {
             char *newName;
         } renaming;
         struct { // AGGREGATION
-        
         struct Expression *input;
             Attributes *group_by;
             Aggregation *aggregations;
@@ -193,4 +192,5 @@ void destroyRelation(Relation *relation);
 void destroyExpression(Expression *expression);
 void destroyProgram(Program *program);
 void destroyAttributes(Attributes *attrs) ;
+void destroyAggregation(Aggregation *aggr);
 #endif

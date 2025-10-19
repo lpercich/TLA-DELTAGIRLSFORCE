@@ -53,6 +53,8 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %destructor { destroyConstant($$); } <constant>
 %destructor { destroyExpression($$); } <expression>
 %destructor { destroyCondition($$); } <condition>
+%destructor { destroyAttributes($$); } <attributes>
+%destructor { destroyAggregation($$); } <aggregation>
 
 /** Terminals. */
 %token <integer> INTEGER
@@ -189,11 +191,9 @@ aggregation:
     AGGREGATION COLON OPEN_BRACE
         GROUP_BY COLON OPEN_BRACKET attributes_list CLOSE_BRACKET COMMA
         AGGREGATIONS COLON OPEN_BRACKET aggregation_list CLOSE_BRACKET COMMA
-        INPUT COLON input
-    CLOSE_BRACE
-    {
-        $$ = AggregationSemanticAction($6, $10, $14);
-    };
+        INPUT COLON OPEN_BRACE expression CLOSE_BRACE
+    CLOSE_BRACE { $$ = AggregationSemanticAction($7, $13, $19);};
+
 
 condition: 
 	AND COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET	{ $$ = BinaryConditionSemanticAction($4, $6, "AND"); }
