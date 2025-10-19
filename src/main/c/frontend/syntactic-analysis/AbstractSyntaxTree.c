@@ -100,6 +100,12 @@ void destroyCondition(Condition *condition) {
     free(condition);
 }
 
+void destroyOrder(Order* order){
+    if(order!=NULL){
+        destroyExpression(order->input);
+        destroyOrders(order->orders);
+    }
+}
 
 void destroyProgram(Program *program) {
     logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
@@ -109,6 +115,9 @@ void destroyProgram(Program *program) {
     if (program->expression != NULL) {
         destroyExpression(program->expression);
         program->expression = NULL;
+    }
+    if(program->order !=NULL){
+        destroyOrder(program->order);
     }
 
     free(program);

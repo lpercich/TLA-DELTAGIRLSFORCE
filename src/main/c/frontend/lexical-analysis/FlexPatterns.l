@@ -95,6 +95,10 @@ string              \"([^\\\"]|\\.)*\"
 "\"COUNT\""                             { return SymbolLexemeAction(COUNT); }
 "\"MIN\""                               { return SymbolLexemeAction(MIN); }
 "\"MAX\""                               { return SymbolLexemeAction(MAX); }
+"\"ORDER\""                             { return SymbolLexemeAction(ORDER); }
+"\"directions\""                        { return SymbolLexemeAction(directions); }
+"\"ASC\""                             { return SymbolLexemeAction(ASC); }
+"\"DESC\""                             { return SymbolLexemeAction(DESC); }
 
 "\"attributes\""                        {return SymbolLexemeAction(ATTRIBUTES);}
 "\"input\""                             {return SymbolLexemeAction(INPUT);}

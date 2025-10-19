@@ -124,10 +124,10 @@ Program * ExpressionProgramSemanticAction(Expression * expression) {
 	_compilerState->abstractSyntaxtTree = program;
 	return program;
 }
-Program * RelationProgramSemanticAction(Expression * relation) {
+Program * OrderProgramSemanticAction(Order * order){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Program * program = calloc(1, sizeof(Program));
-	program->expression = relation;
+	program->order = order;
 	_compilerState->abstractSyntaxtTree = program;
 	return program;
 }
@@ -182,4 +182,13 @@ Aggregation * AggregationFunctionSemanticAction(char *func, char *attribute) {
     agg->attribute = strdup(attribute);
     return agg;
 }
+
+Order * OrderSemanticAction(Attributes * atts, Orders* orders, Expression * input){
+	Order * o = calloc(1, sixeof(Order));
+	o->attributes=atts;
+	o->orders=orders;
+	o->input=input;
+	return o;
+}
+
 

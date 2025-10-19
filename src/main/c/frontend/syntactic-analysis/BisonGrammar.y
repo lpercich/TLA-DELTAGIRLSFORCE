@@ -40,6 +40,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 	Program * program;
 	Aggregation * aggregation; /*funciones de agregacion*/
 	Order * order;
+	Orders* order_dirs;
 }
 
 /**
@@ -75,10 +76,13 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> TABLE
 %token <token> PROJECT
 %token <token> RENAME
+%token <token> ORDER
+
 
 %token <token> left
 %token <token> right
-
+%token <token> ASC 
+%token <token> DESC
 
 %token <token> COLON
 %token <token> COMMA
@@ -118,10 +122,11 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <attributes> attributes_list
 %type <attributes> attributes_item
 %type <attributes> attributes_param
-
-
+%type <string> order_dir
 %type <expression> expression
-
+%type <order> order
+%type <order_dirs> order_dirs
+%type <order_dirs> order_d
 %type <expression> input
 %type <expression> side_input
 %type <expression> relation
@@ -150,6 +155,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 program: 
   OPEN_BRACE expression CLOSE_BRACE											{ $$ = ExpressionProgramSemanticAction($2); }
+	|OPEN_BRACE order CLOSE_BRACE											{$$ = OrderProgramSemanticAction($2);}
 	;
 
 expression: 
@@ -164,8 +170,24 @@ expression:
 	;
 
 
- input: INPUT COLON OPEN_BRACE expression CLOSE_BRACE { $$ = $4;};
+input: INPUT COLON OPEN_BRACE expression CLOSE_BRACE { $$ = $4;};
 
+order: ORDER COLON OPEN_BRACE attributes_param  order_dirs COMMA input CLOSE_BRACE { $$ = OrderSemanticAction( $4, $6, $8) }
+|
+;
+
+
+    
+order_dirs: COMMA OPEN_BRACKET order_d CLOSE_BRACKET {$$=$3;};
+
+order_d:  order_dir { $$ = $1; }
+| order_dir COMMA order_dirs { $1->next = $3; $$ = $1; }
+| {$$=NULL;}
+;
+
+order_dir: ASC { $$ = $1;}
+| DESC { $$ = $1;}
+;
 
 side_input:
 	left COLON OPEN_BRACE expression CLOSE_BRACE { $$=$4; }

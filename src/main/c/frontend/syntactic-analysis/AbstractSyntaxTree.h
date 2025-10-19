@@ -61,7 +61,7 @@ struct Constant {
 	int value;
 };
 
-enum OrderByType
+enum OrderType
 {
 	ASC,
 	DESC
@@ -130,13 +130,22 @@ struct Expression {
              Condition *condition;
         }join;
         
-
-     
+       
       
     };
 };
 
+struct Order {
+        Attributes *attributes;
+        Orders orders;
+        Expression *input;
+};
 
+
+struct Orders{
+    OrderType value;
+    Orders * next;
+}
 
 //queda para preguntar xq con la correccion alfinal no me queda claro???
 struct Condition {
@@ -180,7 +189,7 @@ struct Condition {
 
 struct Program {
 	Expression * expression;
-    //Relation * relation;
+    Order * order;
 };
 
 /**
