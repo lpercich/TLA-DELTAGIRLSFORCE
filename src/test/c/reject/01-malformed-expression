@@ -1,9 +1,6 @@
 {
-  "SELECT": {
-    ">": ["edad", 30],
-    "input": {
-    "TABLE":"Persona"
+  "RHO": {
+    "NAME": 123,
+    "input": { "TABLE": "Clientes" }
   }
 }
-}
-
