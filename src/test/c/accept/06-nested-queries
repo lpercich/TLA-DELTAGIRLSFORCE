@@ -4,7 +4,7 @@
        "PROJECTION":{
       "attributes": ["nombre"],
       "input": {
-         "SELECTION":{
+         "SELECT":{
         ">":["edad", 30],
         "input": {
           "TABLE": "Persona"
@@ -18,7 +18,7 @@
        "PROJECTION":{
       "attributes": ["nombre"],
       "input": {
-         "SELECTION":{
+         "SELECT":{
         "<":["edad", 20],
         "input": {
           "TABLE":  "Persona"
