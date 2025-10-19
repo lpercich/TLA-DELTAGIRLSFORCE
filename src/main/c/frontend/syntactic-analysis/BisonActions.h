@@ -44,6 +44,7 @@ Aggregation * AggregationFunctionSemanticAction(char *func, char *attribute);
 
 Attributes * AtributeSemanticAction(char * next, Attributes * list);
 Order * OrderSemanticAction(Attributes * atts, Directions* direction, Expression * input);
+Program * OrderProgramSemanticAction(Order * order);
 
 char * IntegerSemanticAction(int i);
 

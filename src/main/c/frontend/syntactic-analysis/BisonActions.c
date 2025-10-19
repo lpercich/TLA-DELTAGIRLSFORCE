@@ -62,9 +62,10 @@ Condition *UnaryConditionSemanticAction(Condition *expr) {
 Condition *ComparisonConditionSemanticAction(char *left, char *op, char *right) {
     Condition *cond = calloc(1, sizeof(Condition));
     cond->type = COMPARISON;
-    cond->comparison.leftOperand  = left ? strdup(left) : NULL;  
-    cond->comparison.operator     = op  ? strdup(op)  : NULL;
-    cond->comparison.rightOperand = right ? strdup(right) : NULL;
+
+    cond->comparison.leftOperand  = left ;
+    cond->comparison.operator     =  strdup(op)  ;
+    cond->comparison.rightOperand = right ;
     return cond;
 }
 

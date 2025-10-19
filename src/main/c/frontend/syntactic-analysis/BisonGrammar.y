@@ -174,14 +174,13 @@ expression:
 
 input: INPUT COLON OPEN_BRACE expression CLOSE_BRACE { $$ = $4;};
 
-order: ORDER COLON OPEN_BRACE attributes_param directions_param COMMA input CLOSE_BRACE { $$ = OrderSemanticAction( $4, $5, $7); }
+order: ORDER COLON OPEN_BRACE attributes_param COMMA directions_param COMMA input CLOSE_BRACE { $$ = OrderSemanticAction( $4, $6, $8); }
 ;
 
 
 
 directions_param:
-   COMMA DIRECTIONS COLON OPEN_BRACKET directions_list CLOSE_BRACKET { $$ = $5; }
-	|%empty                                		{ $$ = DirectionsSemanticAction(DEFAULT, NULL); }
+    DIRECTIONS COLON OPEN_BRACKET directions_list CLOSE_BRACKET { $$ = $4; }
 ;
 
 directions_list:
