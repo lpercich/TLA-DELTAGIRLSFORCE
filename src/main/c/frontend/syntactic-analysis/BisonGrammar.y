@@ -39,6 +39,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 	Program * program;
 	Aggregation * aggregation; /*funciones de agregacion*/
 	Order * order;
+	Directions* directions;
 }
 
 /**
@@ -76,10 +77,13 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> TABLE
 %token <token> PROJECT
 %token <token> RENAME
+%token <token> ORDER
+
 
 %token <token> left
 %token <token> right
-
+%token <token> ASC_T 
+%token <token> DESC_T
 
 %token <token> COLON
 %token <token> COMMA
@@ -98,6 +102,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <token> COUNT 
 %token <token> MIN 
 %token <token> MAX
+%token <token> DIRECTIONS
 
 
 %token <token> NAME
@@ -119,10 +124,11 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <attributes> attributes_list
 %type <attributes> attributes_item
 %type <attributes> attributes_param
-
-
+%type <directions> directions_list
+%type <directions> directions_item
+%type <directions> directions_param
 %type <expression> expression
-
+%type <order> order
 %type <expression> input
 %type <expression> side_input
 %type <expression> relation
@@ -151,6 +157,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 program: 
   OPEN_BRACE expression CLOSE_BRACE											{ $$ = ExpressionProgramSemanticAction($2); }
+	|OPEN_BRACE order CLOSE_BRACE											{$$ = OrderProgramSemanticAction($2);}
 	;
 
 expression: 
@@ -165,7 +172,29 @@ expression:
 	;
 
 
- input: INPUT COLON OPEN_BRACE expression CLOSE_BRACE { $$ = $4;};
+input: INPUT COLON OPEN_BRACE expression CLOSE_BRACE { $$ = $4;};
+
+order: ORDER COLON OPEN_BRACE attributes_param directions_param COMMA input CLOSE_BRACE { $$ = OrderSemanticAction( $4, $5, $7); }
+;
+
+
+
+directions_param:
+   COMMA DIRECTIONS COLON OPEN_BRACKET directions_list CLOSE_BRACKET { $$ = $5; }
+	|%empty                                		{ $$ = DirectionsSemanticAction(DEFAULT, NULL); }
+;
+
+directions_list:
+      directions_item                           { $$ = $1; }
+    | directions_item COMMA directions_list     { $1->next = $3; $$ = $1; }
+
+;
+
+directions_item: 
+	ASC_T                                    { $$ = DirectionsSemanticAction(ASC, NULL); }
+	|DESC_T                                   { $$ = DirectionsSemanticAction(DESC, NULL); }
+	|%empty 	                                		{ $$ = DirectionsSemanticAction(DEFAULT, NULL); }
+;
 
 
 side_input:
@@ -239,11 +268,7 @@ attributes_item:
 
 value:
 	STRING { $$ = $1; }
-    | INTEGER {
-        char buf[32];
-        snprintf(buf, sizeof buf, "%d", $1);
-        $$ = strdup(buf);
-      }
+    | INTEGER  			{$$ = IntegerSemanticAction($1);}
     ;
 	
 
