@@ -28,6 +28,7 @@ void destroyConstant(Constant * constant) {
 }
 
 void destroyExpression(Expression *expression) {
+    logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
     if (expression == NULL) return;
     switch (expression->type) {
         case SELECTION:
@@ -45,6 +46,17 @@ void destroyExpression(Expression *expression) {
             free(expression->renaming.newName);
             break;
 
+        case BASE_TABLE:
+            free(expression->base.tableName);
+            break;
+        case JOIN: 
+			destroyCondition(expression->join.condition);
+		case UNION:
+		case INTERSECTION:
+		case DIFF:
+			destroyExpression(expression->binary.left);
+			destroyExpression(expression->binary.right);
+			break;
         default:
             break;
     }
@@ -88,32 +100,10 @@ void destroyCondition(Condition *condition) {
 }
 
 
-void destroyRelation(Relation *relation){
-	if (relation != NULL) {
-		switch (relation->type) {
-			case BASE_TABLE:
-			free(relation->base.tableName);
-			break;
-			case JOIN: 
-			destroyCondition(relation->binary.condition);
-			case UNION:
-			case INTERSECTION:
-			case DIFF:
-			destroyRelation(relation->binary.left);
-			destroyRelation(relation->binary.right);
-			break;
-		}
-		free(relation);
-	}
-}
-
 void destroyProgram(Program *program) {
     logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
     if (program == NULL) return;
-    if (program->relation != NULL) {
-        destroyRelation(program->relation);
-        program->relation = NULL;
-    }
+  
 
     if (program->expression != NULL) {
         destroyExpression(program->expression);

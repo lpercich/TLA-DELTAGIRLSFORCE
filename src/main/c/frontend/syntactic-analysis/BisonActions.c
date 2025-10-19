@@ -124,45 +124,27 @@ Program * ExpressionProgramSemanticAction(Expression * expression) {
 	_compilerState->abstractSyntaxtTree = program;
 	return program;
 }
-Program * RelationProgramSemanticAction(Relation * relation) {
+Program * RelationProgramSemanticAction(Expression * relation) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Program * program = calloc(1, sizeof(Program));
-	program->relation = relation;
+	program->expression = relation;
 	_compilerState->abstractSyntaxtTree = program;
 	return program;
 }
 
 
-Expression *BinaryExpressionSemanticAction(RelationType type, Expression *left, Expression *right, Condition * cond) {
+Expression *BinaryExpressionSemanticAction(ExpressionType type, Expression *left, Expression *right, Condition * cond) {
     Expression *e = calloc(1, sizeof(Expression));
     switch (type) {
         case JOIN:
-            e->type = JOIN;
-            e->join.left = left;
-            e->join.right = right;
             e->join.condition = cond;
-            break;
         case PRODUCT:
-            e->type = PRODUCT;
-            e->binary.left = left;
-            e->binary.right = right;
-            break;
         case UNION:
-            e->type = UNION;
-            e->binary.left = left;
-            e->binary.right = right;
-            break;
         case INTERSECTION:
-            e->type = INTERSECTION;
-            e->binary.left = left;
-            e->binary.right = right;
-            break;
         case DIFF:
-            e->type = DIFF;
+		  	e->type = type;
             e->binary.left = left;
             e->binary.right = right;
-            break;
-        default:
 		break;
 	}
 		return e;
@@ -173,7 +155,7 @@ Expression *BinaryExpressionSemanticAction(RelationType type, Expression *left, 
 Expression *BaseExpressionSemanticAction(char *tableName) {
     Expression *e = calloc(1, sizeof(Expression));
     e->type = BASE_TABLE;
-     e->base.tableName = tableName ? strdup(tableName) : NULL;
+    e->base.tableName = tableName ? strdup(tableName) : NULL;
     return e;
 }
 

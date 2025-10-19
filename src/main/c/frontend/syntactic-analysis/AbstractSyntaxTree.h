@@ -17,7 +17,7 @@ ModuleDestructor initializeAbstractSyntaxTreeModule();
 typedef enum ExpressionType ExpressionType;
 typedef enum FactorType FactorType;
 typedef enum ConditionType ConditionType;
-typedef enum RelationType RelationType;
+
 
 typedef struct Constant Constant;
 typedef struct Expression Expression;
@@ -42,19 +42,15 @@ enum ExpressionType{
 	PROJECTION,
 	RHO,
     AGGR,
-    BASE_TABLE_EXP
-
-
-};
-
-enum RelationType{
-	BASE_TABLE,
-	JOIN,
+    BASE_TABLE,
+    JOIN,
 	UNION,
 	INTERSECTION,
 	DIFF,
     PRODUCT
+
 };
+
 
 enum FactorType {
 	CONSTANT,
@@ -164,7 +160,7 @@ struct Condition {
         } unary;
     };
 };
-
+/*
  struct Relation {
     RelationType type;
 
@@ -179,12 +175,12 @@ struct Condition {
             Condition * condition; //para el on del JOIN
         } binary;
     };
-};
+};*/
 
 
 struct Program {
 	Expression * expression;
-    Relation * relation;
+    //Relation * relation;
 };
 
 /**
@@ -196,4 +192,5 @@ void destroyCondition(Condition *condition);
 void destroyRelation(Relation *relation);
 void destroyExpression(Expression *expression);
 void destroyProgram(Program *program);
+void destroyAttributes(Attributes *attrs) ;
 #endif

@@ -29,7 +29,7 @@ Condition *ComparisonConditionSemanticAction(char *left, char *op, char *right);
 
 
 
-Expression *BinaryRelationSemanticAction(RelationType type, Relation *left, Relation *right, Condition * condition);
+Expression *BinaryRelationSemanticAction(ExpressionType type, Relation *left, Relation *right, Condition * condition);
 Expression *BaseExpressionSemanticAction(char *tableName);
 
 Expression * SelectionSemanticAction(Condition *condition, Expression *input);
@@ -37,7 +37,7 @@ Expression * RenameSemanticAction(Expression *input, char *newName);
 Expression * ProjectionSemanticAction(Expression *input, Attributes *atts);
 
 Expression * BaseRelationSemanticAction(char *tableName);
-Expression * BinaryExpressionSemanticAction(RelationType type, Expression *left, Expression *right,Condition *cond);
+Expression * BinaryExpressionSemanticAction(ExpressionType type, Expression *left, Expression *right,Condition *cond);
 
 Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggs, Expression *input);
 Aggregation * AggregationFunctionSemanticAction(char *func, char *attribute);
