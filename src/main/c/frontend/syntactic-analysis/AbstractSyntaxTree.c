@@ -37,6 +37,7 @@ void destroyExpression(Expression *expression) {
 
         case PROJECTION:
             destroyExpression(expression->projection.input);
+			destroyAttributes(expression->projection.attributes);
             break;
 
         case RHO:
@@ -122,3 +123,11 @@ void destroyProgram(Program *program) {
     free(program);
 }
 
+void destroyAttributes(Attributes *attrs) {
+    while (attrs != NULL) {
+        Attributes *next = attrs->next;
+        free(attrs->value);   
+        free(attrs);
+        attrs = next;
+    }
+}

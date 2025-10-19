@@ -109,8 +109,7 @@ struct Expression {
             char *newName;
         } renaming;
         struct { // AGGREGATION
-            
-            
+        
         struct Expression *input;
             Attributes *group_by;
             Aggregation *aggregations;
