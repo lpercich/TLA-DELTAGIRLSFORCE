@@ -62,9 +62,9 @@ Condition *UnaryConditionSemanticAction(Condition *expr) {
 Condition *ComparisonConditionSemanticAction(char *left, char *op, char *right) {
     Condition *cond = calloc(1, sizeof(Condition));
     cond->type = COMPARISON;
-    cond->comparison.leftOperand = left;
-    cond->comparison.operator = op;
-    cond->comparison.rightOperand = right;
+    cond->comparison.leftOperand  = left ? strdup(left) : NULL;  
+    cond->comparison.operator     = op  ? strdup(op)  : NULL;
+    cond->comparison.rightOperand = right ? strdup(right) : NULL;
     return cond;
 }
 
@@ -88,7 +88,7 @@ Expression * RenameSemanticAction(Expression* input, char * newName){
 	Expression * exp = calloc(1, sizeof(Expression));
 	exp->type=RHO;
 	exp->renaming.input=input;
-	exp->renaming.newName=newName;
+	 exp->renaming.newName = newName ? strdup(newName) : NULL;
 	return exp;
 }
 
@@ -173,14 +173,14 @@ Expression *BinaryExpressionSemanticAction(RelationType type, Expression *left, 
 Expression *BaseExpressionSemanticAction(char *tableName) {
     Expression *e = calloc(1, sizeof(Expression));
     e->type = BASE_TABLE;
-    e->base.tableName = tableName;
+     e->base.tableName = tableName ? strdup(tableName) : NULL;
     return e;
 }
 
 Attributes * AtributeSemanticAction(char * next, Attributes * list){
 		Attributes * ats= calloc(1, sizeof(Attributes));
-		ats->value=next;
-		ats->next=list;
+		 ats->value = next ? strdup(next) : NULL;                       
+		 ats->next = NULL; 
 		return ats;	
 }
 Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggs, Expression *input) {
