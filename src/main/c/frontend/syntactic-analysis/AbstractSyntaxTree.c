@@ -27,45 +27,65 @@ void destroyConstant(Constant * constant) {
 	}
 }
 
-void destroyExpression(Expression * expression) {
-	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
-	if (expression != NULL) {
-		switch (expression->type) {
-			case SELECTION:
-			destroyExpression(expression->selection.input);
-			destroyCondition(expression->selection.condition);
-			case PROJECTION:
-			destroyExpression(expression->projection.input);
-			//destroyAtributes(expression->projection.attributes);
-			case RHO:
-				destroyExpression(expression->renaming.input);
-				free(expression->renaming.newName);
-				break;
-		}
-		free(expression);
-	}
+void destroyExpression(Expression *expression) {
+    if (expression == NULL) return;
+    switch (expression->type) {
+        case SELECTION:
+            destroyExpression(expression->selection.input);
+            destroyCondition(expression->selection.condition);
+            break;
+
+        case PROJECTION:
+            destroyExpression(expression->projection.input);
+            break;
+
+        case RHO:
+            destroyExpression(expression->renaming.input);
+            free(expression->renaming.newName);
+            break;
+
+        default:
+            break;
+    }
+
+    free(expression);
 }
 
-void destroyCondition(Condition *condition){
-	if (condition != NULL) {
-		switch (condition->type) {
-			case UNARY:
-			destroyCondition(condition->unary.expr);
-			break;
-			case BINARY:
-			destroyCondition(condition->binary.left);
-			destroyCondition(condition->binary.right);
-			free(condition->binary.operator);
-			break;
-			case COMPARISON:
-			free(condition->comparison.leftOperand);
-			free(condition->comparison.rightOperand);
-			free(condition->comparison.operator);
-			break;
-		}
-		free(condition);
-	}
+void destroyCondition(Condition *condition) {
+    if (condition == NULL)
+        return;
+
+    switch (condition->type) {
+        case UNARY:
+            destroyCondition(condition->unary.expr);
+            condition->unary.expr = NULL;
+            break;
+
+        case BINARY:
+            destroyCondition(condition->binary.left);
+            destroyCondition(condition->binary.right);
+            free(condition->binary.operator);
+            condition->binary.left = NULL;
+            condition->binary.right = NULL;
+            condition->binary.operator = NULL;
+            break;
+
+        case COMPARISON:
+            free(condition->comparison.leftOperand);
+            free(condition->comparison.rightOperand);
+            free(condition->comparison.operator);
+            condition->comparison.leftOperand = NULL;
+            condition->comparison.rightOperand = NULL;
+            condition->comparison.operator = NULL;
+            break;
+
+        default:
+            break;
+    }
+
+    free(condition);
 }
+
 
 void destroyRelation(Relation *relation){
 	if (relation != NULL) {
@@ -86,11 +106,19 @@ void destroyRelation(Relation *relation){
 	}
 }
 
-void destroyProgram(Program * program) {
-	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
-	if (program != NULL) {
-		destroyRelation(program->relation);
-		destroyExpression(program->expression);
-		free(program);
-	}
+void destroyProgram(Program *program) {
+    logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+    if (program == NULL) return;
+    if (program->relation != NULL) {
+        destroyRelation(program->relation);
+        program->relation = NULL;
+    }
+
+    if (program->expression != NULL) {
+        destroyExpression(program->expression);
+        program->expression = NULL;
+    }
+
+    free(program);
 }
+

@@ -26,7 +26,6 @@ ModuleDestructor initializeFlexActionsModule(LexicalAnalyzer * lexicalAnalyzer) 
 	_lexicalAnalyzer = lexicalAnalyzer;
 	_logger = createLogger("FlexActions");
 	_logIgnoredLexemes = getBooleanOrDefault("LOG_IGNORED_LEXEMES", _logIgnoredLexemes);
-	printf("entre en ignore\n");
 	return _shutdownFlexActionsModule;
 }
 
@@ -90,12 +89,6 @@ CompilationStatus IntegerLexemeAction() {
 CompilationStatus SymbolLexemeAction(TokenLabel label) {
 	Token * token = createToken(_lexicalAnalyzer, label);
 	_logTokenAction(__FUNCTION__, token);
-	if (label == CLOSE_BRACKET) {
-        printf(">>> CLOSE_BRACKET token emitted: %s\n", token->lexeme);
-    }
-	if (label == COMMA) {
-        printf(">>> COMMA token emitted: %s\n", token->lexeme);
-    }
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
 	destroyToken(token);
 	return IN_PROGRESS;
@@ -141,7 +134,7 @@ CompilationStatus StringLexemeAction() {
     size_t len = strlen(token->lexeme);
 	char *clean =NULL;
 	if(len>2){
-		clean== malloc(len - 1);
+		clean== calloc(1, len - 1);
 		 if (clean != NULL) {
         strncpy(clean, token->lexeme + 1, len - 2);
         clean[len - 2] = '\0';

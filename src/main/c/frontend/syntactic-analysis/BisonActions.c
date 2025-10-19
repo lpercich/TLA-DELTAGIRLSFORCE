@@ -44,7 +44,7 @@ Constant * IntegerConstantSemanticAction(const int value) {
 }
 
 Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *op) {
-    Condition *cond = malloc(sizeof(Condition));
+    Condition *cond = calloc(1, sizeof(Condition));
     cond->type = BINARY;
     cond->binary.left = left;
     cond->binary.right = right;
@@ -53,14 +53,14 @@ Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, cons
 }
 
 Condition *UnaryConditionSemanticAction(Condition *expr) {
-    Condition *cond = malloc(sizeof(Condition));
+    Condition *cond = calloc(1, sizeof(Condition));
     cond->type = NOT;
     cond->unary.expr = expr;
     return cond;
 }
 
 Condition *ComparisonConditionSemanticAction(char *left, char *op, char *right) {
-    Condition *cond = malloc(sizeof(Condition));
+    Condition *cond = calloc(1, sizeof(Condition));
     cond->type = COMPARISON;
     cond->comparison.leftOperand = left;
     cond->comparison.operator = op;
@@ -69,7 +69,7 @@ Condition *ComparisonConditionSemanticAction(char *left, char *op, char *right) 
 }
 
 Expression * SelectionSemanticAction( Condition * condition, Expression *input){
-	Expression * exp = malloc(sizeof(Expression));
+	Expression * exp = calloc(1, sizeof(Expression));
 	exp->type= SELECTION;
 	exp->selection.condition= condition; //preg si hay que reservar espacio ????
 	exp->selection.input=input;
@@ -77,7 +77,7 @@ Expression * SelectionSemanticAction( Condition * condition, Expression *input){
 }
 
 Expression * ProjectionSemanticAction(Expression *input, Attributes * atts){
-	Expression * exp = malloc(sizeof(Expression));
+	Expression * exp = calloc(1, sizeof(Expression));
 	exp->type= PROJECTION;
 	exp->projection.attributes=atts;
 	exp->projection.input=input;
@@ -85,7 +85,7 @@ Expression * ProjectionSemanticAction(Expression *input, Attributes * atts){
 }
 
 Expression * RenameSemanticAction(Expression* input, char * newName){
-	Expression * exp = malloc(sizeof(Expression));
+	Expression * exp = calloc(1, sizeof(Expression));
 	exp->type=RHO;
 	exp->renaming.input=input;
 	exp->renaming.newName=newName;
@@ -171,14 +171,14 @@ Expression *BinaryExpressionSemanticAction(RelationType type, Expression *left, 
 
 
 Expression *BaseExpressionSemanticAction(char *tableName) {
-    Expression *e = malloc(sizeof(Expression));
+    Expression *e = calloc(1, sizeof(Expression));
     e->type = BASE_TABLE;
     e->base.tableName = tableName;
     return e;
 }
 
 Attributes * AtributeSemanticAction(char * next, Attributes * list){
-		Attributes * ats= malloc(sizeof(Attributes));
+		Attributes * ats= calloc(1, sizeof(Attributes));
 		ats->value=next;
 		ats->next=list;
 		return ats;	

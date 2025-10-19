@@ -52,6 +52,7 @@ const int main(const int length, const char ** arguments) {
 	else {
 		logError(logger, "The syntactic-analysis phase rejects the input program.");
 		compilationStatus = FAILED;
+
 	}
 	logDebugging(logger, "Releasing AST resources...");
 	destroyProgram(program);
