@@ -34,7 +34,6 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 	/** Non-terminals. */
 	Expression * expression; /*operadores*/
 	Condition* condition;
-	Constant * constant;
 	Condition * comparison;
 	Attributes * attributes;
 	Program * program;
@@ -50,7 +49,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
  *
  * @see https://www.gnu.org/software/bison/manual/html_node/Destructor-Decl.html
  */
-%destructor { destroyConstant($$); } <constant>
+
 %destructor { destroyExpression($$); } <expression>
 %destructor { destroyCondition($$); } <condition>
 %destructor { destroyAttributes($$); } <attributes>
@@ -116,7 +115,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 
 /** Non-terminals. */
-%type <constant> constant
+
 %type <attributes> attributes_list
 %type <attributes> attributes_item
 %type <attributes> attributes_param
@@ -175,8 +174,8 @@ side_input:
 ;
 
 aggregation_list:
-      aggregation_function
-    | aggregation_list COMMA aggregation_function
+      aggregation_function { $$ = $1; }
+    | aggregation_list COMMA aggregation_function { $1->next = $3; $$ = $1; }
     ;
 
 aggregation_function:
@@ -247,8 +246,6 @@ value:
       }
     ;
 	
-constant: INTEGER										{ $$ = IntegerConstantSemanticAction($1); }
-	;
 
 
 %%

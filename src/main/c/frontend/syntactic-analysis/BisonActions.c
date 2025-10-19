@@ -179,7 +179,7 @@ Aggregation * AggregationFunctionSemanticAction(char *func, char *attribute) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Aggregation *agg = calloc(1, sizeof(Aggregation));
     agg->function = func ? strdup(func) : NULL;
-    agg->attribute = attribute ? strdup(attribute): NULL;
+    agg->attribute = (Attributes *) (attribute ? strdup(attribute): NULL);
     return agg;
 }
 
