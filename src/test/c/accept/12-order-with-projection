@@ -1,0 +1,12 @@
+{
+  "ORDER": {
+    "attributes": ["edad", "nombre"],
+    "directions": ["DESC", "ASC"],
+    "input": {
+      "PROJECTION": {
+        "attributes": ["nombre", "edad"],
+        "input": { "TABLE": "Persona" }
+      }
+    }
+  }
+}
