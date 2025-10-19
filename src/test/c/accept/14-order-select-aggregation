@@ -1,0 +1,19 @@
+
+{
+  "ORDER": {
+    "attributes": ["monto"],
+    "directions": ["DESC"],
+    "input": {
+            "SELECT": {
+                ">": ["monto", 1000],
+                "input": {
+                "AGGREGATION": {
+                    "group_by": ["producto"],
+                    "aggregations": [{ "SUM": "monto" }],
+                    "input": { "TABLE": "Ventas" }
+                }
+                }
+            }
+    }
+  }
+}
