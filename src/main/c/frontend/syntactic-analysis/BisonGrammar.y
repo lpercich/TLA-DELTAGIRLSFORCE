@@ -164,12 +164,12 @@ expression:
 	;
 
 
- input: INPUT COLON OPEN_BRACE expression CLOSE_BRACE {$$ = $4;};
+ input: INPUT COLON OPEN_BRACE expression CLOSE_BRACE { $$ = $4;};
 
 
 side_input:
-	left COLON OPEN_BRACE relation CLOSE_BRACE {$$=$4;}
-	|right COLON OPEN_BRACE relation CLOSE_BRACE {$$=$4;}
+	left COLON OPEN_BRACE expression CLOSE_BRACE { $$=$4; }
+	|right COLON OPEN_BRACE expression CLOSE_BRACE { $$=$4;}
 ;
 
 aggregation_list:
