@@ -1,5 +1,5 @@
 {
-    "SELECTION": {
+    "SELECT": {
     "AND": [{"<<": ["edad", 30]},{">": ["edad", 20]}],
     "input": {
       "TABLE":"Persona"
