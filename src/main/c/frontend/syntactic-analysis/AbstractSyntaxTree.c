@@ -50,6 +50,8 @@ void destroyExpression(Expression *expression) {
             free(expression->base.tableName);
             break;
         case JOIN: 
+            destroyExpression(expression->join.left);
+			destroyExpression(expression->join.right);
 			destroyCondition(expression->join.condition);
 		case UNION:
 		case INTERSECTION:
