@@ -49,7 +49,7 @@ static void _generateUnaryCondition(Condition *cond);
 static void _generateAttributes(Attributes *attrs);
 static void _generateAggregationList(Aggregation *aggr);
 static void _generateOrder(Order *order);
-static void _generateDirectionsForAttribute(Directions **dirPtr);
+
 
 static void _checkNullInput(Expression * expr, char * context);
 
@@ -299,19 +299,86 @@ static void _generateUnaryCondition(Condition *cond) {
 }
 
 static void _generateAttributes(Attributes *attrs) {
-	
+	Attributes *current = attrs;
+    while (current != NULL) {
+        if (current->value == NULL) {
+            logError(_logger, "Attribute with null value encountered.");
+            return;
+        }
+        _outputSql("%s", current->value);
+        if (current->next != NULL) {
+            _outputSql(", ");
+        }
+        current = current->next;
+    }
 }
 
 static void _generateAggregationList(Aggregation *aggr) {
-
+    Aggregation *current = aggr;
+    while (current != NULL) {
+        if (current->function == NULL) {
+            logError(_logger, "Invalid Aggregation node: function is null.");
+            return;
+        }
+		if (current->attribute == NULL) {
+            logError(_logger, "Invalid Aggregation node: attribute is null.");
+            return;
+        }
+        _outputSql("%s(", current->function);
+        _generateAttributes(current->attribute);
+        _outputSql(")");
+        if (current->next != NULL) {
+            _outputSql(", ");
+        }
+        current = current->next;
+    }
 }
 
 static void _generateOrder(Order *order) {
+	if(order->input == NULL) {
+		logError(_logger, "Order has null input expression.");
+		return;
+	}
+	if(order->attributes == NULL) {
+		logError(_logger, "Order has null attributes.");
+		return;
+	}
+	_outputSql("SELECT * FROM (");
+    _generateExpression(order->input);
+    _outputSql(") ORDER BY ");
 
+    Attributes *attr = order->attributes;
+    Directions *dir  = order->directions;
+	    while (attr != NULL) {
+        if (attr->value == NULL) {
+            logError(_logger, "Order attribute has null value.");
+            return;
+        }
+
+        _outputSql("%s", attr->value);
+		      if (dir != NULL) {
+            switch (dir->value) {
+                case ASC:
+                    _outputSql(" ASC");
+                    break;
+                case DESC:
+                    _outputSql(" DESC");
+                    break;
+                case DEFAULT:
+                    break;
+                default:
+                    logError(_logger, "Unknown direction type: %d", dir->value);
+                    break;
+            }
+            dir = dir->next;
+        }
+
+        if (attr->next != NULL) {
+            _outputSql(", ");
+        }
+
+        attr = attr->next;
 }
-
-static void _generateDirectionsForAttribute(Directions **dirPtr) {
-
 }
 
 
