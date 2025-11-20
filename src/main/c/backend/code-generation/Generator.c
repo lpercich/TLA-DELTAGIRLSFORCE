@@ -1,178 +1,190 @@
-// #include "Generator.h"
+ #include "Generator.h"
 
-// /* MODULE INTERNAL STATE */
+ static Logger * _logger = NULL;
 
-// const char _indentationCharacter = ' ';
-// const char _indentationSize = 4;
-// static Logger * _logger = NULL;
-
-// /** Shutdown module's internal state. */
-// void _shutdownGeneratorModule() {
-// 	if (_logger != NULL) {
-// 		logDebugging(_logger, "Destroying module: Generator...");
-// 		destroyLogger(_logger);
-// 		_logger = NULL;
-// 	}
-// }
-
- ModuleDestructor initializeGeneratorModule() {
+static void _outputSql(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    vfprintf(stdout, format, args);
+    va_end(args);
+}
+void initializeGeneratorModule() {
 	_logger = createLogger("Generator");
-	return _shutdownGeneratorModule;
- }
+}
+
+void shutdownGeneratorModule() {
+    if (_logger != NULL) {
+        destroyLogger(_logger);
+        _logger = NULL;
+    }
+}
+void generate(Program *program) {
+    if (program == NULL) {
+        logError(_logger, "Program is NULL in generate().");
+        return;
+    }
+    _generateProgram(program);
+    _outputSql(";\n");
+}
 
 // /** PRIVATE FUNCTIONS */
 
-// static char * _indentation(const unsigned int indentationLevel);
-// static const char _expressionTypeToCharacter(const ExpressionType type);
-// static void _generateConstant(const unsigned int indentationLevel, Constant * constant);
-// static void _generateEpilogue(const int value);
-// static void _generateExpression(const unsigned int indentationLevel, Expression * expression);
-// static void _generateFactor(const unsigned int indentationLevel, Factor * factor);
-// static void _generateProgram(Program * program);
-// static void _generatePrologue(void);
-// static void _output(const unsigned int indentationLevel, const char * const format, ...);
+static void _generateProgram(Program *program);
+static void _generateExpression(Expression *expr);
+static void _generateSelection(Expression *expr);
+static void _generateProjection(Expression *expr);
+static void _generateRenaming(Expression *expr);
+static void _generateAggregationExpr(Expression *expr);
+static void _generateBaseTable(Expression *expr);
+static void _generateJoin(Expression *expr);
+static void _generateUnion(Expression *expr);
+static void _generateIntersection(Expression *expr);
+static void _generateDiff(Expression *expr);
+static void _generateProduct(Expression *expr);
 
-// /**
-//  * Converts and expression type to the proper character of the operation
-//  * involved, or returns '\0' if that's not possible.
-//  */
-// static const char _expressionTypeToCharacter(const ExpressionType type) {
-// 	switch (type) {
-// 		case ADDITION: return '+';
-// 		case DIVISION: return '/';
-// 		case MULTIPLICATION: return '*';
-// 		case SUBTRACTION: return '-';
-// 		default:
-// 			logError(_logger, "The specified expression type cannot be converted into character: %d", type);
-// 			return '\0';
-// 	}
-// }
+static void _generateCondition(Condition *cond);
+static void _generateComparison(Condition *cond);
+static void _generateBinaryCondition(Condition *cond);
+static void _generateUnaryCondition(Condition *cond);
 
-// /**
-//  * Generates the output of a constant.
-//  */
-// static void _generateConstant(const unsigned int indentationLevel, Constant * constant) {
-// 	_output(indentationLevel, "%s", "[ $C$, circle, draw, black!20\n");
-// 	_output(1 + indentationLevel, "%s%d%s", "[ $", constant->value, "$, circle, draw ]\n");
-// 	_output(indentationLevel, "%s", "]\n");
-// }
+static void _generateAttributes(Attributes *attrs);
+static void _generateAggregationList(Aggregation *aggr);
+static void _generateOrder(Order *order);
+static void _generateDirectionsForAttribute(Directions **dirPtr);
 
-// /**
-//  * Creates the epilogue of the generated output, that is, the final lines that
-//  * completes a valid Latex document.
-//  */
-// static void _generateEpilogue(const int value) {
-// 	_output(0, "%s%d%s",
-// 		"            [ $", value, "$, circle, draw, blue ]\n"
-// 		"        ]\n"
-// 		"    \\end{forest}\n"
-// 		"\\end{document}\n\n"
-// 	);
-// }
+static void _generateProgram(Program * program) {
+	if(program->expression != NULL) {
+		_generateExpression(program->expression);
+	} else if(program->order != NULL) {
+		_generateOrder(program->order);
+	} else {
+		logError(_logger, "Program has neither expression nor order.");
+	}
+}
 
-// /**
-//  * Generates the output of an expression.
-//  */
-// static void _generateExpression(const unsigned int indentationLevel, Expression * expression) {
-// 	_output(indentationLevel, "%s", "[ $E$, circle, draw, black!20\n");
-// 	switch (expression->type) {
-// 		case ADDITION:
-// 		case DIVISION:
-// 		case MULTIPLICATION:
-// 		case SUBTRACTION:
-// 			_generateExpression(1 + indentationLevel, expression->leftExpression);
-// 			_output(1 + indentationLevel, "%s%c%s", "[ $", _expressionTypeToCharacter(expression->type), "$, circle, draw, purple ]\n");
-// 			_generateExpression(1 + indentationLevel, expression->rightExpression);
-// 			break;
-// 		case FACTOR:
-// 			_generateFactor(1 + indentationLevel, expression->factor);
-// 			break;
-// 		default:
-// 			logError(_logger, "The specified expression type is unknown: %d", expression->type);
-// 			break;
-// 	}
-// 	_output(indentationLevel, "%s", "]\n");
-// }
+static void _generateExpression(Expression *expr) {
+	if(expr == NULL) {
+		logError(_logger, "Expression is null.");
+		return;
+	}
+	switch(expr->type) {
+		case SELECTION:
+			_generateSelection(expr);
+			break;
+		case PROJECTION:
+			_generateProjection(expr);
+			break;
+		case RHO:
+			_generateRenaming(expr);
+			break;
+		case AGGR:
+			_generateAggregationExpr(expr);
+			break;
+		case BASE_TABLE:
+			_generateBaseTableExpr(expr);
+			break;
+		case JOIN:
+			_generateJoin(expr);
+			break;
+		case UNION:
+			_generateUnion(expr);
+			break;
+		case INTERSECTION:
+			_generateIntersection(expr);
+			break;
+		case DIFF:
+			_generateDiff(expr);
+			break;
+		case PRODUCT:
+			_generateProduct(expr);
+			break;
+		default:
+		logError(_logger, "Unknown expression type: %d.", expr->type);
+		break;
+	}
 
-// /**
-//  * Generates the output of a factor.
-//  */
-// static void _generateFactor(const unsigned int indentationLevel, Factor * factor) {
-// 	_output(indentationLevel, "%s", "[ $F$, circle, draw, black!20\n");
-// 	switch (factor->type) {
-// 		case CONSTANT:
-// 			_generateConstant(1 + indentationLevel, factor->constant);
-// 			break;
-// 		case EXPRESSION:
-// 			_output(1 + indentationLevel, "%s", "[ $($, circle, draw, purple ]\n");
-// 			_generateExpression(1 + indentationLevel, factor->expression);
-// 			_output(1 + indentationLevel, "%s", "[ $)$, circle, draw, purple ]\n");
-// 			break;
-// 		default:
-// 			logError(_logger, "The specified factor type is unknown: %d", factor->type);
-// 			break;
-// 	}
-// 	_output(indentationLevel, "%s", "]\n");
-// }
+}
 
-// /**
-//  * Generates the output of the program.
-//  */
-// static void _generateProgram(Program * program) {
-// 	_generateExpression(3, program->expression);
-// }
+static void _generateSelection(Expression *expr) {
 
-// /**
-//  * Creates the prologue of the generated output, a Latex document that renders
-//  * a tree thanks to the Forest package.
-//  *
-//  * @see https://ctan.dcc.uchile.cl/graphics/pgf/contrib/forest/forest-doc.pdf
-//  */
-// static void _generatePrologue(void) {
-// 	_output(0, "%s",
-// 		"\\documentclass{standalone}\n\n"
-// 		"\\usepackage[utf8]{inputenc}\n"
-// 		"\\usepackage[T1]{fontenc}\n"
-// 		"\\usepackage{amsmath}\n"
-// 		"\\usepackage{forest}\n"
-// 		"\\usepackage{microtype}\n\n"
-// 		"\\begin{document}\n"
-// 		"    \\centering\n"
-// 		"    \\begin{forest}\n"
-// 		"        [ \\text{$=$}, circle, draw, purple\n"
-// 	);
-// }
+}
 
-// /**
-//  * Generates an indentation string for the specified level.
-//  */
-// static char * _indentation(const unsigned int level) {
-// 	return indentation(_indentationCharacter, level, _indentationSize);
-// }
+static void _generateProjection(Expression *expr) {
 
-// /**
-//  * Outputs a formatted string to standard output. The "fflush" instruction
-//  * allows to see the output even close to a failure, because it drops the
-//  * buffering.
-//  */
-// static void _output(const unsigned int indentationLevel, const char * const format, ...) {
-// 	va_list arguments;
-// 	va_start(arguments, format);
-// 	char * indentation = _indentation(indentationLevel);
-// 	char * effectiveFormat = concatenate(2, indentation, format);
-// 	vfprintf(stdout, effectiveFormat, arguments);
-// 	fflush(stdout);
-// 	free(effectiveFormat);
-// 	free(indentation);
-// 	va_end(arguments);
-// }
+}
 
-// /** PUBLIC FUNCTIONS */
+static void _generateRenaming(Expression *expr) {
 
-// void executeGenerator(CompilerState * compilerState) {
-// 	logDebugging(_logger, "Generating final output...");
-// 	_generatePrologue();
-// 	_generateProgram(compilerState->abstractSyntaxtTree);
-// 	_generateEpilogue(compilerState->value);
-// 	logDebugging(_logger, "Generation is done.");
-// }
+}
+
+static void _generateAggregationExpr(Expression *expr) {
+
+}
+
+static void _generateBaseTable(Expression *expr) {
+
+}
+
+static void _generateJoin(Expression *expr) {
+
+}
+
+static void _generateUnion(Expression *expr) {
+
+}
+
+static void _generateIntersection(Expression *expr) {
+
+}
+
+static void _generateDiff(Expression *expr) {
+
+}
+
+static void _generateProduct(Expression *expr) {
+
+}
+
+static void _generateCondition(Condition *cond) {
+
+}
+
+static void _generateComparison(Condition *cond) {
+
+}
+
+static void _generateBinaryCondition(Condition *cond) {
+
+}
+
+static void _generateUnaryCondition(Condition *cond) {
+
+}
+
+static void _generateAttributes(Attributes *attrs) {
+
+}
+
+static void _generateAggregationList(Aggregation *aggr) {
+
+}
+
+static void _generateOrder(Order *order) {
+
+}
+
+static void _generateDirectionsForAttribute(Directions **dirPtr) {
+
+}
+
+
+
+
+
+
+
+
+
+
+
+

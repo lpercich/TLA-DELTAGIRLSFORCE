@@ -9,12 +9,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-/** Initialize module's internal state. */
-ModuleDestructor initializeGeneratorModule();
+/** Inicializa el módulo de generación. */
+void initializeGeneratorModule();
 
-/**
- * Generates the final output using the current compiler state.
- */
-void executeGenerator(CompilerState * compilerState);
+/** Libera recursos internos. */
+void shutdownGeneratorModule();
 
+/** Genera SQL a partir del AST. */
+void generate(Program *program);
 #endif
