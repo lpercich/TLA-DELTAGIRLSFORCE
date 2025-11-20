@@ -1,5 +1,5 @@
 #include "backend/code-generation/Generator.h"
-#include "backend/domain-specific/Calculator.h"
+#include "backend/domain-specific/sql.h"
 #include "frontend/Frontend.h"
 #include "frontend/lexical-analysis/FlexActions.h"
 #include "frontend/syntactic-analysis/BisonActions.h"
@@ -28,8 +28,10 @@ const int main(const int length, const char ** arguments) {
 		initializeFlexActionsModule(lexicalAnalyzer),
 		initializeBisonActionsModule(&compilerState),
 		initializeFrontendModule(lexicalAnalyzer)
-		//initializeCalculatorModule(),
+		//initializeSqlModule(),
 		//initializeGeneratorModule()
+		//estan comentadas pero ya son las que deberian estar por 
+		//ahi haya que corregirlas (no creo)
 	};
 	CompilationStatus compilationStatus = executeSyntacticAnalysis();
 	Program * program = compilerState.abstractSyntaxtTree;

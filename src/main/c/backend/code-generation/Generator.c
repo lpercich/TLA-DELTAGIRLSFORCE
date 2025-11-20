@@ -15,10 +15,10 @@
 // 	}
 // }
 
-// ModuleDestructor initializeGeneratorModule() {
-// 	_logger = createLogger("Generator");
-// 	return _shutdownGeneratorModule;
-// }
+ ModuleDestructor initializeGeneratorModule() {
+	_logger = createLogger("Generator");
+	return _shutdownGeneratorModule;
+ }
 
 // /** PRIVATE FUNCTIONS */
 
