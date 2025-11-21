@@ -89,7 +89,7 @@ Expression * RenameSemanticAction(Expression* input, char * newName){
 	Expression * exp = calloc(1, sizeof(Expression));
 	exp->type=RHO;
 	exp->renaming.input=input;
-	 exp->renaming.newName = newName ? strdup(newName) : NULL;
+	 exp->renaming.newName = newName ;
 	return exp;
 }
 
@@ -137,17 +137,20 @@ Program * OrderProgramSemanticAction(Order * order){
 
 Expression *BinaryExpressionSemanticAction(ExpressionType type, Expression *left, Expression *right, Condition * cond) {
     Expression *e = calloc(1, sizeof(Expression));
+	e->type=type;
     switch (type) {
         case JOIN:
+			e->join.left = left;
+            e->join.right = right;
             e->join.condition = cond;
+			break;
         case PRODUCT:
         case UNION:
         case INTERSECTION:
         case DIFF:
-		  	e->type = type;
             e->binary.left = left;
             e->binary.right = right;
-		break;
+			break;
 	}
 		return e;
 }
@@ -157,14 +160,14 @@ Expression *BinaryExpressionSemanticAction(ExpressionType type, Expression *left
 Expression *BaseExpressionSemanticAction(char *tableName) {
     Expression *e = calloc(1, sizeof(Expression));
     e->type = BASE_TABLE;
-    e->base.tableName = tableName ? strdup(tableName) : NULL;
+    e->base.tableName = tableName ;
     return e;
 }
 
 Attributes * AtributeSemanticAction(char * next, Attributes * list){
 		Attributes * ats= calloc(1, sizeof(Attributes));
 		 ats->value = next ? strdup(next) : NULL;                       
-		 ats->next = NULL; 
+		 ats->next = list; 
 		return ats;	
 }
 

@@ -53,6 +53,7 @@ void destroyExpression(Expression *expression) {
             destroyExpression(expression->join.left);
 			destroyExpression(expression->join.right);
 			destroyCondition(expression->join.condition);
+            break;
 		case UNION:
 		case INTERSECTION:
 		case DIFF:

@@ -134,8 +134,8 @@ CompilationStatus StringLexemeAction() {
     size_t len = strlen(token->lexeme);
 	char *clean =NULL;
 	if(len>2){
-		clean== calloc(1, len - 1);
-		 if (clean != NULL) {
+		clean= calloc(1, len - 1);
+		if (clean != NULL) {
         strncpy(clean, token->lexeme + 1, len - 2);
         clean[len - 2] = '\0';
     } 

@@ -7,7 +7,7 @@ Logger * _logger=NULL;
 bool validateAttsExpressionAndOrder(Order* order);
 bool expressionHasProjection(Expression* expression);
 bool attributesExist(Attributes * orderAtts, Attributes* projAtts);
-void getProjectionAttributes(Expression * expression, Attributes * res);
+Attributes* getProjectionAttributes(Expression * expression);
 bool validateExpression(Expression* expression);
 bool validateAttributes(Attributes *attributes);
 bool validateAggregation(Aggregation *aggregation);
@@ -22,9 +22,10 @@ void initializeSqlModule()
 }
 
 void shutdownSqlModule(){
-    if (_logger==NULL){
-        logError(_logger,"Destroy logger");
+    if (_logger!=NULL){
+        logDebugging(_logger,"Destroy logger");
         destroyLogger(_logger); //preguta si es != a null y lo destruye
+        //Deberiamos dejarlo en NULL? TIPO _logger=NULL?
     }
         
 }
@@ -50,69 +51,6 @@ bool validateProgram(Program *program){
 
 }
 
-
-
-
-// struct Expression {
-//     ExpressionType type;
-
-//     union {
-//         struct { // SELECTION
-//             struct Expression *input;
-//             Condition *condition;
-//         } selection;
-
-//         struct { // PROJECTION
-//             struct Expression *input;
-//             Attributes *attributes;
-//         } projection;
-
-//         struct { // RENAMING
-//             struct Expression *input;
-//             char *newName;
-//         } renaming;
-//         struct { // AGGREGATION
-//         struct Expression *input;
-//             Attributes *group_by;
-//             Aggregation *aggregations;
-//         } aggregation;
-
-//         struct { // Entrada base
-//             char* tableName;
-//         } base;
-
-
-//         struct 
-//         {
-//            struct Expression *left;
-//             struct Expression *right;
-//         } binary;
-
-//         struct 
-//         {   struct Expression *left;
-//             struct Expression *right;
-//              Condition *condition;
-//         }join;
-      
-//     };
-// };
-
-
-// enum ExpressionType{
-// 	SELECTION,
-// 	PROJECTION,
-// 	RHO,
-//     AGGR,
-//     BASE_TABLE,
-//     JOIN,
-// 	UNION,
-// 	INTERSECTION,
-// 	DIFF,
-//     PRODUCT
-
-// };
-
-//hecho recurivamente 
 bool validateExpression(Expression* expression){
     logDebugging(_logger, "Validating expression");
 
@@ -120,6 +58,8 @@ bool validateExpression(Expression* expression){
         logError(_logger, "Expression is null");
         return false;
     }
+
+    
     switch (expression->type)
     {
     case SELECTION:
@@ -164,9 +104,15 @@ bool validateExpression(Expression* expression){
             && validateExpression(expression->join.left) 
             && validateExpression(expression->join.right);
     case UNION:
-    logDebugging(_logger, "Validating binary UNION");
+        logDebugging(_logger, "Validating binary UNION");
+         return (
+        validateExpression(expression->binary.left) && 
+        validateExpression(expression->binary.right));
     case INTERSECTION:
-    logDebugging(_logger, "Validating binary INTERSECTION");
+        logDebugging(_logger, "Validating binary INTERSECTION");
+         return (
+        validateExpression(expression->binary.left) && 
+        validateExpression(expression->binary.right));
     case DIFF:
         if(expression->type==DIFF){
         logDebugging(_logger, "Validating binary DIFFERENCE");
@@ -182,6 +128,7 @@ bool validateExpression(Expression* expression){
             logError(_logger, "No name for TABLE");
             return false;
         }
+        return true;
     default: 
         logError(_logger, "Expression has no type");
         return false;
@@ -224,8 +171,7 @@ bool validateAttsExpressionAndOrder(Order* order){
         return true;
     }
 
-    Attributes* projected;
-    getProjectionAttributes(order->input, projected);
+    Attributes* projected= getProjectionAttributes(order->input);
 
 
     if (!attributesExist(order->attributes, projected)) {
@@ -236,33 +182,43 @@ bool validateAttsExpressionAndOrder(Order* order){
 
 }
 
-void getProjectionAttributes(Expression * expression, Attributes * res){
+Attributes* getProjectionAttributes(Expression * expression){
+    if (!expression){
+        return NULL;
+    }
     switch (expression->type) {
+
+
         case SELECTION:
-            getProjectionAttributes(expression->selection.input, res);
+            return getProjectionAttributes(expression->selection.input);
+
         case PROJECTION:
-            res=expression->projection.attributes;
-            return;
+            return expression->projection.attributes;
         case RHO:
-            getProjectionAttributes(expression->renaming.input, res);
-            break;
+            return getProjectionAttributes(expression->renaming.input);
         case BASE_TABLE:
-            return;
-        case JOIN: 
-            getProjectionAttributes(expression->join.left, res);
-		    getProjectionAttributes(expression->join.right, res);
+            return NULL;
+        case JOIN: {
+            Attributes *leftAttr= getProjectionAttributes(expression->join.left);
+            if(leftAttr!=NULL ){
+                return leftAttr;
+            }
+		    return getProjectionAttributes(expression->join.right);
+        }
 		case UNION:
 		case INTERSECTION:
 		case DIFF:
-        case PRODUCT:
-			getProjectionAttributes(expression->binary.left, res);
-			getProjectionAttributes(expression->binary.right, res);
-			break;
+        case PRODUCT:{
+			Attributes *leftAttr= getProjectionAttributes(expression->binary.left);
+            if(leftAttr!=NULL ){
+                return leftAttr;
+            }
+		    return getProjectionAttributes(expression->binary.right);
+        }
         case AGGR: //esto me da duda, podemos tener una projection adentro de una aggregation ????
-                getProjectionAttributes(expression->aggregation.input, res);
-                break;
+                return getProjectionAttributes(expression->aggregation.input);
         default:
-            break;
+            return NULL;
     }
 }
 
@@ -291,7 +247,7 @@ bool expressionHasProjection(Expression* e) {
         
         switch (e->type) {
             case PROJECTION: return true;
-            case SELECTION: expressionHasProjection(e->selection.input); break;
+            case SELECTION: return expressionHasProjection(e->selection.input); 
             case BASE_TABLE: return false;
             case JOIN: 
                 return expressionHasProjection(e->join.left)
@@ -346,8 +302,9 @@ bool validateCondition(Condition* condition){
      {
         logError(_logger, "COMPARISON is null");
         return false;
-
      }
+     return true;
+
      case BINARY:   
     if (condition->binary.left == NULL || condition->binary.right  == NULL || condition->binary.operator  == NULL)
     
@@ -355,13 +312,16 @@ bool validateCondition(Condition* condition){
         logError(_logger, "BINAY CONDITION is null");
         return false;
      }
+        return true;
+
      case UNARY:
         if (condition->unary.expr==NULL)
      {
         logError(_logger, "NOT CONDITION  is null");
         return false;  
     }
-     
+        return true;
+
     default:
         logError(_logger, "CONDITION type is null or not valid");
         return false;
@@ -381,6 +341,7 @@ bool validateAggregation(Aggregation *aggregation){
         }
         aggregation= aggregation->next;
     }
+    return true;
     
 }
 

@@ -266,7 +266,7 @@ attributes_item:
 ;
 
 value:
-	STRING { $$ = $1; }
+	STRING 				{ $$ = $1; }
     | INTEGER  			{$$ = IntegerSemanticAction($1);}
     ;
 	
