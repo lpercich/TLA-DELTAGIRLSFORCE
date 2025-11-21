@@ -2,14 +2,19 @@
 #define __SQL__
 
 #include "../../frontend/syntactic-analysis/AbstractSyntaxTree.h"
+#include "../../support/logging/Logger.h"
+ 
 
 
 void initializeSqlModule();
+
 void shutdownSqlModule();
 
-boolean validateSql(Program *program);
-boolean validateExpression(Expression* expression);
-boolean validateOrder(Order* order);
+bool validateProgram(Program *program);
+
+bool validateExpression(Expression* expression);
+
+bool validateOrder(Order* order);
 
 
 #endif

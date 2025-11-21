@@ -1,30 +1,6 @@
  #include "Generator.h"
  static Logger * _logger = NULL;
 
-static void _outputSql(const char *format, ...) {
-    va_list args;
-    va_start(args, format);
-    vfprintf(stdout, format, args);
-    va_end(args);
-}
-void initializeGeneratorModule() {
-	_logger = createLogger("Generator");
-}
-
-void shutdownGeneratorModule() {
-    if (_logger != NULL) {
-        destroyLogger(_logger);
-        _logger = NULL;
-    }
-}
-void generate(Program *program) {
-    if (program == NULL) {
-        logError(_logger, "Program is NULL in generate().");
-        return;
-    }
-    _generateProgram(program);
-    _outputSql(";\n");
-}
 
 // /** PRIVATE FUNCTIONS */
 
@@ -52,6 +28,36 @@ static void _generateOrder(Order *order);
 
 
 static void _checkNullInput(Expression * expr, char * context);
+
+
+
+
+
+static void _outputSql(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    vfprintf(stdout, format, args);
+    va_end(args);
+}
+
+void initializeGeneratorModule() {
+	_logger = createLogger("Generator");
+}
+
+void shutdownGeneratorModule() {
+    if (_logger != NULL) {
+        destroyLogger(_logger);
+        _logger = NULL;
+    }
+}
+void generate(Program *program) {
+    if (program == NULL) {
+        logError(_logger, "Program is NULL in generate().");
+        return;
+    }
+    _generateProgram(program);
+    _outputSql(";\n");
+}
 
 static void _checkNullInput(Expression * expr, char * context) {
 	if(expr->binary.left == NULL) {
@@ -93,7 +99,7 @@ static void _generateExpression(Expression *expr) {
 			_generateAggregationExpr(expr);
 			break;
 		case BASE_TABLE:
-			_generateBaseTableExpr(expr);
+			_generateBaseTable(expr);
 			break;
 		case JOIN:
 			_generateJoin(expr);

@@ -1,71 +1,234 @@
-#include <sql.h>
+#include "SQL.h"
+
+
+Logger * _logger=NULL;
+
+
+bool validateAttsExpressionAndOrder(Order* order);
+bool expressionHasProjection(Expression* expression);
+bool attributesExist(Attributes * orderAtts, Attributes* projAtts);
+void getProjectionAttributes(Expression * expression, Attributes * res);
+bool validateExpression(Expression* expression);
+bool validateAttributes(Attributes *attributes);
+bool validateAggregation(Aggregation *aggregation);
+bool validateCondition(Condition* condition);
+
 
 
 void initializeSqlModule()
 {
     _logger = createLogger("Sql");
+    logDebugging(_logger, "Start Logger");
 }
 
-boolean validateAttsExpressionAndOrder(Order* order);
-boolean expressionHasProjection(Expression* expression);
-boolean attributesExist(Attributes * orderAtts, Attributes* projAtts);
-void getProjectionAttributes(Expression * expression, Attributes * res);
-boolean validateExpression(Expression* expression);
+void shutdownSqlModule(){
+    if (_logger==NULL){
+        logError(_logger,"Destroy logger");
+        destroyLogger(_logger); //preguta si es != a null y lo destruye
+    }
+        
+}
 
-boolean validateProgram(Program *program){
-    if (!program) return false;
+bool validateProgram(Program *program){
+    if (!program){
+         logError(_logger, "Program is NULL");
+         return false;
+    }
     if(program->expression && program->order){
+        logError(_logger, "Program has expression and orden");
+
         return false;
+
     }else if (program->expression){
         return validateExpression(program->expression);
+
     }else if (program->order){
         return validateOrder(program->order);
     }
+    logError(_logger, "program doesnt have expression nor order");
     return false;
 
 }
 
-boolean validateExpression(Expression* expression){
-//falta esto
+
+
+
+// struct Expression {
+//     ExpressionType type;
+
+//     union {
+//         struct { // SELECTION
+//             struct Expression *input;
+//             Condition *condition;
+//         } selection;
+
+//         struct { // PROJECTION
+//             struct Expression *input;
+//             Attributes *attributes;
+//         } projection;
+
+//         struct { // RENAMING
+//             struct Expression *input;
+//             char *newName;
+//         } renaming;
+//         struct { // AGGREGATION
+//         struct Expression *input;
+//             Attributes *group_by;
+//             Aggregation *aggregations;
+//         } aggregation;
+
+//         struct { // Entrada base
+//             char* tableName;
+//         } base;
+
+
+//         struct 
+//         {
+//            struct Expression *left;
+//             struct Expression *right;
+//         } binary;
+
+//         struct 
+//         {   struct Expression *left;
+//             struct Expression *right;
+//              Condition *condition;
+//         }join;
+      
+//     };
+// };
+
+
+// enum ExpressionType{
+// 	SELECTION,
+// 	PROJECTION,
+// 	RHO,
+//     AGGR,
+//     BASE_TABLE,
+//     JOIN,
+// 	UNION,
+// 	INTERSECTION,
+// 	DIFF,
+//     PRODUCT
+
+// };
+
+//hecho recurivamente 
+bool validateExpression(Expression* expression){
+    logDebugging(_logger, "Validating expression");
+
+    if (expression == NULL){
+        logError(_logger, "Expression is null");
+        return false;
+    }
+    switch (expression->type)
+    {
+    case SELECTION:
+    //FALTA CHEQUEO DE SI HAY UN PROJECTION QUE LOS ATTS DE PROJECTION COINCIDAN CON LOS DE SELECTION
+        logDebugging(_logger, "Validating SELECTION");
+        return validateCondition(expression->selection.condition) 
+        && (validateExpression(expression->selection.input));
+            
+       
+        
+    case PROJECTION:
+        logDebugging(_logger, "Validating PROJECTION");
+
+        return validateAttributes(expression->projection.attributes) && 
+        validateExpression(expression->projection.input);
+        
+
+       
+    case RHO:
+        logDebugging(_logger, "Validating RENAMING");
+    
+        if (expression->renaming.newName == NULL )
+        {
+            logError(_logger, "Alias for RENAMING is null");
+            return false;
+        }
+        return validateExpression(expression->renaming.input);
+        
+    case AGGR:
+
+        if(!validateAttributes(expression->aggregation.group_by)){
+             logError(_logger, "Invalid attributes for AGGREGATION");
+            return false;
+        }
+        return validateAggregation(expression->aggregation.aggregations)
+        && validateExpression(expression->aggregation.input);
+
+    case JOIN:
+            logDebugging(_logger, "Validating JOIN");
+
+            return validateCondition(expression->join.condition) 
+            && validateExpression(expression->join.left) 
+            && validateExpression(expression->join.right);
+    case UNION:
+    logDebugging(_logger, "Validating binary UNION");
+    case INTERSECTION:
+    logDebugging(_logger, "Validating binary INTERSECTION");
+    case DIFF:
+        if(expression->type==DIFF){
+        logDebugging(_logger, "Validating binary DIFFERENCE");
+        }
+
+        return (
+        validateExpression(expression->binary.left) && 
+        validateExpression(expression->binary.right));
+    case BASE_TABLE:
+        logDebugging(_logger, "Validating  TABLE");
+
+        if( expression->base.tableName==NULL){
+            logError(_logger, "No name for TABLE");
+            return false;
+        }
+    default: 
+        logError(_logger, "Expression has no type");
+        return false;
+    }
 }
 
-boolean validateOrder(Order* order){
-    Attributes* a = o->attributes;
-    Directions* d = o->directions;
+bool validateOrder(Order* order){
+     logDebugging(_logger, "Validating ORDER");
+
+    Attributes* a = order->attributes;
+    Directions* d = order->directions;
 
     while (a && d) {
         a = a->next;
         d = d->next;
     }
-    if (a || d) return false;
+    if (a || d){
+        logError(_logger, "Number of attributes and directions for ORDER does not match");
+        return false;
+    }
 
-    if (!validateExpression(o->input))
+    if (!validateExpression(order->input))
         return false;
     if(!expressionHasProjection(order->input))
         return true;
 
 
-    if (!validateAttsExpressionAndOrder(order->input, order)) {
-        //esto seria para logger CAMBIARLO
-        prlintf("ERROR: atributo en ORDER BY no está en la PROJECTION\n");
+    if (!validateAttsExpressionAndOrder(order)) {
+        logError(_logger, "Attribute in ORDER not in PROJECTION");
         return false;
     }
     return true;
  
 }
 
-boolean validateAttsExpressionAndOrder(Order* order){
-    if (!o) return true;
+bool validateAttsExpressionAndOrder(Order* order){
+    if (!order) return true;
 
-    if (!expression_has_projection(o->input)) {
+    if (!expressionHasProjection(order->input)) {
         return true;
     }
 
     Attributes* projected;
-    getProjectionAttributes(o->input, projected);
+    getProjectionAttributes(order->input, projected);
 
 
-    if (!attributesExist(o->attributes, projected)) {
+    if (!attributesExist(order->attributes, projected)) {
         return false;
     }
 
@@ -103,7 +266,7 @@ void getProjectionAttributes(Expression * expression, Attributes * res){
     }
 }
 
-boolean attributesExist(Attributes * orderAtts, Attributes* projAtts){
+bool attributesExist(Attributes * orderAtts, Attributes* projAtts){
     for (Attributes *o = orderAtts; o != NULL; o = o->next) {
         bool found = false;
 
@@ -122,23 +285,23 @@ boolean attributesExist(Attributes * orderAtts, Attributes* projAtts){
 }
 
 
+
 bool expressionHasProjection(Expression* e) {
-    while (e) {
+    if (e) {
         
         switch (e->type) {
             case PROJECTION: return true;
-            case SELECTION: e = e->selection.input; break;
+            case SELECTION: expressionHasProjection(e->selection.input); break;
             case BASE_TABLE: return false;
             case JOIN: 
-                return expression_has_projection(e->join.left)
-                    || expression_has_projection(e->join.right);
-            case JOIN: 
+                return expressionHasProjection(e->join.left)
+                    || expressionHasProjection(e->join.right);
 		case UNION:
 		case INTERSECTION:
 		case DIFF:
         case PRODUCT:
-                return expression_has_projection(e->binary.left)
-                    || expression_has_projection(e->binary.right);
+                return expressionHasProjection(e->binary.left)
+                    || expressionHasProjection(e->binary.right);
         }
     }
     return false;
@@ -168,10 +331,12 @@ bool expressionHasProjection(Expression* e) {
 // };
 
 
-boolean validateCondition(Condition* condition){
+bool validateCondition(Condition* condition){
+    logDebugging(_logger, "Validating CONDITION");
+
     if (condition==NULL)
     {
-        // AGREGAR LOG 
+        logError(_logger, "CONDITION is null");
         return false; 
     }
     switch (condition->type)
@@ -179,43 +344,67 @@ boolean validateCondition(Condition* condition){
     case COMPARISON:
      if (condition->comparison.leftOperand == NULL || condition->comparison.rightOperand  == NULL || condition->comparison.operator  == NULL)
      {
-        // AGREGAR LOG 
-        return false
+        logError(_logger, "COMPARISON is null");
+        return false;
 
      }
      case BINARY:   
     if (condition->binary.left == NULL || condition->binary.right  == NULL || condition->binary.operator  == NULL)
     
      {
-        // AGREGAR LOG 
-        return false
+        logError(_logger, "BINAY CONDITION is null");
+        return false;
      }
      case UNARY:
-     if (condition->unary/expr==NULL)
+        if (condition->unary.expr==NULL)
      {
-        // AGREGAR LOG 
-        return false   
-      }
-     
-
-    default:
-        // AGREGAR LOG 
-        return false   
+        logError(_logger, "NOT CONDITION  is null");
+        return false;  
     }
-
-    
-
+     
+    default:
+        logError(_logger, "CONDITION type is null or not valid");
+        return false;
+    }
 
 }
 
+bool validateAggregation(Aggregation *aggregation){
+    logDebugging(_logger, "Validating AGGREGATION");
 
+    while (aggregation!= NULL)
+    {
+        if (aggregation->function==NULL || !validateAttributes(aggregation->attribute)){
+            logError(_logger, "Agreggation function is null or ");
 
-boolean validateAttributes(Attributes *attributes){
-    if (attributes ==NULL){
-        return true;
+            return false;
+        }
+        aggregation= aggregation->next;
     }
-//no termine
+    
+}
 
+
+bool validateAttributes(Attributes *attributes){
+     logDebugging(_logger, "Validating ATTRIBUTES");
+
+    Attributes *a = attributes;
+      if (attributes ==NULL){
+         logError(_logger, "ATTRIBUTES are null");
+
+        return false;
+        }
+    while (a!=NULL)
+    {
+        if(a->value == NULL){
+            logError(_logger, " Attribute value is null");
+
+            return false;
+        }
+        a = a->next;
+
+    }
+    return true;
 
 }
 

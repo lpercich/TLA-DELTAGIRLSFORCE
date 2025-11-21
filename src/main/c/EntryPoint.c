@@ -1,5 +1,5 @@
 #include "backend/code-generation/Generator.h"
-#include "backend/domain-specific/sql.h"
+#include "backend/domain-specific/SQL.h"
 #include "frontend/Frontend.h"
 #include "frontend/lexical-analysis/FlexActions.h"
 #include "frontend/syntactic-analysis/BisonActions.h"
@@ -16,9 +16,11 @@
 const int main(const int length, const char ** arguments) {
 	LexicalAnalyzer * lexicalAnalyzer = createLexicalAnalyzer();
 	Logger * logger = createLogger("EntryPoint");
+
 	for (int k = 0; k < length; ++k) {
 		logDebugging(logger, "Argument %d: \"%s\"", k, arguments[k]);
 	}
+
 	CompilerState compilerState = {
 		.abstractSyntaxtTree = NULL,
 		.value = 0
@@ -28,18 +30,21 @@ const int main(const int length, const char ** arguments) {
 		initializeFlexActionsModule(lexicalAnalyzer),
 		initializeBisonActionsModule(&compilerState),
 		initializeFrontendModule(lexicalAnalyzer)
-		//initializeSqlModule(),
-		//initializeGeneratorModule()
+	};
+
+	initializeSqlModule();
+	initializeGeneratorModule();
 		//estan comentadas pero ya son las que deberian estar por 
 		//ahi haya que corregirlas (no creo)
-	};
+
+
 	CompilationStatus compilationStatus = executeSyntacticAnalysis();
 	Program * program = compilerState.abstractSyntaxtTree;
 	if (compilationStatus == SUCCEEDED) {
 		// ----------------------------------------------------------------------------------------
 		// Beginning of the Backend... ------------------------------------------------------------
 	logDebugging(logger, "Starting semantic validation...");
-	boolean isValid = validateSql(program);
+	bool isValid = validateProgram(program);
 	if (!isValid) {
 		logError(logger, "Semantic validation failed.");
 		compilationStatus = FAILED;
@@ -59,6 +64,10 @@ const int main(const int length, const char ** arguments) {
 	}
 	logDebugging(logger, "Releasing AST resources...");
 	destroyProgram(program);
+
+	shutdownGeneratorModule();
+	shutdownSqlModule();
+	
 	for (int k = (sizeof(moduleDestructors)/sizeof(ModuleDestructor)) - 1; 0 <= k; --k) {
 		moduleDestructors[k]();
 	}
