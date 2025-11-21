@@ -166,7 +166,7 @@ Expression *BaseExpressionSemanticAction(char *tableName) {
 
 Attributes * AtributeSemanticAction(char * next, Attributes * list){
 		Attributes * ats= calloc(1, sizeof(Attributes));
-		 ats->value = next ? strdup(next) : NULL;                       
+		 ats->value = next;                       
 		 ats->next = list; 
 		return ats;	
 }
@@ -185,7 +185,18 @@ Aggregation * AggregationFunctionSemanticAction(char *func, char *attribute) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Aggregation *agg = calloc(1, sizeof(Aggregation));
     agg->function = func ? strdup(func) : NULL;
-    agg->attribute = (Attributes *) (attribute ? strdup(attribute): NULL);
+	if(attribute!=NULL){
+		Attributes *attr=calloc(1,sizeof(Attributes));
+		attr->value=attribute;
+		attr->next=NULL;
+
+		agg->attribute=attr;
+
+	}
+	else{
+    	agg->attribute = NULL;
+	}
+	agg->next=NULL;
     return agg;
 }
 

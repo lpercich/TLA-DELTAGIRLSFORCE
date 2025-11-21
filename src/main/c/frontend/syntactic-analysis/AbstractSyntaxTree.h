@@ -71,6 +71,7 @@ struct Attributes{
     char * value;
     Attributes * next;
 };
+
 typedef struct Aggregation {
     char *function;  
     Attributes *attribute;  

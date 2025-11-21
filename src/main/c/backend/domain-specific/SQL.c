@@ -59,7 +59,7 @@ bool validateExpression(Expression* expression){
         return false;
     }
 
-    
+
     switch (expression->type)
     {
     case SELECTION:
@@ -129,6 +129,10 @@ bool validateExpression(Expression* expression){
             return false;
         }
         return true;
+    case PRODUCT:
+        logDebugging(_logger, "Validating  PRODUCT");
+        return validateExpression(expression->binary.left) && validateExpression(expression->binary.right);
+
     default: 
         logError(_logger, "Expression has no type");
         return false;

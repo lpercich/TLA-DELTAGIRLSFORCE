@@ -150,7 +150,7 @@ void destroyAggregation(Aggregation *aggr) {
     while (aggr != NULL) {
         Aggregation *next = aggr->next;
         free(aggr->function);   
-        free(aggr->attribute);   
+        destroyAttributes(aggr->attribute);   
         free(aggr);
         aggr = next;
     }
