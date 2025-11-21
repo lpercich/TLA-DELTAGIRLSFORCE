@@ -38,16 +38,17 @@ const int main(const int length, const char ** arguments) {
 	if (compilationStatus == SUCCEEDED) {
 		// ----------------------------------------------------------------------------------------
 		// Beginning of the Backend... ------------------------------------------------------------
-		/*logDebugging(logger, "Computing expression value...");
-		ComputationResult computationResult = executeCalculator(&compilerState);
-		if (computationResult.succeeded) {
-			compilerState.value = computationResult.value;
-			executeGenerator(&compilerState);
+	logDebugging(logger, "Starting semantic validation...");
+	boolean isValid = validateSql(program);
+	if (!isValid) {
+		logError(logger, "Semantic validation failed.");
+		compilationStatus = FAILED;
+	} else {
+		logDebugging(logger, "Semantic validation succeeded.");
+		logDebugging(logger, "Generating SQL output...");
+		generate(program);
 		}
-		else {
-			logError(logger, "The computation phase rejects the input program.");
-			compilationStatus = FAILED;
-		}*/
+
 		// ...end of the Backend. -----------------------------------------------------------------
 		// ----------------------------------------------------------------------------------------
 	}

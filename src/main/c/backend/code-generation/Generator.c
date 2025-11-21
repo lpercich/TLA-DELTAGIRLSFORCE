@@ -180,7 +180,7 @@ static void _generateAggregationExpr(Expression *expr) {
     if (aggr != NULL) {
         _generateAggregationList(aggr);
     } else if (group_by == NULL) {
-        _outputSql("*");
+        _outputSql("*"); //CHEQUEAR ESTO!!!!!!!!!
     }
     _outputSql(" FROM (");
     _generateExpression(expr->aggregation.input);
