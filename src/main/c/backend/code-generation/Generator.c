@@ -163,8 +163,34 @@ static void _generateRenaming(Expression *expr) {
 }
 
 static void _generateAggregationExpr(Expression *expr) {
-//TODO
+    if (expr->aggregation.input == NULL) {
+        logError(_logger, "Aggregation expression has null input.");
+        return;
+    }
+    Attributes  *group_by = expr->aggregation.group_by;
+    Aggregation *aggr     = expr->aggregation.aggregations;
+    _outputSql("SELECT ");
+   
+    if (group_by != NULL) {
+        _generateAttributes(group_by);
+        if (aggr != NULL) {
+            _outputSql(", ");
+        }
+    }
+    if (aggr != NULL) {
+        _generateAggregationList(aggr);
+    } else if (group_by == NULL) {
+        _outputSql("*");
+    }
+    _outputSql(" FROM (");
+    _generateExpression(expr->aggregation.input);
+    _outputSql(")");
+    if (group_by != NULL) {
+        _outputSql(" GROUP BY ");
+        _generateAttributes(group_by);
+    }
 }
+
 
 static void _generateBaseTable(Expression *expr) {
 	if(expr->base.tableName == NULL) {
@@ -317,11 +343,11 @@ static void _generateAggregationList(Aggregation *aggr) {
     Aggregation *current = aggr;
     while (current != NULL) {
         if (current->function == NULL) {
-            logError(_logger, "Invalid Aggregation node: function is null.");
+            logError(_logger, "Aggregation function is null.");
             return;
         }
 		if (current->attribute == NULL) {
-            logError(_logger, "Invalid Aggregation node: attribute is null.");
+            logError(_logger, "Aggregation attribute is null.");
             return;
         }
         _outputSql("%s(", current->function);
