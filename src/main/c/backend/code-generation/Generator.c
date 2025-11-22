@@ -25,6 +25,7 @@ static void _generateUnaryCondition(Condition *cond);
 static void _generateAttributes(Attributes *attrs);
 static void _generateAggregationList(Aggregation *aggr);
 static void _generateOrder(Order *order);
+static void _generateExpressionSubquery(Expression *e);
 
 
 static void _checkNullInput(Expression * expr, char * context);
@@ -132,9 +133,9 @@ static void _generateSelection(Expression *expr) {
 		logError(_logger, "Selection expression has null condition.");
 		return;
 	}
-	_outputSql("SELECT * FROM (");
-	_generateExpression(expr->selection.input);
-	_outputSql(") WHERE ");
+	_outputSql("SELECT * FROM ");
+	_generateExpressionSubquery(expr->selection.input);
+	_outputSql(" WHERE ");
 	_generateCondition(expr->selection.condition);
 }
 
@@ -149,9 +150,8 @@ static void _generateProjection(Expression *expr) {
 	}
 	_outputSql("SELECT ");
 	_generateAttributes(expr->projection.attributes);
-	_outputSql(" FROM (");
-	_generateExpression(expr->projection.input);
-	_outputSql(")");
+	_outputSql(" FROM ");
+	_generateExpressionSubquery(expr->projection.input);
 }
 
 static void _generateRenaming(Expression *expr) {
@@ -163,9 +163,10 @@ static void _generateRenaming(Expression *expr) {
 		logError(_logger, "Renaming expression has null new name.");
 		return;
 	}
-	_outputSql("(");
-	_generateExpression(expr->renaming.input);
-	_outputSql(") AS %s", expr->renaming.newName);
+	_outputSql("SELECT * FROM ");
+	
+	_generateExpressionSubquery(expr->renaming.input);
+	_outputSql(" AS %s", expr->renaming.newName);
 }
 
 static void _generateAggregationExpr(Expression *expr) {
@@ -188,9 +189,8 @@ static void _generateAggregationExpr(Expression *expr) {
     } else if (group_by == NULL) {
         _outputSql("*"); //CHEQUEAR ESTO!!!!!!!!!
     }
-    _outputSql(" FROM (");
-    _generateExpression(expr->aggregation.input);
-    _outputSql(")");
+    _outputSql(" FROM ");
+    _generateExpressionSubquery(expr->aggregation.input);
     if (group_by != NULL) {
         _outputSql(" GROUP BY ");
         _generateAttributes(group_by);
@@ -206,6 +206,16 @@ static void _generateBaseTable(Expression *expr) {
 	_outputSql("%s", expr->base.tableName);
 }
 
+static void _generateExpressionSubquery(Expression *e) {
+    if (e->type != BASE_TABLE)
+        _outputSql("(");
+
+    _generateExpression(e);
+
+    if (e->type != BASE_TABLE)
+        _outputSql(")");
+}
+
 static void _generateJoin(Expression *expr) {
 	if(expr->join.left == NULL) {
 		logError(_logger, "Join expression has null left input.");
@@ -219,48 +229,46 @@ static void _generateJoin(Expression *expr) {
 		logError(_logger, "Join expression has null condition.");
 		return;
 	}
-	_outputSql("SELECT * FROM (");
-	_generateExpression(expr->join.left);
-	_outputSql(") JOIN (");
-	_generateExpression(expr->join.right);
-	_outputSql(") ON ");
+	_outputSql("SELECT * FROM ");
+	_generateExpressionSubquery(expr->join.left);
+	_outputSql(" JOIN ");
+	_generateExpressionSubquery(expr->join.right);
+	_outputSql(" ON ");
 	_generateCondition(expr->join.condition);
 }
 
+
+
 static void _generateUnion(Expression *expr) {
 	_checkNullInput(expr, "Union");
-	_outputSql("(");
-	_generateExpression(expr->binary.left);
-	_outputSql(") UNION (");
-	_generateExpression(expr->binary.right);
-	_outputSql(")");
+	_outputSql("SELECT * FROM ");
+	_generateExpressionSubquery(expr->binary.left);
+	_outputSql(" UNION SELECT * FROM ");
+	_generateExpressionSubquery(expr->binary.right);
 }
 
 static void _generateIntersection(Expression *expr) {
 	_checkNullInput(expr, "Intersection");
-	_outputSql("(");
-	_generateExpression(expr->binary.left);
-	_outputSql(") INTERSECT (");
-	_generateExpression(expr->binary.right);
-	_outputSql(")");
+	_outputSql("SELECT * FROM ");
+	_generateExpressionSubquery(expr->binary.left);
+	_outputSql(" INTERSECT SELECT * FROM ");
+	_generateExpressionSubquery(expr->binary.right);
 }
 
 static void _generateDiff(Expression *expr) {
 	_checkNullInput(expr, "Difference");
-	_outputSql("(");
-	_generateExpression(expr->binary.left);
-	_outputSql(") EXCEPT (");
-	_generateExpression(expr->binary.right);
-	_outputSql(")");
+	_outputSql("SELECT * FROM ");
+	_generateExpressionSubquery(expr->binary.left);
+	_outputSql(" EXCEPT SELECT * FROM ");
+	_generateExpressionSubquery(expr->binary.right);
 }
 
 static void _generateProduct(Expression *expr) {
 	_checkNullInput(expr, "Cartesian Product");
-	_outputSql("SELECT * FROM (");
-    _generateExpression(expr->binary.left);
-    _outputSql("), (");
-    _generateExpression(expr->binary.right);
-    _outputSql(")");
+	_outputSql("SELECT * FROM ");
+    _generateExpressionSubquery(expr->binary.left);
+    _outputSql(", ");
+    _generateExpressionSubquery(expr->binary.right);
 }
 
 static void _generateCondition(Condition *cond) {
@@ -375,9 +383,9 @@ static void _generateOrder(Order *order) {
 		logError(_logger, "Order has null attributes.");
 		return;
 	}
-	_outputSql("SELECT * FROM (");
-    _generateExpression(order->input);
-    _outputSql(") ORDER BY ");
+	_outputSql("SELECT * FROM ");
+    _generateExpressionSubquery(order->input);
+    _outputSql(" ORDER BY ");
 
     Attributes *attr = order->attributes;
     Directions *dir  = order->directions;
