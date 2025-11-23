@@ -26,6 +26,7 @@ static void _generateAttributes(Attributes *attrs);
 static void _generateAggregationList(Aggregation *aggr);
 static void _generateOrder(Order *order);
 static void _generateExpressionSubquery(Expression *e);
+static void _generateBinaryExpressionSubquery(Expression *e);
 
 
 static void _checkNullInput(Expression * expr, char * context);
@@ -207,14 +208,18 @@ static void _generateBaseTable(Expression *expr) {
 }
 
 static void _generateExpressionSubquery(Expression *e) {
-    if (e->type != BASE_TABLE)
+	bool cond= e->type != BASE_TABLE;
+    if (cond)
         _outputSql("(");
 
     _generateExpression(e);
 
-    if (e->type != BASE_TABLE)
+    if (cond)
         _outputSql(")");
 }
+
+
+
 
 static void _generateJoin(Expression *expr) {
 	if(expr->join.left == NULL) {
@@ -229,8 +234,7 @@ static void _generateJoin(Expression *expr) {
 		logError(_logger, "Join expression has null condition.");
 		return;
 	}
-	_outputSql("SELECT * FROM ");
-	_generateExpressionSubquery(expr->join.left);
+	_generateBinaryExpressionSubquery(expr->join.left);
 	_outputSql(" JOIN ");
 	_generateExpressionSubquery(expr->join.right);
 	_outputSql(" ON ");
@@ -241,26 +245,31 @@ static void _generateJoin(Expression *expr) {
 
 static void _generateUnion(Expression *expr) {
 	_checkNullInput(expr, "Union");
-	_outputSql("SELECT * FROM ");
-	_generateExpressionSubquery(expr->binary.left);
-	_outputSql(" UNION SELECT * FROM ");
-	_generateExpressionSubquery(expr->binary.right);
+	_generateBinaryExpressionSubquery(expr->binary.left);
+	_outputSql(" UNION ");
+	_generateBinaryExpressionSubquery(expr->binary.right);
 }
+
+static void _generateBinaryExpressionSubquery(Expression *e){
+    if (e->type == BASE_TABLE)
+       _outputSql("SELECT * FROM ");
+
+    _generateExpression(e);
+}
+
 
 static void _generateIntersection(Expression *expr) {
 	_checkNullInput(expr, "Intersection");
-	_outputSql("SELECT * FROM ");
-	_generateExpressionSubquery(expr->binary.left);
-	_outputSql(" INTERSECT SELECT * FROM ");
-	_generateExpressionSubquery(expr->binary.right);
+	_generateBinaryExpressionSubquery(expr->binary.left);
+	_outputSql(" INTERSECT ");
+	_generateBinaryExpressionSubquery(expr->binary.right);
 }
 
 static void _generateDiff(Expression *expr) {
 	_checkNullInput(expr, "Difference");
-	_outputSql("SELECT * FROM ");
-	_generateExpressionSubquery(expr->binary.left);
-	_outputSql(" EXCEPT SELECT * FROM ");
-	_generateExpressionSubquery(expr->binary.right);
+	_generateBinaryExpressionSubquery(expr->binary.left);
+	_outputSql(" EXCEPT ");
+	_generateBinaryExpressionSubquery(expr->binary.right);
 }
 
 static void _generateProduct(Expression *expr) {
