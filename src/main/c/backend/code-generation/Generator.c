@@ -383,8 +383,7 @@ static void _generateOrder(Order *order) {
 		logError(_logger, "Order has null attributes.");
 		return;
 	}
-	_outputSql("SELECT * FROM ");
-    _generateExpressionSubquery(order->input);
+	_generateExpression(order->input);
     _outputSql(" ORDER BY ");
 
     Attributes *attr = order->attributes;
