@@ -1,6 +1,6 @@
 {
   "SELECT": {
-      "=": ["producto", "'remera'"],
+      ">": ["precio", 10],
     "input": {
       "AGGREGATION": {
         "group_by": ["producto"],

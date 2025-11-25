@@ -12,6 +12,12 @@ bool validateExpression(Expression* expression);
 bool validateAttributes(Attributes *attributes);
 bool validateAggregation(Aggregation *aggregation);
 bool validateCondition(Condition* condition);
+bool validateAttsBinary(Expression * e1,Expression * e2);
+bool validateAttsSelection(Expression * expr, Condition * cond);
+void getSelectAtts(Condition * cond,Attributes ** out);
+Attributes* getGroupByAttributes(Expression * expression);
+bool expressionHasAggregation(Expression* e);
+
 
 
 
@@ -66,7 +72,8 @@ bool validateExpression(Expression* expression){
     //FALTA CHEQUEO DE SI HAY UN PROJECTION QUE LOS ATTS DE PROJECTION COINCIDAN CON LOS DE SELECTION
         logDebugging(_logger, "Validating SELECTION");
         return validateCondition(expression->selection.condition) 
-        && (validateExpression(expression->selection.input));
+        && (validateExpression(expression->selection.input))
+        && validateAttsSelection(expression->selection.input, expression->selection.condition);
             
        
         
@@ -95,8 +102,9 @@ bool validateExpression(Expression* expression){
             return false;
         }
         return validateAggregation(expression->aggregation.aggregations)
-        && validateExpression(expression->aggregation.input);
-
+        && validateExpression(expression->aggregation.input)
+        && !(expression->aggregation.aggregations == NULL && expression->aggregation.group_by == NULL) ;
+        
     case JOIN:
             logDebugging(_logger, "Validating JOIN");
 
@@ -104,25 +112,26 @@ bool validateExpression(Expression* expression){
             && validateExpression(expression->join.left) 
             && validateExpression(expression->join.right);
     case UNION:
-        logDebugging(_logger, "Validating binary UNION");
+        logDebugging(_logger, "Validating UNION");
          return (
         validateExpression(expression->binary.left) && 
-        validateExpression(expression->binary.right));
+        validateExpression(expression->binary.right)
+    && validateAttsBinary(expression->binary.left, expression->binary.right));
     case INTERSECTION:
-        logDebugging(_logger, "Validating binary INTERSECTION");
+        logDebugging(_logger, "Validating INTERSECTION");
          return (
         validateExpression(expression->binary.left) && 
-        validateExpression(expression->binary.right));
+        validateExpression(expression->binary.right)
+    && validateAttsBinary(expression->binary.left, expression->binary.right));
     case DIFF:
-        if(expression->type==DIFF){
-        logDebugging(_logger, "Validating binary DIFFERENCE");
-        }
+        logDebugging(_logger, "Validating DIFFERENCE");
 
         return (
         validateExpression(expression->binary.left) && 
-        validateExpression(expression->binary.right));
+        validateExpression(expression->binary.right)
+    && validateAttsBinary(expression->binary.left, expression->binary.right));
     case BASE_TABLE:
-        logDebugging(_logger, "Validating  TABLE");
+        logDebugging(_logger, "Validating TABLE");
 
         if( expression->base.tableName==NULL){
             logError(_logger, "No name for TABLE");
@@ -130,8 +139,9 @@ bool validateExpression(Expression* expression){
         }
         return true;
     case PRODUCT:
-        logDebugging(_logger, "Validating  PRODUCT");
-        return validateExpression(expression->binary.left) && validateExpression(expression->binary.right);
+        logDebugging(_logger, "Validating PRODUCT");
+        return validateExpression(expression->binary.left) && validateExpression(expression->binary.right)
+        && validateAttsBinary(expression->binary.left, expression->binary.right);
 
     default: 
         logError(_logger, "Expression has no type");
@@ -156,12 +166,9 @@ bool validateOrder(Order* order){
 
     if (!validateExpression(order->input))
         return false;
-    if(!expressionHasProjection(order->input))
-        return true;
 
 
     if (!validateAttsExpressionAndOrder(order)) {
-        logError(_logger, "Attribute in ORDER not in PROJECTION");
         return false;
     }
     return true;
@@ -171,19 +178,50 @@ bool validateOrder(Order* order){
 bool validateAttsExpressionAndOrder(Order* order){
     if (!order) return true;
 
-    if (!expressionHasProjection(order->input)) {
+    if (!expressionHasProjection(order->input) && !expressionHasAggregation(order->input)) {
         return true;
     }
 
     Attributes* projected= getProjectionAttributes(order->input);
+    Attributes* groupBy= getGroupByAttributes(order->input);
 
 
-    if (!attributesExist(order->attributes, projected)) {
+    if (!attributesExist(order->attributes, projected) && !attributesExist(order->attributes, groupBy)) {
+        logError(_logger, "Attributes in ORDER must be in PROJECTION or in AGGREGATION group by");
         return false;
     }
 
     return true;
 
+}
+
+bool attributesEqual(Attributes * a1, Attributes * a2){
+    Attributes *x = a1;
+    Attributes *y = a2;
+
+    while (x != NULL && y != NULL) {
+        if (strcmp(x->value, y->value) != 0)
+            return false;
+
+        x = x->next;
+        y = y->next;
+    }
+
+    return x == NULL && y == NULL;
+}
+
+bool validateAttsBinary(Expression * e1,Expression * e2){
+    Attributes* p1= getProjectionAttributes(e1);
+    Attributes* p2= getProjectionAttributes(e2);
+    if((p1 == NULL && p2 != NULL) || (p1 != NULL && p2 == NULL)){
+        return false;
+    }
+    if (!attributesEqual(p1, p2)) {
+        logError(_logger, "Attributes in binary relation must be projected in both subexpressions");
+        return false;
+    }
+
+    return true;
 }
 
 Attributes* getProjectionAttributes(Expression * expression){
@@ -219,8 +257,48 @@ Attributes* getProjectionAttributes(Expression * expression){
             }
 		    return getProjectionAttributes(expression->binary.right);
         }
-        case AGGR: //esto me da duda, podemos tener una projection adentro de una aggregation ????
+        case AGGR: 
                 return getProjectionAttributes(expression->aggregation.input);
+        default:
+            return NULL;
+    }
+}
+
+Attributes* getGroupByAttributes(Expression * expression){
+     if (!expression){
+        return NULL;
+    }
+    switch (expression->type) {
+
+
+        case SELECTION:
+            return getProjectionAttributes(expression->selection.input);
+
+        case PROJECTION:
+            return getProjectionAttributes(expression->projection.input);
+        case RHO:
+            return getProjectionAttributes(expression->renaming.input);
+        case BASE_TABLE:
+            return NULL;
+        case JOIN: {
+            Attributes *leftAttr= getProjectionAttributes(expression->join.left);
+            if(leftAttr!=NULL ){
+                return leftAttr;
+            }
+		    return getProjectionAttributes(expression->join.right);
+        }
+		case UNION:
+		case INTERSECTION:
+		case DIFF:
+        case PRODUCT:{
+			Attributes *leftAttr= getProjectionAttributes(expression->binary.left);
+            if(leftAttr!=NULL ){
+                return leftAttr;
+            }
+		    return getProjectionAttributes(expression->binary.right);
+        }
+        case AGGR: 
+                return expression->aggregation.group_by;
         default:
             return NULL;
     }
@@ -267,6 +345,29 @@ bool expressionHasProjection(Expression* e) {
     return false;
 }
 
+bool expressionHasAggregation(Expression* e) {
+    if (e) {
+        
+        switch (e->type) {
+            case PROJECTION: return expressionHasAggregation(e->projection.input);
+            case SELECTION: return expressionHasAggregation(e->selection.input); 
+            case BASE_TABLE: return false;
+            case JOIN: 
+                return expressionHasAggregation(e->join.left)
+                    || expressionHasAggregation(e->join.right);
+		case UNION:
+		case INTERSECTION:
+		case DIFF:
+        case PRODUCT:
+                return expressionHasAggregation(e->binary.left)
+                    || expressionHasAggregation(e->binary.right);
+        case AGGR:
+         return true;
+        }
+    }
+    return false;
+}
+
 
 // struct Condition {
 //     ConditionType type;
@@ -296,7 +397,7 @@ bool validateCondition(Condition* condition){
 
     if (condition==NULL)
     {
-        logError(_logger, "CONDITION is null");
+        
         return false; 
     }
     switch (condition->type)
@@ -331,6 +432,32 @@ bool validateCondition(Condition* condition){
         return false;
     }
 
+}
+void destroySelectAtts(Attributes *attrs) {
+    while (attrs != NULL) {
+        Attributes *next = attrs->next;  
+        free(attrs);
+        attrs = next;
+    }
+}
+bool validateAttsSelection(Expression * expr, Condition * cond){
+    if (!expressionHasProjection(expr) && !expressionHasAggregation(expr)) {
+        return true;
+    }
+
+    Attributes* projected= getProjectionAttributes(expr);
+    Attributes* groupBy= getGroupByAttributes(expr);
+    Attributes* selectionAtts=NULL;
+    getSelectAtts(cond, &selectionAtts);
+    
+
+    if (!attributesExist(selectionAtts, projected) && !attributesExist(selectionAtts, groupBy) ) {
+        logError(_logger, "Attributes in select must be projected or in the group by clause for Aggregation");
+        destroySelectAtts(selectionAtts);
+        return false;
+    }
+    destroySelectAtts(selectionAtts);
+    return true;
 }
 
 bool validateAggregation(Aggregation *aggregation){
@@ -372,4 +499,63 @@ bool validateAttributes(Attributes *attributes){
     return true;
 
 }
+
+bool isQuotedString(const char *s) {
+    int len = strlen(s);
+    if (len < 4) return false;
+    return ( ( s[0] == '\'') &&
+             (s[len - 1] == '\'') );
+}
+bool isNumber(const char *s) {
+    if (*s == '\0') return false;
+
+    if (*s == '-' ) s++;
+
+    bool has_digit = false;
+
+    while (*s) {
+        if (*s >= '0' && *s <= '9') {
+            has_digit = true;
+        } else {
+            return false;
+        }
+        s++;
+    }
+    return has_digit;
+}
+
+bool isColumn(const char *operand) {
+    return !isNumber(operand) && !isQuotedString(operand);
+}
+
+Attributes* AttributesList(char *next, Attributes *list) {
+    Attributes *ats = calloc(1, sizeof(Attributes));
+    ats->value = next;
+    ats->next = list;
+    return ats;
+}
+
+void getSelectAtts(Condition * cond,Attributes ** out) {
+    if (cond == NULL) return;
+
+    switch (cond->type) {
+        case COMPARISON:
+            if (isColumn(cond->comparison.leftOperand))
+                 *out= AttributesList(cond->comparison.leftOperand, *out);
+
+            if (isColumn(cond->comparison.rightOperand))
+                *out= AttributesList(cond->comparison.rightOperand, *out);
+            break;
+
+        case BINARY:
+            getSelectAtts(cond->binary.left, out);
+            getSelectAtts(cond->binary.right, out);
+            break;
+
+        case UNARY:
+            getSelectAtts(cond->unary.expr, out);
+            break;
+    }
+}
+
 

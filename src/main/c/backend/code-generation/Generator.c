@@ -188,8 +188,9 @@ static void _generateAggregationExpr(Expression *expr) {
     if (aggr != NULL) {
         _generateAggregationList(aggr);
     } else if (group_by == NULL) {
-        _outputSql("*"); //CHEQUEAR ESTO!!!!!!!!!
-    }
+        logError(_logger, "Aggregation expression must have aggregation functions or group by.");; 
+		return;
+	}
     _outputSql(" FROM ");
     _generateExpressionSubquery(expr->aggregation.input);
     if (group_by != NULL) {
@@ -314,7 +315,11 @@ static void _generateComparison(Condition *cond) {
 		logError(_logger, "Comparison condition has null operator.");
 		return;
 	}
-	_outputSql("%s %s %s", cond->comparison.leftOperand, cond->comparison.operator, cond->comparison.rightOperand);
+	
+		_outputSql("%s %s %s", cond->comparison.leftOperand, cond->comparison.operator, cond->comparison.rightOperand);
+
+	
+	
 }
 
 static void _generateBinaryCondition(Condition *cond) {

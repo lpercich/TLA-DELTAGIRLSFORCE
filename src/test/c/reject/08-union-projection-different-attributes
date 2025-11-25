@@ -1,0 +1,21 @@
+{
+    "UNION":{
+    "left": {
+       "PROJECTION":{
+      "attributes": ["nombre", "apellido"],
+      "input": {
+          "TABLE": "Persona"    
+      }
+      }
+    },
+    "right": {
+       "PROJECTION":{
+      "attributes": ["nombre"],
+      "input": {
+          "TABLE":  "Persona"
+          
+        }
+      }
+    }
+  }
+}
