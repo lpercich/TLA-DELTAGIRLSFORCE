@@ -141,6 +141,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <condition> condition
 %type <comparison> comparison
 %type <string> operator
+%type <string> aggregation_operator
 %type <program> program
 
 %type <string>     value
@@ -205,6 +206,13 @@ side_input:
 	left COLON OPEN_BRACE expression CLOSE_BRACE 											{ $$ = $4; }
 	|right COLON OPEN_BRACE expression CLOSE_BRACE 											{ $$ = $4;}
 ;
+aggregation_operator:
+    AVERAGE 																				{ $$ = "AVG"; }
+    | SUM     																				{ $$ = "SUM"; }
+    | COUNT   																				{ $$ = "COUNT"; }
+    | MIN     																				{ $$ = "MIN"; }
+    | MAX     																				{ $$ = "MAX"; }
+;
 
 aggregation_list:
     aggregation_function 																	{ $$ = $1; }
@@ -212,11 +220,7 @@ aggregation_list:
 ;
 
 aggregation_function:
-    OPEN_BRACE AVERAGE COLON STRING CLOSE_BRACE  											{ $$ = AggregationFunctionSemanticAction("AVG", $4); }
-    |OPEN_BRACE SUM COLON STRING CLOSE_BRACE  												{ $$ = AggregationFunctionSemanticAction("SUM", $4); }
-    |OPEN_BRACE COUNT COLON STRING CLOSE_BRACE 												{ $$ = AggregationFunctionSemanticAction("COUNT", $4); }
-    |OPEN_BRACE MIN COLON STRING CLOSE_BRACE  												{ $$ = AggregationFunctionSemanticAction("MIN", $4); }
-    |OPEN_BRACE MAX COLON STRING CLOSE_BRACE  												{ $$ = AggregationFunctionSemanticAction("MAX", $4); }
+	OPEN_BRACE aggregation_operator COLON STRING CLOSE_BRACE  								{ $$ = AggregationFunctionSemanticAction($2, $4); }
 ;
 
 aggregation:
