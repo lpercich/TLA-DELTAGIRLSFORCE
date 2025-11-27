@@ -34,8 +34,6 @@ const int main(const int length, const char ** arguments) {
 
 	initializeSqlModule();
 	initializeGeneratorModule();
-		//estan comentadas pero ya son las que deberian estar por 
-		//ahi haya que corregirlas (no creo)
 
 
 	CompilationStatus compilationStatus = executeSyntacticAnalysis();

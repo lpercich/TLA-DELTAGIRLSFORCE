@@ -6,17 +6,17 @@ Logger * _logger=NULL;
 
 bool validateAttsExpressionAndOrder(Order* order);
 bool expressionHasProjection(Expression* expression);
-bool attributesExist(Attributes * orderAtts, Attributes* projAtts);
+bool attributesExist(Attributes * orderAttributes, Attributes* projectionAttributes);
 Attributes* getProjectionAttributes(Expression * expression);
 bool validateExpression(Expression* expression);
 bool validateAttributes(Attributes *attributes);
 bool validateAggregation(Aggregation *aggregation);
 bool validateCondition(Condition* condition);
-bool validateAttsBinary(Expression * e1,Expression * e2);
-bool validateAttsSelection(Expression * expr, Condition * cond);
-void getSelectAtts(Condition * cond,Attributes ** out);
+bool validateAttsBinary(Expression * expression1,Expression * expression2);
+bool validateAttsSelection(Expression * expression, Condition * condition);
+void getSelectAtts(Condition * condition,Attributes ** out);
 Attributes* getGroupByAttributes(Expression * expression);
-bool expressionHasAggregation(Expression* e);
+bool expressionHasAggregation(Expression* expression);
 
 
 
@@ -152,14 +152,14 @@ bool validateExpression(Expression* expression){
 bool validateOrder(Order* order){
      logDebugging(_logger, "Validating ORDER");
 
-    Attributes* a = order->attributes;
-    Directions* d = order->directions;
+    Attributes* attribute = order->attributes;
+    Directions* direction = order->directions;
 
-    while (a && d) {
-        a = a->next;
-        d = d->next;
+    while (attribute && direction) {
+        attribute = attribute->next;
+        direction = direction->next;
     }
-    if (a || d){
+    if (attribute || direction){
         logError(_logger, "Number of attributes and directions for ORDER does not match");
         return false;
     }
@@ -195,28 +195,28 @@ bool validateAttsExpressionAndOrder(Order* order){
 
 }
 
-bool attributesEqual(Attributes * a1, Attributes * a2){
-    Attributes *x = a1;
-    Attributes *y = a2;
+bool attributesEqual(Attributes * attributes1, Attributes * attributes2){
+    Attributes *attribute1 = attributes1;
+    Attributes *attribute2 = attributes2;
 
-    while (x != NULL && y != NULL) {
-        if (strcmp(x->value, y->value) != 0)
+    while (attribute1 != NULL && attribute2 != NULL) {
+        if (strcmp(attribute1->value, attribute2->value) != 0)
             return false;
 
-        x = x->next;
-        y = y->next;
+        attribute1 = attribute1->next;
+        attribute2 = attribute2->next;
     }
 
-    return x == NULL && y == NULL;
+    return attribute1 == NULL && attribute2 == NULL;
 }
 
-bool validateAttsBinary(Expression * e1,Expression * e2){
-    Attributes* p1= getProjectionAttributes(e1);
-    Attributes* p2= getProjectionAttributes(e2);
-    if((p1 == NULL && p2 != NULL) || (p1 != NULL && p2 == NULL)){
+bool validateAttsBinary(Expression * expression1,Expression * expression2){
+    Attributes* attributes1= getProjectionAttributes(expression1);
+    Attributes* attributes2= getProjectionAttributes(expression2);
+    if((attributes1 == NULL && attributes2 != NULL) || (attributes1 != NULL && attributes2 == NULL)){
         return false;
     }
-    if (!attributesEqual(p1, p2)) {
+    if (!attributesEqual(attributes1, attributes2)) {
         logError(_logger, "Attributes in binary relation must be projected in both subexpressions");
         return false;
     }
@@ -241,9 +241,9 @@ Attributes* getProjectionAttributes(Expression * expression){
         case BASE_TABLE:
             return NULL;
         case JOIN: {
-            Attributes *leftAttr= getProjectionAttributes(expression->join.left);
-            if(leftAttr!=NULL ){
-                return leftAttr;
+            Attributes *leftAttribute= getProjectionAttributes(expression->join.left);
+            if(leftAttribute!=NULL ){
+                return leftAttribute;
             }
 		    return getProjectionAttributes(expression->join.right);
         }
@@ -251,9 +251,9 @@ Attributes* getProjectionAttributes(Expression * expression){
 		case INTERSECTION:
 		case DIFF:
         case PRODUCT:{
-			Attributes *leftAttr= getProjectionAttributes(expression->binary.left);
-            if(leftAttr!=NULL ){
-                return leftAttr;
+			Attributes *leftAttribute= getProjectionAttributes(expression->binary.left);
+            if(leftAttribute!=NULL ){
+                return leftAttribute;
             }
 		    return getProjectionAttributes(expression->binary.right);
         }
@@ -281,9 +281,9 @@ Attributes* getGroupByAttributes(Expression * expression){
         case BASE_TABLE:
             return NULL;
         case JOIN: {
-            Attributes *leftAttr= getProjectionAttributes(expression->join.left);
-            if(leftAttr!=NULL ){
-                return leftAttr;
+            Attributes *leftAttribute= getProjectionAttributes(expression->join.left);
+            if(leftAttribute!=NULL ){
+                return leftAttribute;
             }
 		    return getProjectionAttributes(expression->join.right);
         }
@@ -291,9 +291,9 @@ Attributes* getGroupByAttributes(Expression * expression){
 		case INTERSECTION:
 		case DIFF:
         case PRODUCT:{
-			Attributes *leftAttr= getProjectionAttributes(expression->binary.left);
-            if(leftAttr!=NULL ){
-                return leftAttr;
+			Attributes *leftAttribute= getProjectionAttributes(expression->binary.left);
+            if(leftAttribute!=NULL ){
+                return leftAttribute;
             }
 		    return getProjectionAttributes(expression->binary.right);
         }
@@ -304,13 +304,13 @@ Attributes* getGroupByAttributes(Expression * expression){
     }
 }
 
-bool attributesExist(Attributes * orderAtts, Attributes* projAtts){
-    for (Attributes *o = orderAtts; o != NULL; o = o->next) {
+bool attributesExist(Attributes * orderAttributes, Attributes* projectionAttributes){
+    for (Attributes *orderAttribute = orderAttributes; orderAttribute != NULL; orderAttribute = orderAttribute->next) {
         bool found = false;
 
         // Buscar o->value dentro de la lista projAtts
-        for (Attributes *p = projAtts; p != NULL; p = p->next) {
-            if (strcmp(o->value, p->value) == 0) {
+        for (Attributes *projectionAttribute = projectionAttributes; projectionAttribute != NULL; projectionAttribute = projectionAttribute->next) {
+            if (strcmp(orderAttribute->value, projectionAttribute->value) == 0) {
                 found = true;
                 break;
             }
@@ -324,43 +324,43 @@ bool attributesExist(Attributes * orderAtts, Attributes* projAtts){
 
 
 
-bool expressionHasProjection(Expression* e) {
-    if (e) {
+bool expressionHasProjection(Expression* expression) {
+    if (expression) {
         
-        switch (e->type) {
+        switch (expression->type) {
             case PROJECTION: return true;
-            case SELECTION: return expressionHasProjection(e->selection.input); 
+            case SELECTION: return expressionHasProjection(expression->selection.input); 
             case BASE_TABLE: return false;
             case JOIN: 
-                return expressionHasProjection(e->join.left)
-                    || expressionHasProjection(e->join.right);
+                return expressionHasProjection(expression->join.left)
+                    || expressionHasProjection(expression->join.right);
 		case UNION:
 		case INTERSECTION:
 		case DIFF:
         case PRODUCT:
-                return expressionHasProjection(e->binary.left)
-                    || expressionHasProjection(e->binary.right);
+                return expressionHasProjection(expression->binary.left)
+                    || expressionHasProjection(expression->binary.right);
         }
     }
     return false;
 }
 
-bool expressionHasAggregation(Expression* e) {
-    if (e) {
+bool expressionHasAggregation(Expression* expression) {
+    if (expression) {
         
-        switch (e->type) {
-            case PROJECTION: return expressionHasAggregation(e->projection.input);
-            case SELECTION: return expressionHasAggregation(e->selection.input); 
+        switch (expression->type) {
+            case PROJECTION: return expressionHasAggregation(expression->projection.input);
+            case SELECTION: return expressionHasAggregation(expression->selection.input); 
             case BASE_TABLE: return false;
             case JOIN: 
-                return expressionHasAggregation(e->join.left)
-                    || expressionHasAggregation(e->join.right);
+                return expressionHasAggregation(expression->join.left)
+                    || expressionHasAggregation(expression->join.right);
 		case UNION:
 		case INTERSECTION:
 		case DIFF:
         case PRODUCT:
-                return expressionHasAggregation(e->binary.left)
-                    || expressionHasAggregation(e->binary.right);
+                return expressionHasAggregation(expression->binary.left)
+                    || expressionHasAggregation(expression->binary.right);
         case AGGR:
          return true;
         }
@@ -433,30 +433,30 @@ bool validateCondition(Condition* condition){
     }
 
 }
-void destroySelectAtts(Attributes *attrs) {
-    while (attrs != NULL) {
-        Attributes *next = attrs->next;  
-        free(attrs);
-        attrs = next;
+void destroySelectAtts(Attributes *attributes) {
+    while (attributes != NULL) {
+        Attributes *next = attributes->next;  
+        free(attributes);
+        attributes = next;
     }
 }
-bool validateAttsSelection(Expression * expr, Condition * cond){
-    if (!expressionHasProjection(expr) && !expressionHasAggregation(expr)) {
+bool validateAttsSelection(Expression * expression, Condition * condition){
+    if (!expressionHasProjection(expression) && !expressionHasAggregation(expression)) {
         return true;
     }
 
-    Attributes* projected= getProjectionAttributes(expr);
-    Attributes* groupBy= getGroupByAttributes(expr);
-    Attributes* selectionAtts=NULL;
-    getSelectAtts(cond, &selectionAtts);
+    Attributes* projected= getProjectionAttributes(expression);
+    Attributes* groupBy= getGroupByAttributes(expression);
+    Attributes* selectionAttributes=NULL;
+    getSelectAtts(condition, &selectionAttributes);
     
 
-    if (!attributesExist(selectionAtts, projected) && !attributesExist(selectionAtts, groupBy) ) {
+    if (!attributesExist(selectionAttributes, projected) && !attributesExist(selectionAttributes, groupBy) ) {
         logError(_logger, "Attributes in select must be projected or in the group by clause for Aggregation");
-        destroySelectAtts(selectionAtts);
+        destroySelectAtts(selectionAttributes);
         return false;
     }
-    destroySelectAtts(selectionAtts);
+    destroySelectAtts(selectionAttributes);
     return true;
 }
 
@@ -466,7 +466,7 @@ bool validateAggregation(Aggregation *aggregation){
     while (aggregation!= NULL)
     {
         if (aggregation->function==NULL || !validateAttributes(aggregation->attribute)){
-            logError(_logger, "Agreggation function is null or ");
+            logError(_logger, "Agreggation function is null or  invalid.");
 
             return false;
         }
@@ -480,46 +480,46 @@ bool validateAggregation(Aggregation *aggregation){
 bool validateAttributes(Attributes *attributes){
      logDebugging(_logger, "Validating ATTRIBUTES");
 
-    Attributes *a = attributes;
+    Attributes *attribute = attributes;
       if (attributes ==NULL){
          logError(_logger, "ATTRIBUTES are null");
 
         return false;
         }
-    while (a!=NULL)
+    while (attribute!=NULL)
     {
-        if(a->value == NULL){
+        if(attribute->value == NULL){
             logError(_logger, " Attribute value is null");
 
             return false;
         }
-        a = a->next;
+        attribute = attribute->next;
 
     }
     return true;
 
 }
 
-bool isQuotedString(const char *s) {
-    int len = strlen(s);
-    if (len < 4) return false;
-    return ( ( s[0] == '\'') &&
-             (s[len - 1] == '\'') );
+bool isQuotedString(const char *string) {
+    int length = strlen(string);
+    if (length < 4) return false;
+    return ( ( string[0] == '\'') &&
+             (string[length - 1] == '\'') );
 }
-bool isNumber(const char *s) {
-    if (*s == '\0') return false;
+bool isNumber(const char *string) {
+    if (*string == '\0') return false;
 
-    if (*s == '-' ) s++;
+    if (*string == '-' ) string++;
 
     bool has_digit = false;
 
-    while (*s) {
-        if (*s >= '0' && *s <= '9') {
+    while (*string) {
+        if (*string >= '0' && *string <= '9') {
             has_digit = true;
         } else {
             return false;
         }
-        s++;
+        string++;
     }
     return has_digit;
 }
@@ -529,31 +529,31 @@ bool isColumn(const char *operand) {
 }
 
 Attributes* AttributesList(char *next, Attributes *list) {
-    Attributes *ats = calloc(1, sizeof(Attributes));
-    ats->value = next;
-    ats->next = list;
-    return ats;
+    Attributes *attributes = calloc(1, sizeof(Attributes));
+    attributes->value = next;
+    attributes->next = list;
+    return attributes;
 }
 
-void getSelectAtts(Condition * cond,Attributes ** out) {
-    if (cond == NULL) return;
+void getSelectAtts(Condition * condition,Attributes ** out) {
+    if (condition == NULL) return;
 
-    switch (cond->type) {
+    switch (condition->type) {
         case COMPARISON:
-            if (isColumn(cond->comparison.leftOperand))
-                 *out= AttributesList(cond->comparison.leftOperand, *out);
+            if (isColumn(condition->comparison.leftOperand))
+                 *out= AttributesList(condition->comparison.leftOperand, *out);
 
-            if (isColumn(cond->comparison.rightOperand))
-                *out= AttributesList(cond->comparison.rightOperand, *out);
+            if (isColumn(condition->comparison.rightOperand))
+                *out= AttributesList(condition->comparison.rightOperand, *out);
             break;
 
         case BINARY:
-            getSelectAtts(cond->binary.left, out);
-            getSelectAtts(cond->binary.right, out);
+            getSelectAtts(condition->binary.left, out);
+            getSelectAtts(condition->binary.right, out);
             break;
 
         case UNARY:
-            getSelectAtts(cond->unary.expr, out);
+            getSelectAtts(condition->unary.expr, out);
             break;
     }
 }
