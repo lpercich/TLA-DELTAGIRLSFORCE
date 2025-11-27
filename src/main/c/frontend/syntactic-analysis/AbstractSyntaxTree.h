@@ -37,7 +37,6 @@ typedef struct Directions Directions;
  * Node types for the Abstract Syntax Tree (AST).
  */
 
-
 enum ConditionType {
 	BINARY, UNARY, COMPARISON
 };
@@ -75,7 +74,7 @@ struct Attributes{
 };
 
 typedef struct Aggregation {
-    char * function;  
+    char *function;  
     Attributes *attribute;  
     struct Aggregation *next;
 } Aggregation;
@@ -188,8 +187,6 @@ struct Program {
 	Expression * expression;
     Order * order;
 };
-
-
 
 /**
  * Node recursive super-duper-trambolik-destructors.
