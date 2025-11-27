@@ -60,14 +60,14 @@ string              \"([^\\\"]|\\.)*\"
 %}
 
 
-"{"                                     {return newContextSymbolLexemeAction(OPEN_BRACE);}
-"}"                                     {return closeContextSymbolLexemeAction(CLOSE_BRACE);}
+"{"                                     { return newContextSymbolLexemeAction(OPEN_BRACE); }
+"}"                                     { return closeContextSymbolLexemeAction(CLOSE_BRACE); }
 "["						            	{ return newContextSymbolLexemeAction(OPEN_BRACKET); }
-"]"						            	{  return closeContextSymbolLexemeAction(CLOSE_BRACKET); }
+"]"						            	{ return closeContextSymbolLexemeAction(CLOSE_BRACKET); }
 "("						            	{ return SymbolLexemeAction(OPEN_PARENTHESIS); }
 ")"						            	{ return SymbolLexemeAction(CLOSE_PARENTHESIS); }
 ":"						            	{ return SymbolLexemeAction(COLON); }
-","						            	{  return SymbolLexemeAction(COMMA); }
+","						            	{ return SymbolLexemeAction(COMMA); }
 "\"PROJECTION\""                        { return SymbolLexemeAction(PROJECT); }
 "\"TABLE\""                             { return SymbolLexemeAction(TABLE); }
 "\"SELECT\""                            { return SymbolLexemeAction(SELECT); }
@@ -97,25 +97,25 @@ string              \"([^\\\"]|\\.)*\"
 "\"MAX\""                               { return SymbolLexemeAction(MAX); }
 "\"ORDER\""                             { return SymbolLexemeAction(ORDER); }
 "\"directions\""                        { return SymbolLexemeAction(DIRECTIONS); }
-"\"ASC\""                             { return SymbolLexemeAction(ASCENDANT_TOKEN); }
-"\"DESC\""                             { return SymbolLexemeAction(DESCENDANT_TOKEN); }
+"\"ASC\""                               { return SymbolLexemeAction(ASCENDANT_TOKEN); }
+"\"DESC\""                              { return SymbolLexemeAction(DESCENDANT_TOKEN); }
 
-"\"attributes\""                        {return SymbolLexemeAction(ATTRIBUTES);}
-"\"input\""                             {return SymbolLexemeAction(INPUT);}
-"\"left\""                              {return SymbolLexemeAction(left);}
-"\"right\""                             {return SymbolLexemeAction(right);}
-"\"NAME\""                              {return SymbolLexemeAction(NAME);}
+"\"attributes\""                        { return SymbolLexemeAction(ATTRIBUTES); }
+"\"input\""                             { return SymbolLexemeAction(INPUT); }
+"\"left\""                              { return SymbolLexemeAction(left); }
+"\"right\""                             { return SymbolLexemeAction(right); }
+"\"NAME\""                              { return SymbolLexemeAction(NAME); }
 
 
 [[:digit:]]+						    { return IntegerLexemeAction(); }
 
-{string}                                {return StringLexemeAction();}
+{string}                                { return StringLexemeAction(); }
 {number}                                { return IntegerLexemeAction(); }
 {whitespace}						    { return IgnoredLexemeAction(); }
 
 
 <<EOF>>								    { return EOFLexemeAction(); }
-.								    	{return UnknownLexemeAction(); }
+.								    	{ return UnknownLexemeAction(); }
 %%
 
 /**

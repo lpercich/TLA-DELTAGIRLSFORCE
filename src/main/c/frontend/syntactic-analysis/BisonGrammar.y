@@ -156,123 +156,126 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
 
-program: 
-  OPEN_BRACE expression CLOSE_BRACE											{ $$ = ExpressionProgramSemanticAction($2); }
-	|OPEN_BRACE order CLOSE_BRACE											{$$ = OrderProgramSemanticAction($2);}
+program:
+	OPEN_BRACE expression CLOSE_BRACE														{ $$ = ExpressionProgramSemanticAction($2); }
+	|OPEN_BRACE order CLOSE_BRACE															{ $$ = OrderProgramSemanticAction($2); }
 	;
 
 expression: 
-	SELECT COLON OPEN_BRACE condition COMMA input CLOSE_BRACE {$$= SelectionSemanticAction($4,$6); };
-	|PROJECT COLON OPEN_BRACE attributes_param COMMA input CLOSE_BRACE{$$= ProjectionSemanticAction($6, $4);};
-	|RENAME COLON OPEN_BRACE NAME COLON STRING COMMA input CLOSE_BRACE {$$= RenameSemanticAction($8, $6);};
+	SELECT COLON OPEN_BRACE condition COMMA input CLOSE_BRACE 								{ $$ = SelectionSemanticAction($4,$6); };
+	|PROJECT COLON OPEN_BRACE attributes_param COMMA input CLOSE_BRACE						{ $$ = ProjectionSemanticAction($6, $4); };
+	|RENAME COLON OPEN_BRACE NAME COLON STRING COMMA input CLOSE_BRACE						{ $$ = RenameSemanticAction($8, $6);};
 	|input 
-	|TABLE COLON STRING                                           { $$ = BaseExpressionSemanticAction($3); }
+	|TABLE COLON STRING                                          							{ $$ = BaseExpressionSemanticAction($3); }
 	|relation
 	|aggregation
 
-	;
+;
 
 
-input: INPUT COLON OPEN_BRACE expression CLOSE_BRACE { $$ = $4;};
+input: 
+	INPUT COLON OPEN_BRACE expression CLOSE_BRACE											{ $$ = $4;}
 
-order: ORDER COLON OPEN_BRACE attributes_param COMMA directions_param COMMA input CLOSE_BRACE { $$ = OrderSemanticAction( $4, $6, $8); }
+;
+
+order: 
+	ORDER COLON OPEN_BRACE attributes_param COMMA directions_param COMMA input CLOSE_BRACE	{ $$ = OrderSemanticAction( $4, $6, $8); }
 ;
 
 
 
 directions_param:
-    DIRECTIONS COLON OPEN_BRACKET directions_list CLOSE_BRACKET { $$ = $4; }
+	DIRECTIONS COLON OPEN_BRACKET directions_list CLOSE_BRACKET 							{ $$ = $4; }
 ;
 
 directions_list:
-      directions_item                           { $$ = $1; }
-    | directions_item COMMA directions_list     { $1->next = $3; $$ = $1; }
+	directions_item                          											 	{ $$ = $1; }
+	|directions_item COMMA directions_list     												{ $1->next = $3; $$ = $1; }
 
 ;
 
 directions_item: 
-	ASCENDANT_TOKEN                                   { $$ = DirectionsSemanticAction(ASC, NULL); }
-	|DESCENDANT_TOKEN                                   { $$ = DirectionsSemanticAction(DESC, NULL); }
-	|%empty 	                                		{ $$ = DirectionsSemanticAction(DEFAULT, NULL); }
+	ASCENDANT_TOKEN                                   										{ $$ = DirectionsSemanticAction(ASCENDANT, NULL); }
+	|DESCENDANT_TOKEN                                   									{ $$ = DirectionsSemanticAction(DESCENDANT, NULL); }
+	|%empty 	                                											{ $$ = DirectionsSemanticAction(DEFAULT, NULL); }
 ;
 
 
 side_input:
-	left COLON OPEN_BRACE expression CLOSE_BRACE { $$=$4; }
-	|right COLON OPEN_BRACE expression CLOSE_BRACE { $$=$4;}
+	left COLON OPEN_BRACE expression CLOSE_BRACE 											{ $$ = $4; }
+	|right COLON OPEN_BRACE expression CLOSE_BRACE 											{ $$ = $4;}
 ;
 
 aggregation_list:
-      aggregation_function { $$ = $1; }
-    | aggregation_list COMMA aggregation_function { $1->next = $3; $$ = $1; }
-    ;
+    aggregation_function 																	{ $$ = $1; }
+    |aggregation_list COMMA aggregation_function 											{ $1->next = $3; $$ = $1; }
+;
 
 aggregation_function:
-      OPEN_BRACE AVERAGE COLON STRING CLOSE_BRACE  { $$ = AggregationFunctionSemanticAction("AVERAGE", $4); }
-    | OPEN_BRACE SUM COLON STRING CLOSE_BRACE  { $$ = AggregationFunctionSemanticAction("SUM", $4); }
-    | OPEN_BRACE COUNT COLON STRING CLOSE_BRACE { $$ = AggregationFunctionSemanticAction("COUNT", $4); }
-    | OPEN_BRACE MIN COLON STRING CLOSE_BRACE  { $$ = AggregationFunctionSemanticAction("MIN", $4); }
-    | OPEN_BRACE MAX COLON STRING CLOSE_BRACE  { $$ = AggregationFunctionSemanticAction("MAX", $4); }
-    ;
+    OPEN_BRACE AVERAGE COLON STRING CLOSE_BRACE  											{ $$ = AggregationFunctionSemanticAction("AVG", $4); }
+    |OPEN_BRACE SUM COLON STRING CLOSE_BRACE  												{ $$ = AggregationFunctionSemanticAction("SUM", $4); }
+    |OPEN_BRACE COUNT COLON STRING CLOSE_BRACE 												{ $$ = AggregationFunctionSemanticAction("COUNT", $4); }
+    |OPEN_BRACE MIN COLON STRING CLOSE_BRACE  												{ $$ = AggregationFunctionSemanticAction("MIN", $4); }
+    |OPEN_BRACE MAX COLON STRING CLOSE_BRACE  												{ $$ = AggregationFunctionSemanticAction("MAX", $4); }
+;
 
 aggregation:
     AGGREGATION_TOKEN COLON OPEN_BRACE
-        GROUP_BY COLON OPEN_BRACKET attributes_list CLOSE_BRACKET COMMA
-        AGGREGATIONS COLON OPEN_BRACKET aggregation_list CLOSE_BRACKET COMMA
-        INPUT COLON OPEN_BRACE expression CLOSE_BRACE
-    CLOSE_BRACE { $$ = AggregationSemanticAction($7, $13, $19);};
+    GROUP_BY COLON OPEN_BRACKET attributes_list CLOSE_BRACKET COMMA
+    AGGREGATIONS COLON OPEN_BRACKET aggregation_list CLOSE_BRACKET COMMA
+    INPUT COLON OPEN_BRACE expression CLOSE_BRACE
+    CLOSE_BRACE 																			{ $$ = AggregationSemanticAction($7, $13, $19); }
+;
 
 
 condition: 
-	AND COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET	{ $$ = BinaryConditionSemanticAction($4, $6, "AND"); }
-	| OR COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET			{ $$ = BinaryConditionSemanticAction($4, $6, "OR"); }
-	| NOT COLON OPEN_BRACKET condition CLOSE_BRACKET							{ $$ = UnaryConditionSemanticAction($4); }
-	| comparison { $$ = $1; }
+	AND COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET							{ $$ = BinaryConditionSemanticAction($4, $6, "AND"); }
+	|OR COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET							{ $$ = BinaryConditionSemanticAction($4, $6, "OR"); }
+	|NOT COLON OPEN_BRACKET condition CLOSE_BRACKET											{ $$ = UnaryConditionSemanticAction($4); }
+	|comparison 																			{ $$ = $1; }
 
-	;
+;
 
 comparison:
-	 operator COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($4, $1, $6); }
+	 operator COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET	 						{ $$ = ComparisonConditionSemanticAction($4, $1, $6); }
 	
 ;
+
 operator: 
-EQUAL {$$ = "=";}
-| LOWER {$$ = "<";}
-| HIGHER {$$ = ">";}
-| LOWER_EQUAL {$$ = "<=";}
-| HIGHER_EQUAL {$$ = ">=";}
-| NOT_EQUAL {$$ = "!=";}
+	EQUAL 																					{ $$ = "="; }
+	|LOWER 																					{ $$ = "<"; }
+	|HIGHER 																				{ $$ = ">"; }
+	|LOWER_EQUAL 																			{ $$ = "<="; }
+	|HIGHER_EQUAL 																			{ $$ = ">="; }
+	|NOT_EQUAL 																				{ $$ = "!="; }
 ;
 
 relation:
-  JOIN_TOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input CLOSE_BRACE
-                                                                 { $$ = BinaryExpressionSemanticAction(JOIN, $6, $8, $4 ); }
-  | CARTESIAN_PRODUCT COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE
-                                                                 { $$ = BinaryExpressionSemanticAction(PRODUCT, $4, $6, NULL ); }
-  | UNION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE  { $$ = BinaryExpressionSemanticAction(UNION, $4, $6, NULL ); }
-  | INTERSECTION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE
-                                                                 { $$ = BinaryExpressionSemanticAction(INTERSECTION, $4, $6, NULL); }
-  | DIFFERENCE_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE { $$ = BinaryExpressionSemanticAction(DIFF, $4, $6, NULL); }
+	JOIN_TOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input CLOSE_BRACE 	{ $$ = BinaryExpressionSemanticAction(JOIN, $6, $8, $4 ); }
+	|CARTESIAN_PRODUCT COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE				{ $$ = BinaryExpressionSemanticAction(PRODUCT, $4, $6, NULL ); }
+	|UNION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE  					{ $$ = BinaryExpressionSemanticAction(UNION, $4, $6, NULL ); }
+	|INTERSECTION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE			{ $$ = BinaryExpressionSemanticAction(INTERSECTION, $4, $6, NULL); }
+  	|DIFFERENCE_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE 				{ $$ = BinaryExpressionSemanticAction(DIFF, $4, $6, NULL); }
 ;
 
 
 attributes_param:
-    ATTRIBUTES COLON OPEN_BRACKET attributes_list CLOSE_BRACKET { $$ = $4; }
+    ATTRIBUTES COLON OPEN_BRACKET attributes_list CLOSE_BRACKET 							{ $$ = $4; }
 ;
 
 attributes_list:
-      attributes_item                           { $$ = $1; }
-    | attributes_item COMMA attributes_list     { $$ = AttributesPrepend($1, $3); }
+    attributes_item                           												{ $$ = $1; }
+    |attributes_item COMMA attributes_list     												{ $$ = AttributesPrepend($1, $3); }
 ;
 
 attributes_item:
-      STRING                                    { $$ = AtributeSemanticAction($1, NULL); }
+    STRING                                   				 								{ $$ = AtributeSemanticAction($1, NULL); }
 ;
 
 value:
-	STRING 				{ $$ = $1; }
-    | INTEGER  			{$$ = IntegerSemanticAction($1);}
-    ;
+	STRING 																					{ $$ = $1; }
+    |INTEGER  																				{ $$ = IntegerSemanticAction($1); }
+;
 	
 
 
