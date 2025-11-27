@@ -21,6 +21,7 @@ typedef enum DirectionType DirectionType;
 
 
 
+
 typedef struct Constant Constant;
 typedef struct Expression Expression;
 typedef struct Condition Condition;

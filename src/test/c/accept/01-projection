@@ -1,5 +1,5 @@
 {
   "PROJECTION": {
-  "attributes": ["nombre"],
+  "attributes": ["nombre", "apellido"],
   "input": { "TABLE": "Persona" }
 }}

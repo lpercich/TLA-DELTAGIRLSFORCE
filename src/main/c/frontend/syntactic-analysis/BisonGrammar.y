@@ -140,6 +140,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 %type <condition> condition
 %type <comparison> comparison
+%type <string> operator
 %type <program> program
 
 %type <string>     value
@@ -231,13 +232,16 @@ condition:
 	;
 
 comparison:
-	 EQUAL COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($4, "=", $6); }
-	| LOWER COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($4, "<", $6); }
-	| HIGHER COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($4, ">", $6); }
-	| LOWER_EQUAL COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET { $$ = ComparisonConditionSemanticAction($4, "<=", $6); }
-	| HIGHER_EQUAL COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET { $$ = ComparisonConditionSemanticAction($4, ">=", $6); }
-	| NOT_EQUAL COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET { $$ = ComparisonConditionSemanticAction($4, "!=", $6); }
-
+	 operator COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET	 { $$ = ComparisonConditionSemanticAction($4, $1, $6); }
+	
+;
+operator: 
+EQUAL {$$ = "=";}
+| LOWER {$$ = "<";}
+| HIGHER {$$ = ">";}
+| LOWER_EQUAL {$$ = "<=";}
+| HIGHER_EQUAL {$$ = ">=";}
+| NOT_EQUAL {$$ = "!=";}
 ;
 
 relation:
@@ -258,7 +262,7 @@ attributes_param:
 
 attributes_list:
       attributes_item                           { $$ = $1; }
-    | attributes_item COMMA attributes_list     { $1->next = $3; $$ = $1; }
+    | attributes_item COMMA attributes_list     { $$ = AttributesPrepend($1, $3); }
 ;
 
 attributes_item:

@@ -165,10 +165,18 @@ Expression *BaseExpressionSemanticAction(char *tableName) {
 }
 
 Attributes * AtributeSemanticAction(char * next, Attributes * list){
+	logDebugging(_logger, "Adding %s to attributes list", next);
 		Attributes * ats= calloc(1, sizeof(Attributes));
 		 ats->value = next;                       
 		 ats->next = list; 
 		return ats;	
+}
+
+Attributes *AttributesPrepend(Attributes *item, Attributes *list) {
+	logDebugging(_logger, "Adding %s to attributes list", item->value);
+    if (item == NULL) return list;
+    item->next = list;
+    return item;
 }
 
 Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggs, Expression *input) {
@@ -217,7 +225,18 @@ Directions * DirectionsSemanticAction(DirectionType next, Directions * tail){
 
 
 char * IntegerSemanticAction(int i){
-	char buf[32];  
-	snprintf(buf, sizeof buf, "%d", i); 
-	return strdup(buf);
+	char buf[32];
+    snprintf(buf, sizeof(buf), "%d", i);
+
+    char *result = calloc(1,strlen(buf) + 1);
+    if (!result) {
+        exit(1);
+    }
+
+    strcpy(result, buf);
+    return result;
 }
+
+
+
+

@@ -43,6 +43,7 @@ Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggs, 
 Aggregation * AggregationFunctionSemanticAction(char *func, char *attribute);
 
 Attributes * AtributeSemanticAction(char * next, Attributes * list);
+Attributes *AttributesPrepend(Attributes *item, Attributes *list);
 Order * OrderSemanticAction(Attributes * atts, Directions* direction, Expression * input);
 Program * OrderProgramSemanticAction(Order * order);
 
