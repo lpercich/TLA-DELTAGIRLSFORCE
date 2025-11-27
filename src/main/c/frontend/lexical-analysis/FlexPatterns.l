@@ -44,7 +44,14 @@ extern CompilationStatus closeContextSymbolLexemeAction(TokenLabel label);
  */
 whitespace        [ \t\n\r\f\v]+
 
-number              -?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?
+digit       [0-9]
+digits      {digit}+
+sign        [+-]?
+fraction    \.{digit}+
+exponent    [eE]{sign}{digit}+
+
+number      {sign}{digits}({fraction})?({exponent})?
+
 string              \"([^\\\"]|\\.)*\"
 
 

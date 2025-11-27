@@ -223,6 +223,7 @@ aggregation_function:
 	OPEN_BRACE aggregation_operator COLON STRING CLOSE_BRACE  								{ $$ = AggregationFunctionSemanticAction($2, $4); }
 ;
 
+
 aggregation:
     AGGREGATION_TOKEN COLON OPEN_BRACE
     GROUP_BY COLON OPEN_BRACKET attributes_list CLOSE_BRACKET COMMA
