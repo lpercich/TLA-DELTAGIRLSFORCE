@@ -23,9 +23,9 @@ Expression * FactorExpressionSemanticAction(Factor * factor);
 Factor * ConstantFactorSemanticAction(Constant * constant);
 Factor * ExpressionFactorSemanticAction(Expression * expression);
 
-Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *op);
-Condition *UnaryConditionSemanticAction(Condition *expr);
-Condition *ComparisonConditionSemanticAction(char *left, char *op, char *right);
+Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *operand);
+Condition *UnaryConditionSemanticAction(Condition *expression);
+Condition *ComparisonConditionSemanticAction(char *left, char *operand, char *right);
 
 
 
@@ -34,17 +34,17 @@ Expression *BaseExpressionSemanticAction(char *tableName);
 
 Expression * SelectionSemanticAction(Condition *condition, Expression *input);
 Expression * RenameSemanticAction(Expression *input, char *newName);
-Expression * ProjectionSemanticAction(Expression *input, Attributes *atts);
+Expression * ProjectionSemanticAction(Expression *input, Attributes *attributes);
 
 Expression * BaseRelationSemanticAction(char *tableName);
-Expression * BinaryExpressionSemanticAction(ExpressionType type, Expression *left, Expression *right,Condition *cond);
+Expression * BinaryExpressionSemanticAction(ExpressionType type, Expression *left, Expression *right,Condition *condition);
 
-Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggs, Expression *input);
-Aggregation * AggregationFunctionSemanticAction(char *func, char *attribute);
+Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggregations, Expression *input);
+Aggregation * AggregationFunctionSemanticAction(char *function, char *attribute);
 
 Attributes * AtributeSemanticAction(char * next, Attributes * list);
 Attributes *AttributesPrepend(Attributes *item, Attributes *list);
-Order * OrderSemanticAction(Attributes * atts, Directions* direction, Expression * input);
+Order * OrderSemanticAction(Attributes * attributes, Directions* direction, Expression * input);
 Program * OrderProgramSemanticAction(Order * order);
 
 char * IntegerSemanticAction(int i);

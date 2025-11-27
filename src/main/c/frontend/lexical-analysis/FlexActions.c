@@ -131,10 +131,10 @@ CompilationStatus UnknownLexemeAction() {
 
 CompilationStatus StringLexemeAction() {
     Token *token = createToken(_lexicalAnalyzer, STRING);
-  	int len = strlen(token->lexeme);
-	char *clean = calloc(1, len - 1); 
-	strncpy(clean, token->lexeme + 1, len - 2);
-	clean[len - 2] = '\0';
+  	int length = strlen(token->lexeme);
+	char *clean = calloc(1, length - 1); 
+	strncpy(clean, token->lexeme + 1, length - 2);
+	clean[length - 2] = '\0';
 	token->semanticValue->string = clean;
 
 

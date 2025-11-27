@@ -43,54 +43,54 @@ Constant * IntegerConstantSemanticAction(const int value) {
 	return constant;
 }
 
-Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *op) {
+Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *operand) {
     Condition *cond = calloc(1, sizeof(Condition));
     cond->type = BINARY;
     cond->binary.left = left;
     cond->binary.right = right;
-    cond->binary.operator = strdup(op);
+    cond->binary.operator = strdup(operand);
     return cond;
 }
 
-Condition *UnaryConditionSemanticAction(Condition *expr) {
-    Condition *cond = calloc(1, sizeof(Condition));
-    cond->type = NOT;
-    cond->unary.expr = expr;
-    return cond;
+Condition *UnaryConditionSemanticAction(Condition *expression) {
+    Condition *condition = calloc(1, sizeof(Condition));
+    condition->type = NOT;
+    condition->unary.expr = expression;
+    return condition;
 }
 
-Condition *ComparisonConditionSemanticAction(char *left, char *op, char *right) {
-    Condition *cond = calloc(1, sizeof(Condition));
-    cond->type = COMPARISON;
+Condition *ComparisonConditionSemanticAction(char *left, char *operand, char *right) {
+    Condition *condition = calloc(1, sizeof(Condition));
+    condition->type = COMPARISON;
 
-    cond->comparison.leftOperand  = left ;
-    cond->comparison.operator     =  strdup(op)  ;
-    cond->comparison.rightOperand = right ;
-    return cond;
+    condition->comparison.leftOperand  = left ;
+    condition->comparison.operator     =  strdup(operand);
+    condition->comparison.rightOperand = right ;
+    return condition;
 }
 
 Expression * SelectionSemanticAction( Condition * condition, Expression *input){
-	Expression * exp = calloc(1, sizeof(Expression));
-	exp->type= SELECTION;
-	exp->selection.condition= condition; //preg si hay que reservar espacio ????
-	exp->selection.input=input;
-	return exp;
+	Expression * expression = calloc(1, sizeof(Expression));
+	expression->type= SELECTION;
+	expression->selection.condition= condition; //preg si hay que reservar espacio ????
+	expression->selection.input=input;
+	return expression;
 }
 
-Expression * ProjectionSemanticAction(Expression *input, Attributes * atts){
-	Expression * exp = calloc(1, sizeof(Expression));
-	exp->type= PROJECTION;
-	exp->projection.attributes=atts;
-	exp->projection.input=input;
-	return exp;
+Expression * ProjectionSemanticAction(Expression *input, Attributes * attributes){
+	Expression * expression = calloc(1, sizeof(Expression));
+	expression->type= PROJECTION;
+	expression->projection.attributes=attributes;
+	expression->projection.input=input;
+	return expression;
 }
 
 Expression * RenameSemanticAction(Expression* input, char * newName){
-	Expression * exp = calloc(1, sizeof(Expression));
-	exp->type=RHO;
-	exp->renaming.input=input;
-	 exp->renaming.newName = newName ;
-	return exp;
+	Expression * expression = calloc(1, sizeof(Expression));
+	expression->type=RHO;
+	expression->renaming.input=input;
+	 expression->renaming.newName = newName ;
+	return expression;
 }
 
 /*
@@ -135,41 +135,41 @@ Program * OrderProgramSemanticAction(Order * order){
 }
 
 
-Expression *BinaryExpressionSemanticAction(ExpressionType type, Expression *left, Expression *right, Condition * cond) {
-    Expression *e = calloc(1, sizeof(Expression));
-	e->type=type;
+Expression *BinaryExpressionSemanticAction(ExpressionType type, Expression *left, Expression *right, Condition * condition) {
+    Expression *expression = calloc(1, sizeof(Expression));
+	expression->type=type;
     switch (type) {
         case JOIN:
-			e->join.left = left;
-            e->join.right = right;
-            e->join.condition = cond;
+			expression->join.left = left;
+            expression->join.right = right;
+            expression->join.condition = condition;
 			break;
         case PRODUCT:
         case UNION:
         case INTERSECTION:
         case DIFF:
-            e->binary.left = left;
-            e->binary.right = right;
+            expression->binary.left = left;
+            expression->binary.right = right;
 			break;
 	}
-		return e;
+		return expression;
 }
 
 
 
 Expression *BaseExpressionSemanticAction(char *tableName) {
-    Expression *e = calloc(1, sizeof(Expression));
-    e->type = BASE_TABLE;
-    e->base.tableName = tableName ;
-    return e;
+    Expression *expression = calloc(1, sizeof(Expression));
+    expression->type = BASE_TABLE;
+    expression->base.tableName = tableName ;
+    return expression;
 }
 
 Attributes * AtributeSemanticAction(char * next, Attributes * list){
 	logDebugging(_logger, "Adding %s to attributes list", next);
-		Attributes * ats= calloc(1, sizeof(Attributes));
-		 ats->value = next;                       
-		 ats->next = list; 
-		return ats;	
+		Attributes * attributes= calloc(1, sizeof(Attributes));
+		 attributes->value = next;                       
+		 attributes->next = list; 
+		return attributes;	
 }
 
 Attributes *AttributesPrepend(Attributes *item, Attributes *list) {
@@ -179,61 +179,61 @@ Attributes *AttributesPrepend(Attributes *item, Attributes *list) {
     return item;
 }
 
-Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggs, Expression *input) {
+Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggregations, Expression *input) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
-    Expression *expr = calloc(1, sizeof(Expression));
-  	expr->type = AGGR;
-    expr->aggregation.input = input;
-    expr->aggregation.group_by = group_by;
-    expr->aggregation.aggregations = aggs;
-    return expr;
+    Expression *expression = calloc(1, sizeof(Expression));
+  	expression->type = AGGR;
+    expression->aggregation.input = input;
+    expression->aggregation.group_by = group_by;
+    expression->aggregation.aggregations = aggregations;
+    return expression;
 }
 
-Aggregation * AggregationFunctionSemanticAction(char *func, char *attribute) {
+Aggregation * AggregationFunctionSemanticAction(char *function, char *attribute) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
-    Aggregation *agg = calloc(1, sizeof(Aggregation));
-    agg->function = func ? strdup(func) : NULL;
+    Aggregation *aggregation = calloc(1, sizeof(Aggregation));
+    aggregation->function = function ? strdup(function) : NULL;
 	if(attribute!=NULL){
-		Attributes *attr=calloc(1,sizeof(Attributes));
-		attr->value=attribute;
-		attr->next=NULL;
+		Attributes *attributes=calloc(1,sizeof(Attributes));
+		attributes->value=attribute;
+		attributes->next=NULL;
 
-		agg->attribute=attr;
+		aggregation->attribute=attributes;
 
 	}
 	else{
-    	agg->attribute = NULL;
+    	aggregation->attribute = NULL;
 	}
-	agg->next=NULL;
-    return agg;
+	aggregation->next=NULL;
+    return aggregation;
 }
 
-Order * OrderSemanticAction(Attributes * atts, Directions* directions, Expression * input){
-	Order * o = calloc(1, sizeof(Order));
-	o->attributes=atts;
-	o->directions=directions;
-	o->input=input;
-	return o;
+Order * OrderSemanticAction(Attributes * attributes, Directions* directions, Expression * input){
+	Order * order = calloc(1, sizeof(Order));
+	order->attributes=attributes;
+	order->directions=directions;
+	order->input=input;
+	return order;
 }
 
 Directions * DirectionsSemanticAction(DirectionType next, Directions * tail){
-		Directions * dir= calloc(1, sizeof(Directions));
-		 dir->value = next ;                       
-		 dir->next = NULL;
-		return dir;	
+		Directions * direction = calloc(1, sizeof(Directions));
+		 direction->value = next ;                       
+		 direction->next = NULL;
+		return direction;	
 }
 
 
-char * IntegerSemanticAction(int i){
-	char buf[32];
-    snprintf(buf, sizeof(buf), "%d", i);
+char * IntegerSemanticAction(int integer){
+	char buffer[32];
+    snprintf(buffer, sizeof(buffer), "%d", integer);
 
-    char *result = calloc(1,strlen(buf) + 1);
+    char *result = calloc(1,strlen(buffer) + 1);
     if (!result) {
         exit(1);
     }
 
-    strcpy(result, buf);
+    strcpy(result, buffer);
     return result;
 }
 
