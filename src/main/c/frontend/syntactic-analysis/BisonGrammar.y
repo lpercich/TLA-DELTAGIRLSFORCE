@@ -255,7 +255,7 @@ relation:
 	|CARTESIAN_PRODUCT COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE				{ $$ = BinaryExpressionSemanticAction(PRODUCT, $4, $6, NULL ); }
 	|UNION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE  					{ $$ = BinaryExpressionSemanticAction(UNION, $4, $6, NULL ); }
 	|INTERSECTION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE			{ $$ = BinaryExpressionSemanticAction(INTERSECTION, $4, $6, NULL); }
-  	|DIFFERENCE_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE 				{ $$ = BinaryExpressionSemanticAction(DIFF, $4, $6, NULL); }
+  	|DIFFERENCE_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE 				{ $$ = BinaryExpressionSemanticAction(DIFFERENCE, $4, $6, NULL); }
 ;
 
 
