@@ -56,12 +56,12 @@ void destroyExpression(Expression *expression) {
             break;
 		case UNION:
 		case INTERSECTION:
-		case DIFF:
+		case DIFFERENCE:
         case PRODUCT:
 			destroyExpression(expression->binary.left);
 			destroyExpression(expression->binary.right);
 			break;
-        case AGGR:
+        case AGGREGATION:
                 destroyExpression(expression->aggregation.input);
                 destroyAttributes(expression->aggregation.group_by);
                 destroyAggregation(expression->aggregation.aggregations);
@@ -79,8 +79,8 @@ void destroyCondition(Condition *condition) {
 
     switch (condition->type) {
         case UNARY:
-            destroyCondition(condition->unary.expr);
-            condition->unary.expr = NULL;
+            destroyCondition(condition->unary.expression);
+            condition->unary.expression = NULL;
             break;
 
         case BINARY:
@@ -138,20 +138,20 @@ void destroyProgram(Program *program) {
     free(program);
 }
 
-void destroyAttributes(Attributes *attrs) {
-    while (attrs != NULL) {
-        Attributes *next = attrs->next;
-        free(attrs->value);   
-        free(attrs);
-        attrs = next;
+void destroyAttributes(Attributes *attributes) {
+    while (attributes != NULL) {
+        Attributes *next = attributes->next;
+        free(attributes->value);   
+        free(attributes);
+        attributes = next;
     }
 }
-void destroyAggregation(Aggregation *aggr) {
-    while (aggr != NULL) {
-        Aggregation *next = aggr->next;
-        free(aggr->function);   
-        destroyAttributes(aggr->attribute);   
-        free(aggr);
-        aggr = next;
+void destroyAggregation(Aggregation *aggregation) {
+    while (aggregation != NULL) {
+        Aggregation *next = aggregation->next;
+        free(aggregation->function);   
+        destroyAttributes(aggregation->attribute);   
+        free(aggregation);
+        aggregation = next;
     }
 }

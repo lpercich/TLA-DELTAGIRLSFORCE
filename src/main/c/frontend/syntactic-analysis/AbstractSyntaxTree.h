@@ -45,12 +45,12 @@ enum ExpressionType{
 	SELECTION,
 	PROJECTION,
 	RHO,
-    AGGR,
+    AGGREGATION,
     BASE_TABLE,
     JOIN,
 	UNION,
 	INTERSECTION,
-	DIFF,
+	DIFFERENCE,
     PRODUCT
 
 };
@@ -65,7 +65,7 @@ struct Constant {
 };
 
 enum  DirectionType{   
-    ASC, DESC, DEFAULT
+    ASCENDANT, DESCENDANT, DEFAULT
  };
 
 struct Attributes{
@@ -161,7 +161,7 @@ struct Condition {
         } binary;
 
         struct { // Unaria: solo NOT
-            Condition *expr;
+            Condition *expression;
         } unary;
     };
 };
@@ -197,8 +197,8 @@ void destroyCondition(Condition *condition);
 void destroyRelation(Relation *relation);
 void destroyExpression(Expression *expression);
 void destroyProgram(Program *program);
-void destroyAttributes(Attributes *attrs) ;
-void destroyAggregation(Aggregation *aggr);
+void destroyAttributes(Attributes *attributes) ;
+void destroyAggregation(Aggregation *aggregation);
 void destroyOrder(Order *order);
 void destroyDirections(Directions *directions);
 

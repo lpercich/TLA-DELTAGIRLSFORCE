@@ -71,10 +71,10 @@ string              \"([^\\\"]|\\.)*\"
 "\"PROJECTION\""                        { return SymbolLexemeAction(PROJECT); }
 "\"TABLE\""                             { return SymbolLexemeAction(TABLE); }
 "\"SELECT\""                            { return SymbolLexemeAction(SELECT); }
-"\"JOIN\""                              { return SymbolLexemeAction(JOINTOKEN); }
-"\"UNION\""                             { return SymbolLexemeAction(UN); }
-"\"INTERSECTION\""                      { return SymbolLexemeAction(INTER); }
-"\"DIFF\""                              { return SymbolLexemeAction(DIF); }
+"\"JOIN\""                              { return SymbolLexemeAction(JOIN_TOKEN); }
+"\"UNION\""                             { return SymbolLexemeAction(UNION_TOKEN); }
+"\"INTERSECTION\""                      { return SymbolLexemeAction(INTERSECTION_TOKEN); }
+"\"DIFF\""                              { return SymbolLexemeAction(DIFFERENCE_TOKEN); }
 "\"PRODUCT\""                           { return SymbolLexemeAction(CARTESIAN_PRODUCT);}
 "\"RHO\""                               { return SymbolLexemeAction(RENAME); }
 "\"AND\""                               { return LogicalConditionLexemeAction(AND); }
@@ -87,18 +87,18 @@ string              \"([^\\\"]|\\.)*\"
 "\"=\""                                 { return LogicalConditionLexemeAction(EQUAL); }
 "\"!=\""                                { return LogicalConditionLexemeAction(NOT_EQUAL); }
 
-"\"AGGREGATION\""                       { return SymbolLexemeAction(AGGREGATION); }
+"\"AGGREGATION\""                       { return SymbolLexemeAction(AGGREGATION_TOKEN); }
 "\"group_by\""                          { return SymbolLexemeAction(GROUP_BY); }
 "\"aggregations\""                      { return SymbolLexemeAction(AGGREGATIONS); }
-"\"AVG\""                               { return SymbolLexemeAction(AVG); }
+"\"AVG\""                               { return SymbolLexemeAction(AVERAGE); }
 "\"SUM\""                               { return SymbolLexemeAction(SUM); }
 "\"COUNT\""                             { return SymbolLexemeAction(COUNT); }
 "\"MIN\""                               { return SymbolLexemeAction(MIN); }
 "\"MAX\""                               { return SymbolLexemeAction(MAX); }
 "\"ORDER\""                             { return SymbolLexemeAction(ORDER); }
 "\"directions\""                        { return SymbolLexemeAction(DIRECTIONS); }
-"\"ASC\""                             { return SymbolLexemeAction(ASC_T); }
-"\"DESC\""                             { return SymbolLexemeAction(DESC_T); }
+"\"ASC\""                             { return SymbolLexemeAction(ASCENDANT_TOKEN); }
+"\"DESC\""                             { return SymbolLexemeAction(DESCENDANT_TOKEN); }
 
 "\"attributes\""                        {return SymbolLexemeAction(ATTRIBUTES);}
 "\"input\""                             {return SymbolLexemeAction(INPUT);}

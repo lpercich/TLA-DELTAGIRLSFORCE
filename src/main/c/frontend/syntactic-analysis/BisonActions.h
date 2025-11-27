@@ -23,9 +23,9 @@ Expression * FactorExpressionSemanticAction(Factor * factor);
 Factor * ConstantFactorSemanticAction(Constant * constant);
 Factor * ExpressionFactorSemanticAction(Expression * expression);
 
-Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *operand);
+Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *operator);
 Condition *UnaryConditionSemanticAction(Condition *expression);
-Condition *ComparisonConditionSemanticAction(char *left, char *operand, char *right);
+Condition *ComparisonConditionSemanticAction(char *left, char *operator, char *right);
 
 
 

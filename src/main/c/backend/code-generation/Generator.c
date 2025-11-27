@@ -97,7 +97,7 @@ static void _generateExpression(Expression *expression) {
 		case RHO:
 			_generateRenaming(expression);
 			break;
-		case AGGR:
+		case AGGREGATION:
 			_generateAggregationExpr(expression);
 			break;
 		case BASE_TABLE:
@@ -112,7 +112,7 @@ static void _generateExpression(Expression *expression) {
 		case INTERSECTION:
 			_generateIntersection(expression);
 			break;
-		case DIFF:
+		case DIFFERENCE:
 			_generateDiff(expression);
 			break;
 		case PRODUCT:
@@ -343,12 +343,12 @@ static void _generateBinaryCondition(Condition *condition) {
 }
 
 static void _generateUnaryCondition(Condition *condition) {
-	if(condition->unary.expr == NULL) {
+	if(condition->unary.expression == NULL) {
 		logError(_logger, "Unary condition has null expression.");
 		return;
 	}
 	_outputSql("NOT (");
-    _generateCondition(condition->unary.expr);
+    _generateCondition(condition->unary.expression);
     _outputSql(")");
 }
 
@@ -411,10 +411,10 @@ static void _generateOrder(Order *order) {
         _outputSql("%s", attribute->value);
 		      if (direction != NULL) {
             switch (direction->value) {
-                case ASC:
+                case ASCENDANT:
                     _outputSql(" ASC");
                     break;
-                case DESC:
+                case DESCENDANT:
                     _outputSql(" DESC");
                     break;
                 case DEFAULT:

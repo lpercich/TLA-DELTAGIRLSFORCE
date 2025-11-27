@@ -82,22 +82,22 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 
 %token <token> left
 %token <token> right
-%token <token> ASC_T 
-%token <token> DESC_T
+%token <token> ASCENDANT_TOKEN
+%token <token> DESCENDANT_TOKEN
 
 %token <token> COLON
 %token <token> COMMA
 
-%token <token> UN
-%token <token> INTER
-%token <token> DIF
-%token <token> JOINTOKEN
+%token <token> UNION_TOKEN
+%token <token> INTERSECTION_TOKEN
+%token <token> DIFFERENCE_TOKEN
+%token <token> JOIN_TOKEN
 %token <token> CARTESIAN_PRODUCT
 %token <token> ATTRIBUTES
-%token <token> AGGREGATION 
+%token <token> AGGREGATION_TOKEN
 %token <token> GROUP_BY 
 %token <token> AGGREGATIONS 
-%token <token> AVG
+%token <token> AVERAGE
 %token <token> SUM 
 %token <token> COUNT 
 %token <token> MIN 
@@ -191,8 +191,8 @@ directions_list:
 ;
 
 directions_item: 
-	ASC_T                                    { $$ = DirectionsSemanticAction(ASC, NULL); }
-	|DESC_T                                   { $$ = DirectionsSemanticAction(DESC, NULL); }
+	ASCENDANT_TOKEN                                   { $$ = DirectionsSemanticAction(ASC, NULL); }
+	|DESCENDANT_TOKEN                                   { $$ = DirectionsSemanticAction(DESC, NULL); }
 	|%empty 	                                		{ $$ = DirectionsSemanticAction(DEFAULT, NULL); }
 ;
 
@@ -208,7 +208,7 @@ aggregation_list:
     ;
 
 aggregation_function:
-      OPEN_BRACE AVG COLON STRING CLOSE_BRACE  { $$ = AggregationFunctionSemanticAction("AVG", $4); }
+      OPEN_BRACE AVERAGE COLON STRING CLOSE_BRACE  { $$ = AggregationFunctionSemanticAction("AVERAGE", $4); }
     | OPEN_BRACE SUM COLON STRING CLOSE_BRACE  { $$ = AggregationFunctionSemanticAction("SUM", $4); }
     | OPEN_BRACE COUNT COLON STRING CLOSE_BRACE { $$ = AggregationFunctionSemanticAction("COUNT", $4); }
     | OPEN_BRACE MIN COLON STRING CLOSE_BRACE  { $$ = AggregationFunctionSemanticAction("MIN", $4); }
@@ -216,7 +216,7 @@ aggregation_function:
     ;
 
 aggregation:
-    AGGREGATION COLON OPEN_BRACE
+    AGGREGATION_TOKEN COLON OPEN_BRACE
         GROUP_BY COLON OPEN_BRACKET attributes_list CLOSE_BRACKET COMMA
         AGGREGATIONS COLON OPEN_BRACKET aggregation_list CLOSE_BRACKET COMMA
         INPUT COLON OPEN_BRACE expression CLOSE_BRACE
@@ -245,14 +245,14 @@ EQUAL {$$ = "=";}
 ;
 
 relation:
-  JOINTOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input CLOSE_BRACE
+  JOIN_TOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input CLOSE_BRACE
                                                                  { $$ = BinaryExpressionSemanticAction(JOIN, $6, $8, $4 ); }
   | CARTESIAN_PRODUCT COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE
                                                                  { $$ = BinaryExpressionSemanticAction(PRODUCT, $4, $6, NULL ); }
-  | UN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE  { $$ = BinaryExpressionSemanticAction(UNION, $4, $6, NULL ); }
-  | INTER COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE
+  | UNION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE  { $$ = BinaryExpressionSemanticAction(UNION, $4, $6, NULL ); }
+  | INTERSECTION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE
                                                                  { $$ = BinaryExpressionSemanticAction(INTERSECTION, $4, $6, NULL); }
-  | DIF COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE { $$ = BinaryExpressionSemanticAction(DIFF, $4, $6, NULL); }
+  | DIFFERENCE_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE { $$ = BinaryExpressionSemanticAction(DIFF, $4, $6, NULL); }
 ;
 
 

@@ -95,7 +95,7 @@ bool validateExpression(Expression* expression){
         }
         return validateExpression(expression->renaming.input);
         
-    case AGGR:
+    case AGGREGATION:
 
         if(!validateAttributes(expression->aggregation.group_by)){
              logError(_logger, "Invalid attributes for AGGREGATION");
@@ -123,7 +123,7 @@ bool validateExpression(Expression* expression){
         validateExpression(expression->binary.left) && 
         validateExpression(expression->binary.right)
     && validateAttsBinary(expression->binary.left, expression->binary.right));
-    case DIFF:
+    case DIFFERENCE:
         logDebugging(_logger, "Validating DIFFERENCE");
 
         return (
@@ -249,7 +249,7 @@ Attributes* getProjectionAttributes(Expression * expression){
         }
 		case UNION:
 		case INTERSECTION:
-		case DIFF:
+		case DIFFERENCE:
         case PRODUCT:{
 			Attributes *leftAttribute= getProjectionAttributes(expression->binary.left);
             if(leftAttribute!=NULL ){
@@ -257,7 +257,7 @@ Attributes* getProjectionAttributes(Expression * expression){
             }
 		    return getProjectionAttributes(expression->binary.right);
         }
-        case AGGR: 
+        case AGGREGATION: 
                 return getProjectionAttributes(expression->aggregation.input);
         default:
             return NULL;
@@ -289,7 +289,7 @@ Attributes* getGroupByAttributes(Expression * expression){
         }
 		case UNION:
 		case INTERSECTION:
-		case DIFF:
+		case DIFFERENCE:
         case PRODUCT:{
 			Attributes *leftAttribute= getProjectionAttributes(expression->binary.left);
             if(leftAttribute!=NULL ){
@@ -297,7 +297,7 @@ Attributes* getGroupByAttributes(Expression * expression){
             }
 		    return getProjectionAttributes(expression->binary.right);
         }
-        case AGGR: 
+        case AGGREGATION: 
                 return expression->aggregation.group_by;
         default:
             return NULL;
@@ -336,7 +336,7 @@ bool expressionHasProjection(Expression* expression) {
                     || expressionHasProjection(expression->join.right);
 		case UNION:
 		case INTERSECTION:
-		case DIFF:
+		case DIFFERENCE:
         case PRODUCT:
                 return expressionHasProjection(expression->binary.left)
                     || expressionHasProjection(expression->binary.right);
@@ -357,11 +357,11 @@ bool expressionHasAggregation(Expression* expression) {
                     || expressionHasAggregation(expression->join.right);
 		case UNION:
 		case INTERSECTION:
-		case DIFF:
+		case DIFFERENCE:
         case PRODUCT:
                 return expressionHasAggregation(expression->binary.left)
                     || expressionHasAggregation(expression->binary.right);
-        case AGGR:
+        case AGGREGATION:
          return true;
         }
     }
@@ -420,7 +420,7 @@ bool validateCondition(Condition* condition){
         return true;
 
      case UNARY:
-        if (condition->unary.expr==NULL)
+        if (condition->unary.expression==NULL)
      {
         logError(_logger, "NOT CONDITION  is null");
         return false;  
@@ -553,7 +553,7 @@ void getSelectAtts(Condition * condition,Attributes ** out) {
             break;
 
         case UNARY:
-            getSelectAtts(condition->unary.expr, out);
+            getSelectAtts(condition->unary.expression, out);
             break;
     }
 }

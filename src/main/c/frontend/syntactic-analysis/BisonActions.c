@@ -43,12 +43,12 @@ Constant * IntegerConstantSemanticAction(const int value) {
 	return constant;
 }
 
-Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *operand) {
+Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *operator) {
     Condition *cond = calloc(1, sizeof(Condition));
     cond->type = BINARY;
     cond->binary.left = left;
     cond->binary.right = right;
-    cond->binary.operator = strdup(operand);
+    cond->binary.operator = strdup(operator);
     return cond;
 }
 
@@ -59,12 +59,12 @@ Condition *UnaryConditionSemanticAction(Condition *expression) {
     return condition;
 }
 
-Condition *ComparisonConditionSemanticAction(char *left, char *operand, char *right) {
+Condition *ComparisonConditionSemanticAction(char *left, char *operator, char *right) {
     Condition *condition = calloc(1, sizeof(Condition));
     condition->type = COMPARISON;
 
     condition->comparison.leftOperand  = left ;
-    condition->comparison.operator     =  strdup(operand);
+    condition->comparison.operator     =  strdup(operator);
     condition->comparison.rightOperand = right ;
     return condition;
 }
