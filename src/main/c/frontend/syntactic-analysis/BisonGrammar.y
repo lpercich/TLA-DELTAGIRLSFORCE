@@ -40,6 +40,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 	Aggregation * aggregation; /*funciones de agregacion*/
 	Order * order;
 	Directions* directions;
+	char * aggregation_operator;
 }
 
 /**
@@ -137,6 +138,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <expression> aggregation
 %type <aggregation> aggregation_function
 %type <aggregation> aggregation_list
+%type <aggregation_operator> aggregation_operator
 
 %type <condition> condition
 %type <comparison> comparison
@@ -211,13 +213,18 @@ aggregation_list:
     |aggregation_list COMMA aggregation_function 											{ $1->next = $3; $$ = $1; }
 ;
 
-aggregation_function:
-    OPEN_BRACE AVERAGE COLON STRING CLOSE_BRACE  											{ $$ = AggregationFunctionSemanticAction("AVG", $4); }
-    |OPEN_BRACE SUM COLON STRING CLOSE_BRACE  												{ $$ = AggregationFunctionSemanticAction("SUM", $4); }
-    |OPEN_BRACE COUNT COLON STRING CLOSE_BRACE 												{ $$ = AggregationFunctionSemanticAction("COUNT", $4); }
-    |OPEN_BRACE MIN COLON STRING CLOSE_BRACE  												{ $$ = AggregationFunctionSemanticAction("MIN", $4); }
-    |OPEN_BRACE MAX COLON STRING CLOSE_BRACE  												{ $$ = AggregationFunctionSemanticAction("MAX", $4); }
+aggregation_operator:
+    AVERAGE																					{ $$ = $1; }
+    |SUM       																				{ $$ = $1; }
+    |COUNT     																				{ $$ = $1; }
+    |MIN       																				{ $$ = $1; }
+    |MAX       																				{ $$ = $1; }
 ;
+
+aggregation_function:
+    OPEN_BRACE aggregation_operator COLON STRING CLOSE_BRACE { $$ = AggregationFunctionSemanticAction($2, $4); }
+;
+
 
 aggregation:
     AGGREGATION_TOKEN COLON OPEN_BRACE

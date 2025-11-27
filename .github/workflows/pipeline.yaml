@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # @see https://docs.github.com/en/actions
 # @see https://github.com/marketplace?verification=verified_creator&type=actions
 jobs:
@@ -9,9 +11,9 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: "Set execute permissions"
-        run: |
-         chmod -R u+x .
+      # - name: "Set execute permissions"
+      #   run: |
+      #    chmod -R u+x .
 
       - name: "Install."
         run: |

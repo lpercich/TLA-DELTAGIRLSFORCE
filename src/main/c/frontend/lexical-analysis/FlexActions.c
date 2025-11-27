@@ -94,6 +94,7 @@ CompilationStatus SymbolLexemeAction(TokenLabel label) {
 	return IN_PROGRESS;
 }
 
+
 CompilationStatus newContextSymbolLexemeAction(TokenLabel label){
 	Token * token = createToken(_lexicalAnalyzer, label);
 	_logTokenAction(__FUNCTION__, token);
