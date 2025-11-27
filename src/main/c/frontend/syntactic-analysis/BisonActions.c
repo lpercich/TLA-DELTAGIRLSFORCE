@@ -55,7 +55,7 @@ Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, cons
 Condition *UnaryConditionSemanticAction(Condition *expression) {
     Condition *condition = calloc(1, sizeof(Condition));
     condition->type = NOT;
-    condition->unary.expr = expression;
+    condition->unary.expression = expression;
     return condition;
 }
 
@@ -147,7 +147,7 @@ Expression *BinaryExpressionSemanticAction(ExpressionType type, Expression *left
         case PRODUCT:
         case UNION:
         case INTERSECTION:
-        case DIFF:
+        case DIFFERENCE:
             expression->binary.left = left;
             expression->binary.right = right;
 			break;
@@ -182,7 +182,7 @@ Attributes *AttributesPrepend(Attributes *item, Attributes *list) {
 Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggregations, Expression *input) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Expression *expression = calloc(1, sizeof(Expression));
-  	expression->type = AGGR;
+  	expression->type = AGGREGATION;
     expression->aggregation.input = input;
     expression->aggregation.group_by = group_by;
     expression->aggregation.aggregations = aggregations;
