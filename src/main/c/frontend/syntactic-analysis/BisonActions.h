@@ -47,6 +47,10 @@ Attributes *AttributesPrepend(Attributes *item, Attributes *list);
 Order * OrderSemanticAction(Attributes * attributes, Directions* direction, Expression * input);
 Program * OrderProgramSemanticAction(Order * order);
 
+AggregationField *makeAggregationField(AggregationFieldKind kind, void *value);
+AggregationFieldList *appendAggregationField(AggregationFieldList *list, AggregationField *field);
+Expression *buildAggregationFromFields(AggregationFieldList *list);
+
 char * IntegerSemanticAction(int i);
 
 Directions * DirectionsSemanticAction(DirectionType next, Directions * tail);

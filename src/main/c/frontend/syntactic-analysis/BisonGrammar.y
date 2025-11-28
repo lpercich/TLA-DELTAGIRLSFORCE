@@ -36,6 +36,8 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 	Condition* condition;
 	Condition * comparison;
 	Attributes * attributes;
+	AggregationField      *aggregationField;
+    AggregationFieldList  *aggregationFieldList;
 	Program * program;
 	Aggregation * aggregation; /*funciones de agregacion*/
 	Order * order;
@@ -61,9 +63,9 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %token <string> STRING
 %token <boolean> BOOL
 
-%token <token> CLOSE_BRACE  /* o sea {} */
-%token <token> CLOSE_BRACKET  /* o sea [] */
-%token <token> CLOSE_PARENTHESIS  /* o sea () */
+%token <token> CLOSE_BRACE  /* {} */
+%token <token> CLOSE_BRACKET  /* [] */
+%token <token> CLOSE_PARENTHESIS  /* () */
 %token <token> OPEN_BRACE /* {} */
 %token <token> OPEN_BRACKET /* [] */
 %token <token> OPEN_PARENTHESIS /* () */
@@ -137,6 +139,9 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <expression> aggregation
 %type <aggregation> aggregation_function
 %type <aggregation> aggregation_list
+%type <aggregationField>      aggregation_field
+%type <aggregationFieldList>  aggregation_fields
+
 
 %type <condition> condition
 %type <comparison> comparison
@@ -208,10 +213,10 @@ side_input:
 ;
 aggregation_operator:
     AVERAGE 																				{ $$ = "AVG"; }
-    | SUM     																				{ $$ = "SUM"; }
-    | COUNT   																				{ $$ = "COUNT"; }
-    | MIN     																				{ $$ = "MIN"; }
-    | MAX     																				{ $$ = "MAX"; }
+    |SUM     																				{ $$ = "SUM"; }
+    |COUNT   																				{ $$ = "COUNT"; }
+    |MIN     																				{ $$ = "MIN"; }
+    |MAX     																				{ $$ = "MAX"; }
 ;
 
 aggregation_list:
@@ -225,12 +230,20 @@ aggregation_function:
 
 
 aggregation:
-    AGGREGATION_TOKEN COLON OPEN_BRACE
-    GROUP_BY COLON OPEN_BRACKET attributes_list CLOSE_BRACKET COMMA
-    AGGREGATIONS COLON OPEN_BRACKET aggregation_list CLOSE_BRACKET COMMA
-    INPUT COLON OPEN_BRACE expression CLOSE_BRACE
-    CLOSE_BRACE 																			{ $$ = AggregationSemanticAction($7, $13, $19); }
+    AGGREGATION_TOKEN COLON OPEN_BRACE aggregation_fields CLOSE_BRACE						{ $$ = buildAggregationFromFields($4); }
 ;
+
+aggregation_fields:
+    aggregation_field
+    |aggregation_fields COMMA aggregation_field 											{ $$ = appendAggregationField($1, $3); }
+;
+
+aggregation_field:
+    GROUP_BY COLON OPEN_BRACKET attributes_list CLOSE_BRACKET								{ $$ = makeAggregationField(AGG_FIELD_GROUP_BY, $4); }
+	|AGGREGATIONS COLON OPEN_BRACKET aggregation_list CLOSE_BRACKET							{ $$ = makeAggregationField(AGG_FIELD_AGGREGATIONS, $4); }
+	|INPUT COLON OPEN_BRACE expression CLOSE_BRACE											{ $$ = makeAggregationField(AGG_FIELD_INPUT, $4); }
+;
+
 
 
 condition: 
@@ -242,7 +255,7 @@ condition:
 ;
 
 comparison:
-	 operator COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET	 						{ $$ = ComparisonConditionSemanticAction($4, $1, $6); }
+	operator COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET	 							{ $$ = ComparisonConditionSemanticAction($4, $1, $6); }
 	
 ;
 

@@ -79,6 +79,23 @@ typedef struct Aggregation {
     struct Aggregation *next;
 } Aggregation;
 
+typedef enum {
+    AGG_FIELD_GROUP_BY,
+    AGG_FIELD_AGGREGATIONS,
+    AGG_FIELD_INPUT
+} AggregationFieldKind;
+
+typedef struct AggregationField {
+    AggregationFieldKind kind;
+    void *value;
+} AggregationField;
+
+
+typedef struct AggregationFieldList {
+    AggregationField *field;
+    struct AggregationFieldList *next;
+} AggregationFieldList;
+
 struct Factor {
 	union {
 		Constant * constant;

@@ -189,6 +189,51 @@ Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggreg
     return expression;
 }
 
+AggregationField *makeAggregationField(AggregationFieldKind kind, void *value) {
+	AggregationField *field = calloc(1, sizeof(AggregationField));
+	field->kind = kind;
+	field->value = value;
+	return field;
+}
+
+AggregationFieldList *appendAggregationField(AggregationFieldList *list, AggregationField *field) {
+    if (!list) {
+        AggregationFieldList *newList = calloc(1, sizeof(AggregationFieldList));
+        newList->field = field;
+        return newList;
+    }
+    AggregationFieldList *pointerList = list;
+    while (pointerList->next) pointerList = pointerList->next;
+    pointerList->next = calloc(1, sizeof(AggregationFieldList));
+    pointerList->next->field = field;
+    return list;
+}
+Expression *buildAggregationFromFields(AggregationFieldList *list) {
+    Attributes  *group_by     = NULL;
+    Aggregation *aggregations = NULL;
+    Expression  *input        = NULL;
+
+    for (AggregationFieldList *pointerList = list; pointerList; pointerList = pointerList->next) {
+        switch (pointerList->field->kind) {
+            case AGG_FIELD_GROUP_BY:
+                group_by = pointerList->field->value;
+                break;
+
+            case AGG_FIELD_AGGREGATIONS:
+                aggregations = pointerList->field->value;
+                break;
+
+            case AGG_FIELD_INPUT:
+                input = pointerList->field->value;
+                break;
+        }
+    }
+
+    return AggregationSemanticAction(group_by, aggregations, input);
+}
+
+
+
 Aggregation * AggregationFunctionSemanticAction(char *function, char *attribute) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Aggregation *aggregation = calloc(1, sizeof(Aggregation));
