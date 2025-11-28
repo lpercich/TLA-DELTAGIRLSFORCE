@@ -142,7 +142,7 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 %type <aggregationField>      aggregation_field
 %type <aggregationFieldList>  aggregation_fields
 
-
+%type <integer> binary_relation_op
 %type <condition> condition
 %type <comparison> comparison
 %type <string> operator
@@ -234,7 +234,7 @@ aggregation:
 ;
 
 aggregation_fields:
-    aggregation_field
+    aggregation_field  																		{ $$ = calloc(1, sizeof(AggregationFieldList)); $$->field = $1; $$->next = NULL; }
     |aggregation_fields COMMA aggregation_field 											{ $$ = appendAggregationField($1, $3); }
 ;
 
@@ -267,14 +267,18 @@ operator:
 	|HIGHER_EQUAL 																			{ $$ = ">="; }
 	|NOT_EQUAL 																				{ $$ = "!="; }
 ;
+binary_relation_op:
+    UNION_TOKEN          																	{ $$ = UNION; }
+    |INTERSECTION_TOKEN   																	{ $$ = INTERSECTION; }
+    |DIFFERENCE_TOKEN     																	{ $$ = DIFFERENCE; }
+    |CARTESIAN_PRODUCT    																	{ $$ = PRODUCT; }
+;
 
 relation:
-	JOIN_TOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input CLOSE_BRACE 	{ $$ = binaryExpressionSemanticAction(JOIN, $6, $8, $4 ); }
-	|CARTESIAN_PRODUCT COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE				{ $$ = binaryExpressionSemanticAction(PRODUCT, $4, $6, NULL ); }
-	|UNION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE  					{ $$ = binaryExpressionSemanticAction(UNION, $4, $6, NULL ); }
-	|INTERSECTION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE			{ $$ = binaryExpressionSemanticAction(INTERSECTION, $4, $6, NULL); }
-  	|DIFFERENCE_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE 				{ $$ = binaryExpressionSemanticAction(DIFFERENCE, $4, $6, NULL); }
+    JOIN_TOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input CLOSE_BRACE		{ $$ = BinaryExpressionSemanticAction(JOIN, $6, $8, $4); }
+	|binary_relation_op COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE			{ $$ = BinaryExpressionSemanticAction($1, $4, $6, NULL); }
 ;
+
 
 
 attributes_param:
