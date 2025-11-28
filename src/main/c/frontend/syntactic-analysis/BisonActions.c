@@ -36,14 +36,14 @@ static void _logSyntacticAnalyzerAction(const char * functionName) {
 
 /* PUBLIC FUNCTIONS */
 
-Constant * IntegerConstantSemanticAction(const int value) {
+Constant * integerConstantSemanticAction(const int value) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Constant * constant = calloc(1, sizeof(Constant));
 	constant->value = value;
 	return constant;
 }
 
-Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *operator) {
+Condition *binaryConditionSemanticAction(Condition *left, Condition *right, const char *operator) {
     Condition *cond = calloc(1, sizeof(Condition));
     cond->type = BINARY;
     cond->binary.left = left;
@@ -52,14 +52,14 @@ Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, cons
     return cond;
 }
 
-Condition *UnaryConditionSemanticAction(Condition *expression) {
+Condition *unaryConditionSemanticAction(Condition *expression) {
     Condition *condition = calloc(1, sizeof(Condition));
     condition->type = NOT;
     condition->unary.expression = expression;
     return condition;
 }
 
-Condition *ComparisonConditionSemanticAction(char *left, char *operator, char *right) {
+Condition *comparisonConditionSemanticAction(char *left, char *operator, char *right) {
     Condition *condition = calloc(1, sizeof(Condition));
     condition->type = COMPARISON;
 
@@ -69,7 +69,7 @@ Condition *ComparisonConditionSemanticAction(char *left, char *operator, char *r
     return condition;
 }
 
-Expression * SelectionSemanticAction( Condition * condition, Expression *input){
+Expression * selectionSemanticAction( Condition * condition, Expression *input){
 	Expression * expression = calloc(1, sizeof(Expression));
 	expression->type= SELECTION;
 	expression->selection.condition= condition; //preg si hay que reservar espacio ????
@@ -77,7 +77,7 @@ Expression * SelectionSemanticAction( Condition * condition, Expression *input){
 	return expression;
 }
 
-Expression * ProjectionSemanticAction(Expression *input, Attributes * attributes){
+Expression * projectionSemanticAction(Expression *input, Attributes * attributes){
 	Expression * expression = calloc(1, sizeof(Expression));
 	expression->type= PROJECTION;
 	expression->projection.attributes=attributes;
@@ -85,7 +85,7 @@ Expression * ProjectionSemanticAction(Expression *input, Attributes * attributes
 	return expression;
 }
 
-Expression * RenameSemanticAction(Expression* input, char * newName){
+Expression * renameSemanticAction(Expression* input, char * newName){
 	Expression * expression = calloc(1, sizeof(Expression));
 	expression->type=RHO;
 	expression->renaming.input=input;
@@ -102,7 +102,7 @@ Expression * FactorExpressionSemanticAction(Factor * factor) {
 	return expression;
 }*/
 
-Factor * ConstantFactorSemanticAction(Constant * constant) {
+Factor * constantFactorSemanticAction(Constant * constant) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Factor * factor = calloc(1, sizeof(Factor));
 	factor->constant = constant;
@@ -110,7 +110,7 @@ Factor * ConstantFactorSemanticAction(Constant * constant) {
 	return factor;
 }
 
-Factor * ExpressionFactorSemanticAction(Expression * expression) {
+Factor * expressionFactorSemanticAction(Expression * expression) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Factor * factor = calloc(1, sizeof(Factor));
 	factor->expression = expression;
@@ -118,7 +118,7 @@ Factor * ExpressionFactorSemanticAction(Expression * expression) {
 	return factor;
 }
 
-Program * ExpressionProgramSemanticAction(Expression * expression) {
+Program * expressionProgramSemanticAction(Expression * expression) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Program * program = calloc(1, sizeof(Program));
 	program->expression = expression;
@@ -126,7 +126,7 @@ Program * ExpressionProgramSemanticAction(Expression * expression) {
 	return program;
 }
 
-Program * OrderProgramSemanticAction(Order * order){
+Program * orderProgramSemanticAction(Order * order){
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Program * program = calloc(1, sizeof(Program));
 	program->order = order;
@@ -135,7 +135,7 @@ Program * OrderProgramSemanticAction(Order * order){
 }
 
 
-Expression *BinaryExpressionSemanticAction(ExpressionType type, Expression *left, Expression *right, Condition * condition) {
+Expression *binaryExpressionSemanticAction(ExpressionType type, Expression *left, Expression *right, Condition * condition) {
     Expression *expression = calloc(1, sizeof(Expression));
 	expression->type=type;
     switch (type) {
@@ -157,14 +157,14 @@ Expression *BinaryExpressionSemanticAction(ExpressionType type, Expression *left
 
 
 
-Expression *BaseExpressionSemanticAction(char *tableName) {
+Expression *baseExpressionSemanticAction(char *tableName) {
     Expression *expression = calloc(1, sizeof(Expression));
     expression->type = BASE_TABLE;
     expression->base.tableName = tableName ;
     return expression;
 }
 
-Attributes * AtributeSemanticAction(char * next, Attributes * list){
+Attributes * atributeSemanticAction(char * next, Attributes * list){
 	logDebugging(_logger, "Adding %s to attributes list", next);
 		Attributes * attributes= calloc(1, sizeof(Attributes));
 		 attributes->value = next;                       
@@ -172,14 +172,14 @@ Attributes * AtributeSemanticAction(char * next, Attributes * list){
 		return attributes;	
 }
 
-Attributes *AttributesPrepend(Attributes *item, Attributes *list) {
+Attributes *attributesPrepend(Attributes *item, Attributes *list) {
 	logDebugging(_logger, "Adding %s to attributes list", item->value);
     if (item == NULL) return list;
     item->next = list;
     return item;
 }
 
-Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggregations, Expression *input) {
+Expression * aggregationSemanticAction(Attributes *group_by, Aggregation *aggregations, Expression *input) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Expression *expression = calloc(1, sizeof(Expression));
   	expression->type = AGGREGATION;
@@ -229,12 +229,12 @@ Expression *buildAggregationFromFields(AggregationFieldList *list) {
         }
     }
 
-    return AggregationSemanticAction(group_by, aggregations, input);
+    return aggregationSemanticAction(group_by, aggregations, input);
 }
 
 
 
-Aggregation * AggregationFunctionSemanticAction(char *function, char *attribute) {
+Aggregation * aggregationFunctionSemanticAction(char *function, char *attribute) {
     _logSyntacticAnalyzerAction(__FUNCTION__);
     Aggregation *aggregation = calloc(1, sizeof(Aggregation));
     aggregation->function = function ? strdup(function) : NULL;
@@ -253,7 +253,7 @@ Aggregation * AggregationFunctionSemanticAction(char *function, char *attribute)
     return aggregation;
 }
 
-Order * OrderSemanticAction(Attributes * attributes, Directions* directions, Expression * input){
+Order * orderSemanticAction(Attributes * attributes, Directions* directions, Expression * input){
 	Order * order = calloc(1, sizeof(Order));
 	order->attributes=attributes;
 	order->directions=directions;
@@ -261,7 +261,7 @@ Order * OrderSemanticAction(Attributes * attributes, Directions* directions, Exp
 	return order;
 }
 
-Directions * DirectionsSemanticAction(DirectionType next, Directions * tail){
+Directions * directionsSemanticAction(DirectionType next, Directions * tail){
 		Directions * direction = calloc(1, sizeof(Directions));
 		 direction->value = next ;                       
 		 direction->next = NULL;
@@ -269,7 +269,7 @@ Directions * DirectionsSemanticAction(DirectionType next, Directions * tail){
 }
 
 
-char * IntegerSemanticAction(int integer){
+char * integerSemanticAction(int integer){
 	char buffer[32];
     snprintf(buffer, sizeof(buffer), "%d", integer);
 

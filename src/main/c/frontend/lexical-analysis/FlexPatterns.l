@@ -17,13 +17,13 @@
  */
 
 
-extern CompilationStatus SymbolLexemeAction(TokenLabel label);
-extern CompilationStatus LogicalConditionLexemeAction(TokenLabel label);
-extern CompilationStatus StringLexemeAction();
+extern CompilationStatus symbolLexemeAction(TokenLabel label);
+extern CompilationStatus logicalConditionLexemeAction(TokenLabel label);
+extern CompilationStatus stringLexemeAction();
 extern CompilationStatus EOFLexemeAction();
-extern CompilationStatus IgnoredLexemeAction();
-extern CompilationStatus IntegerLexemeAction();
-extern CompilationStatus UnknownLexemeAction();
+extern CompilationStatus ignoredLexemeAction();
+extern CompilationStatus integerLexemeAction();
+extern CompilationStatus unknownLexemeAction();
 extern CompilationStatus newContextSymbolLexemeAction(TokenLabel label);
 extern CompilationStatus closeContextSymbolLexemeAction(TokenLabel label);
 
@@ -71,58 +71,58 @@ string              \"([^\\\"]|\\.)*\"
 "}"                                     { return closeContextSymbolLexemeAction(CLOSE_BRACE); }
 "["						            	{ return newContextSymbolLexemeAction(OPEN_BRACKET); }
 "]"						            	{ return closeContextSymbolLexemeAction(CLOSE_BRACKET); }
-"("						            	{ return SymbolLexemeAction(OPEN_PARENTHESIS); }
-")"						            	{ return SymbolLexemeAction(CLOSE_PARENTHESIS); }
-":"						            	{ return SymbolLexemeAction(COLON); }
-","						            	{ return SymbolLexemeAction(COMMA); }
-"\"PROJECTION\""                        { return SymbolLexemeAction(PROJECT); }
-"\"TABLE\""                             { return SymbolLexemeAction(TABLE); }
-"\"SELECT\""                            { return SymbolLexemeAction(SELECT); }
-"\"JOIN\""                              { return SymbolLexemeAction(JOIN_TOKEN); }
-"\"UNION\""                             { return SymbolLexemeAction(UNION_TOKEN); }
-"\"INTERSECTION\""                      { return SymbolLexemeAction(INTERSECTION_TOKEN); }
-"\"DIFF\""                              { return SymbolLexemeAction(DIFFERENCE_TOKEN); }
-"\"PRODUCT\""                           { return SymbolLexemeAction(CARTESIAN_PRODUCT);}
-"\"RHO\""                               { return SymbolLexemeAction(RENAME); }
-"\"AND\""                               { return LogicalConditionLexemeAction(AND); }
-"\"OR\""                                { return LogicalConditionLexemeAction(OR); }
-"\"NOT\""                               { return LogicalConditionLexemeAction(NOT); }
-"\"<\""                                 { return LogicalConditionLexemeAction(LOWER); }
-"\"<=\""                                { return LogicalConditionLexemeAction(LOWER_EQUAL); }
-"\">\""                                 { return LogicalConditionLexemeAction(HIGHER); }
-"\">=\""                                { return LogicalConditionLexemeAction(HIGHER_EQUAL); }
-"\"=\""                                 { return LogicalConditionLexemeAction(EQUAL); }
-"\"!=\""                                { return LogicalConditionLexemeAction(NOT_EQUAL); }
+"("						            	{ return symbolLexemeAction(OPEN_PARENTHESIS); }
+")"						            	{ return symbolLexemeAction(CLOSE_PARENTHESIS); }
+":"						            	{ return symbolLexemeAction(COLON); }
+","						            	{ return symbolLexemeAction(COMMA); }
+"\"PROJECTION\""                        { return symbolLexemeAction(PROJECT); }
+"\"TABLE\""                             { return symbolLexemeAction(TABLE); }
+"\"SELECT\""                            { return symbolLexemeAction(SELECT); }
+"\"JOIN\""                              { return symbolLexemeAction(JOIN_TOKEN); }
+"\"UNION\""                             { return symbolLexemeAction(UNION_TOKEN); }
+"\"INTERSECTION\""                      { return symbolLexemeAction(INTERSECTION_TOKEN); }
+"\"DIFF\""                              { return symbolLexemeAction(DIFFERENCE_TOKEN); }
+"\"PRODUCT\""                           { return symbolLexemeAction(CARTESIAN_PRODUCT);}
+"\"RHO\""                               { return symbolLexemeAction(RENAME); }
+"\"AND\""                               { return logicalConditionLexemeAction(AND); }
+"\"OR\""                                { return logicalConditionLexemeAction(OR); }
+"\"NOT\""                               { return logicalConditionLexemeAction(NOT); }
+"\"<\""                                 { return logicalConditionLexemeAction(LOWER); }
+"\"<=\""                                { return logicalConditionLexemeAction(LOWER_EQUAL); }
+"\">\""                                 { return logicalConditionLexemeAction(HIGHER); }
+"\">=\""                                { return logicalConditionLexemeAction(HIGHER_EQUAL); }
+"\"=\""                                 { return logicalConditionLexemeAction(EQUAL); }
+"\"!=\""                                { return logicalConditionLexemeAction(NOT_EQUAL); }
 
-"\"AGGREGATION\""                       { return SymbolLexemeAction(AGGREGATION_TOKEN); }
-"\"group_by\""                          { return SymbolLexemeAction(GROUP_BY); }
-"\"aggregations\""                      { return SymbolLexemeAction(AGGREGATIONS); }
-"\"AVG\""                               { return SymbolLexemeAction(AVERAGE); }
-"\"SUM\""                               { return SymbolLexemeAction(SUM); }
-"\"COUNT\""                             { return SymbolLexemeAction(COUNT); }
-"\"MIN\""                               { return SymbolLexemeAction(MIN); }
-"\"MAX\""                               { return SymbolLexemeAction(MAX); }
-"\"ORDER\""                             { return SymbolLexemeAction(ORDER); }
-"\"directions\""                        { return SymbolLexemeAction(DIRECTIONS); }
-"\"ASC\""                               { return SymbolLexemeAction(ASCENDANT_TOKEN); }
-"\"DESC\""                              { return SymbolLexemeAction(DESCENDANT_TOKEN); }
+"\"AGGREGATION\""                       { return symbolLexemeAction(AGGREGATION_TOKEN); }
+"\"group_by\""                          { return symbolLexemeAction(GROUP_BY); }
+"\"aggregations\""                      { return symbolLexemeAction(AGGREGATIONS); }
+"\"AVG\""                               { return symbolLexemeAction(AVERAGE); }
+"\"SUM\""                               { return symbolLexemeAction(SUM); }
+"\"COUNT\""                             { return symbolLexemeAction(COUNT); }
+"\"MIN\""                               { return symbolLexemeAction(MIN); }
+"\"MAX\""                               { return symbolLexemeAction(MAX); }
+"\"ORDER\""                             { return symbolLexemeAction(ORDER); }
+"\"directions\""                        { return symbolLexemeAction(DIRECTIONS); }
+"\"ASC\""                               { return symbolLexemeAction(ASCENDANT_TOKEN); }
+"\"DESC\""                              { return symbolLexemeAction(DESCENDANT_TOKEN); }
 
-"\"attributes\""                        { return SymbolLexemeAction(ATTRIBUTES); }
-"\"input\""                             { return SymbolLexemeAction(INPUT); }
-"\"left\""                              { return SymbolLexemeAction(left); }
-"\"right\""                             { return SymbolLexemeAction(right); }
-"\"NAME\""                              { return SymbolLexemeAction(NAME); }
+"\"attributes\""                        { return symbolLexemeAction(ATTRIBUTES); }
+"\"input\""                             { return symbolLexemeAction(INPUT); }
+"\"left\""                              { return symbolLexemeAction(left); }
+"\"right\""                             { return symbolLexemeAction(right); }
+"\"NAME\""                              { return symbolLexemeAction(NAME); }
 
 
-[[:digit:]]+						    { return IntegerLexemeAction(); }
+[[:digit:]]+						    { return integerLexemeAction(); }
 
-{string}                                { return StringLexemeAction(); }
-{number}                                { return IntegerLexemeAction(); }
-{whitespace}						    { return IgnoredLexemeAction(); }
+{string}                                { return stringLexemeAction(); }
+{number}                                { return integerLexemeAction(); }
+{whitespace}						    { return ignoredLexemeAction(); }
 
 
 <<EOF>>								    { return EOFLexemeAction(); }
-.								    	{ return UnknownLexemeAction(); }
+.								    	{ return unknownLexemeAction(); }
 %%
 
 /**

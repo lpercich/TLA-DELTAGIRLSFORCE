@@ -68,7 +68,7 @@ CompilationStatus EOFLexemeAction() {
 	return status;
 }
 
-CompilationStatus IgnoredLexemeAction() {
+CompilationStatus ignoredLexemeAction() {
 	if (_logIgnoredLexemes) {
 		Token * token = createToken(_lexicalAnalyzer, IGNORED);
 		_logTokenAction(__FUNCTION__, token);
@@ -77,7 +77,7 @@ CompilationStatus IgnoredLexemeAction() {
 	return IN_PROGRESS;
 }
 
-CompilationStatus IntegerLexemeAction() {
+CompilationStatus integerLexemeAction() {
 	Token * token = createToken(_lexicalAnalyzer, INTEGER);
 	token->semanticValue->integer = atoi(token->lexeme);
 	_logTokenAction(__FUNCTION__, token);
@@ -86,7 +86,7 @@ CompilationStatus IntegerLexemeAction() {
 	return status;
 }
 
-CompilationStatus SymbolLexemeAction(TokenLabel label) {
+CompilationStatus symbolLexemeAction(TokenLabel label) {
 	Token * token = createToken(_lexicalAnalyzer, label);
 	_logTokenAction(__FUNCTION__, token);
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
@@ -114,7 +114,7 @@ CompilationStatus closeContextSymbolLexemeAction(TokenLabel label){
 
 
 
-CompilationStatus LogicalConditionLexemeAction(TokenLabel label) {
+CompilationStatus logicalConditionLexemeAction(TokenLabel label) {
 	Token * token = createToken(_lexicalAnalyzer, label);
 	_logTokenAction(__FUNCTION__, token);
 	CompilationStatus status = pushToken(_lexicalAnalyzer, token);
@@ -122,14 +122,14 @@ CompilationStatus LogicalConditionLexemeAction(TokenLabel label) {
 	return status;
 }
 
-CompilationStatus UnknownLexemeAction() {
+CompilationStatus unknownLexemeAction() {
 	Token * token = createToken(_lexicalAnalyzer, UNKNOWN);
 	_logTokenAction(__FUNCTION__, token);
 	destroyToken(token);
 	return FAILED;
 }
 
-CompilationStatus StringLexemeAction() {
+CompilationStatus stringLexemeAction() {
     Token *token = createToken(_lexicalAnalyzer, STRING);
   	int length = strlen(token->lexeme);
 	char *clean = calloc(1, length - 1); 

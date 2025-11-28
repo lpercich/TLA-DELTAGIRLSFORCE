@@ -15,44 +15,44 @@ ModuleDestructor initializeBisonActionsModule();
 /**
  * Bison semantic actions.
  */
-Program * ExpressionProgramSemanticAction(Expression * expression);
+Program * expressionProgramSemanticAction(Expression * expression);
 
 
-Constant * IntegerConstantSemanticAction(const int value);
-Expression * FactorExpressionSemanticAction(Factor * factor);
-Factor * ConstantFactorSemanticAction(Constant * constant);
-Factor * ExpressionFactorSemanticAction(Expression * expression);
+Constant * integerConstantSemanticAction(const int value);
+Expression * factorExpressionSemanticAction(Factor * factor);
+Factor * constantFactorSemanticAction(Constant * constant);
+Factor * expressionFactorSemanticAction(Expression * expression);
 
-Condition *BinaryConditionSemanticAction(Condition *left, Condition *right, const char *operator);
-Condition *UnaryConditionSemanticAction(Condition *expression);
-Condition *ComparisonConditionSemanticAction(char *left, char *operator, char *right);
+Condition *binaryConditionSemanticAction(Condition *left, Condition *right, const char *operator);
+Condition *unaryConditionSemanticAction(Condition *expression);
+Condition *comparisonConditionSemanticAction(char *left, char *operator, char *right);
 
 
 
-Expression *BinaryRelationSemanticAction(ExpressionType type, Relation *left, Relation *right, Condition * condition);
-Expression *BaseExpressionSemanticAction(char *tableName);
+Expression *binaryRelationSemanticAction(ExpressionType type, Relation *left, Relation *right, Condition * condition);
+Expression *baseExpressionSemanticAction(char *tableName);
 
-Expression * SelectionSemanticAction(Condition *condition, Expression *input);
-Expression * RenameSemanticAction(Expression *input, char *newName);
-Expression * ProjectionSemanticAction(Expression *input, Attributes *attributes);
+Expression * selectionSemanticAction(Condition *condition, Expression *input);
+Expression * renameSemanticAction(Expression *input, char *newName);
+Expression * projectionSemanticAction(Expression *input, Attributes *attributes);
 
-Expression * BaseRelationSemanticAction(char *tableName);
-Expression * BinaryExpressionSemanticAction(ExpressionType type, Expression *left, Expression *right,Condition *condition);
+Expression * baseRelationSemanticAction(char *tableName);
+Expression * binaryExpressionSemanticAction(ExpressionType type, Expression *left, Expression *right,Condition *condition);
 
-Expression * AggregationSemanticAction(Attributes *group_by, Aggregation *aggregations, Expression *input);
-Aggregation * AggregationFunctionSemanticAction(char *function, char *attribute);
+Expression * aggregationSemanticAction(Attributes *group_by, Aggregation *aggregations, Expression *input);
+Aggregation * aggregationFunctionSemanticAction(char *function, char *attribute);
 
-Attributes * AtributeSemanticAction(char * next, Attributes * list);
-Attributes *AttributesPrepend(Attributes *item, Attributes *list);
-Order * OrderSemanticAction(Attributes * attributes, Directions* direction, Expression * input);
-Program * OrderProgramSemanticAction(Order * order);
+Attributes * atributeSemanticAction(char * next, Attributes * list);
+Attributes *attributesPrepend(Attributes *item, Attributes *list);
+Order * orderSemanticAction(Attributes * attributes, Directions* direction, Expression * input);
+Program * orderProgramSemanticAction(Order * order);
 
 AggregationField *makeAggregationField(AggregationFieldKind kind, void *value);
 AggregationFieldList *appendAggregationField(AggregationFieldList *list, AggregationField *field);
 Expression *buildAggregationFromFields(AggregationFieldList *list);
 
-char * IntegerSemanticAction(int i);
+char * integerSemanticAction(int i);
 
-Directions * DirectionsSemanticAction(DirectionType next, Directions * tail);
+Directions * directionsSemanticAction(DirectionType next, Directions * tail);
 
 #endif

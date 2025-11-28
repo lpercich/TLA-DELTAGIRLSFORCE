@@ -163,16 +163,16 @@ void yyerror(const YYLTYPE * location, const char * message) {}
 // IMPORTANT: To use λ in the following grammar, use the %empty symbol.
 
 program:
-	OPEN_BRACE expression CLOSE_BRACE														{ $$ = ExpressionProgramSemanticAction($2); }
-	|OPEN_BRACE order CLOSE_BRACE															{ $$ = OrderProgramSemanticAction($2); }
+	OPEN_BRACE expression CLOSE_BRACE														{ $$ = expressionProgramSemanticAction($2); }
+	|OPEN_BRACE order CLOSE_BRACE															{ $$ = orderProgramSemanticAction($2); }
 	;
 
 expression: 
-	SELECT COLON OPEN_BRACE condition COMMA input CLOSE_BRACE 								{ $$ = SelectionSemanticAction($4,$6); };
-	|PROJECT COLON OPEN_BRACE attributes_param COMMA input CLOSE_BRACE						{ $$ = ProjectionSemanticAction($6, $4); };
-	|RENAME COLON OPEN_BRACE NAME COLON STRING COMMA input CLOSE_BRACE						{ $$ = RenameSemanticAction($8, $6);};
+	SELECT COLON OPEN_BRACE condition COMMA input CLOSE_BRACE 								{ $$ = selectionSemanticAction($4,$6); };
+	|PROJECT COLON OPEN_BRACE attributes_param COMMA input CLOSE_BRACE						{ $$ = projectionSemanticAction($6, $4); };
+	|RENAME COLON OPEN_BRACE NAME COLON STRING COMMA input CLOSE_BRACE						{ $$ = renameSemanticAction($8, $6);};
 	|input 
-	|TABLE COLON STRING                                          							{ $$ = BaseExpressionSemanticAction($3); }
+	|TABLE COLON STRING                                          							{ $$ = baseExpressionSemanticAction($3); }
 	|relation
 	|aggregation
 
@@ -185,7 +185,7 @@ input:
 ;
 
 order: 
-	ORDER COLON OPEN_BRACE attributes_param COMMA directions_param COMMA input CLOSE_BRACE	{ $$ = OrderSemanticAction( $4, $6, $8); }
+	ORDER COLON OPEN_BRACE attributes_param COMMA directions_param COMMA input CLOSE_BRACE	{ $$ = orderSemanticAction( $4, $6, $8); }
 ;
 
 
@@ -201,9 +201,9 @@ directions_list:
 ;
 
 directions_item: 
-	ASCENDANT_TOKEN                                   										{ $$ = DirectionsSemanticAction(ASCENDANT, NULL); }
-	|DESCENDANT_TOKEN                                   									{ $$ = DirectionsSemanticAction(DESCENDANT, NULL); }
-	|%empty 	                                											{ $$ = DirectionsSemanticAction(DEFAULT, NULL); }
+	ASCENDANT_TOKEN                                   										{ $$ = directionsSemanticAction(ASCENDANT, NULL); }
+	|DESCENDANT_TOKEN                                   									{ $$ = directionsSemanticAction(DESCENDANT, NULL); }
+	|%empty 	                                											{ $$ = directionsSemanticAction(DEFAULT, NULL); }
 ;
 
 
@@ -225,7 +225,7 @@ aggregation_list:
 ;
 
 aggregation_function:
-	OPEN_BRACE aggregation_operator COLON STRING CLOSE_BRACE  								{ $$ = AggregationFunctionSemanticAction($2, $4); }
+	OPEN_BRACE aggregation_operator COLON STRING CLOSE_BRACE  								{ $$ = aggregationFunctionSemanticAction($2, $4); }
 ;
 
 
@@ -247,15 +247,15 @@ aggregation_field:
 
 
 condition: 
-	AND COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET							{ $$ = BinaryConditionSemanticAction($4, $6, "AND"); }
-	|OR COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET							{ $$ = BinaryConditionSemanticAction($4, $6, "OR"); }
-	|NOT COLON OPEN_BRACKET condition CLOSE_BRACKET											{ $$ = UnaryConditionSemanticAction($4); }
+	AND COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET							{ $$ = binaryConditionSemanticAction($4, $6, "AND"); }
+	|OR COLON OPEN_BRACKET condition COMMA condition CLOSE_BRACKET							{ $$ = binaryConditionSemanticAction($4, $6, "OR"); }
+	|NOT COLON OPEN_BRACKET condition CLOSE_BRACKET											{ $$ = unaryConditionSemanticAction($4); }
 	|comparison 																			{ $$ = $1; }
 
 ;
 
 comparison:
-	operator COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET	 							{ $$ = ComparisonConditionSemanticAction($4, $1, $6); }
+	operator COLON OPEN_BRACKET value COMMA value CLOSE_BRACKET	 							{ $$ = comparisonConditionSemanticAction($4, $1, $6); }
 	
 ;
 
@@ -269,11 +269,11 @@ operator:
 ;
 
 relation:
-	JOIN_TOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input CLOSE_BRACE 	{ $$ = BinaryExpressionSemanticAction(JOIN, $6, $8, $4 ); }
-	|CARTESIAN_PRODUCT COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE				{ $$ = BinaryExpressionSemanticAction(PRODUCT, $4, $6, NULL ); }
-	|UNION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE  					{ $$ = BinaryExpressionSemanticAction(UNION, $4, $6, NULL ); }
-	|INTERSECTION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE			{ $$ = BinaryExpressionSemanticAction(INTERSECTION, $4, $6, NULL); }
-  	|DIFFERENCE_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE 				{ $$ = BinaryExpressionSemanticAction(DIFFERENCE, $4, $6, NULL); }
+	JOIN_TOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input CLOSE_BRACE 	{ $$ = binaryExpressionSemanticAction(JOIN, $6, $8, $4 ); }
+	|CARTESIAN_PRODUCT COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE				{ $$ = binaryExpressionSemanticAction(PRODUCT, $4, $6, NULL ); }
+	|UNION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE  					{ $$ = binaryExpressionSemanticAction(UNION, $4, $6, NULL ); }
+	|INTERSECTION_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE			{ $$ = binaryExpressionSemanticAction(INTERSECTION, $4, $6, NULL); }
+  	|DIFFERENCE_TOKEN COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE 				{ $$ = binaryExpressionSemanticAction(DIFFERENCE, $4, $6, NULL); }
 ;
 
 
@@ -283,16 +283,16 @@ attributes_param:
 
 attributes_list:
     attributes_item                           												{ $$ = $1; }
-    |attributes_item COMMA attributes_list     												{ $$ = AttributesPrepend($1, $3); }
+    |attributes_item COMMA attributes_list     												{ $$ = attributesPrepend($1, $3); }
 ;
 
 attributes_item:
-    STRING                                   				 								{ $$ = AtributeSemanticAction($1, NULL); }
+    STRING                                   				 								{ $$ = atributeSemanticAction($1, NULL); }
 ;
 
 value:
 	STRING 																					{ $$ = $1; }
-    |INTEGER  																				{ $$ = IntegerSemanticAction($1); }
+    |INTEGER  																				{ $$ = integerSemanticAction($1); }
 ;
 	
 
