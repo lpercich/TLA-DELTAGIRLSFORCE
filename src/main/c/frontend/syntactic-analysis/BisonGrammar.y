@@ -275,8 +275,8 @@ binary_relation_op:
 ;
 
 relation:
-    JOIN_TOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input CLOSE_BRACE		{ $$ = BinaryExpressionSemanticAction(JOIN, $6, $8, $4); }
-	|binary_relation_op COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE			{ $$ = BinaryExpressionSemanticAction($1, $4, $6, NULL); }
+    JOIN_TOKEN COLON OPEN_BRACE condition COMMA side_input COMMA side_input CLOSE_BRACE		{ $$ = binaryExpressionSemanticAction(JOIN, $6, $8, $4); }
+	|binary_relation_op COLON OPEN_BRACE side_input COMMA side_input CLOSE_BRACE			{ $$ = binaryExpressionSemanticAction($1, $4, $6, NULL); }
 ;
 
 
