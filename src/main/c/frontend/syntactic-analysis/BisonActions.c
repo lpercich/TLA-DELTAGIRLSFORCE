@@ -216,20 +216,30 @@ Expression *buildAggregationFromFields(AggregationFieldList *list) {
     for (AggregationFieldList *pointerList = list; pointerList; pointerList = pointerList->next) {
         switch (pointerList->field->kind) {
             case AGG_FIELD_GROUP_BY:
-                group_by = pointerList->field->value;
+                group_by = (Attributes *)pointerList->field->value;
                 break;
 
             case AGG_FIELD_AGGREGATIONS:
-                aggregations = pointerList->field->value;
+                aggregations = (Aggregation *)pointerList->field->value;
                 break;
 
             case AGG_FIELD_INPUT:
-                input = pointerList->field->value;
+                input = (Expression *)pointerList->field->value;
                 break;
         }
     }
 
-    return aggregationSemanticAction(group_by, aggregations, input);
+    Expression *expr = aggregationSemanticAction(group_by, aggregations, input);
+
+    AggregationFieldList *curr = list;
+    while (curr) {
+        AggregationFieldList *next = curr->next;
+        free(curr->field);  
+        free(curr);
+        curr = next;
+    }
+
+    return expr;
 }
 
 
